@@ -1,0 +1,486 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Retro Player - Home</title>
+
+  <!-- Fuentes e Iconos -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Hoja de Estilos Principal -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- ENCABEZADO (HEADER) -->
+  <header class="header">
+    <div class="header-container">
+        
+      <!-- Izquierda: Menú Hamburguesa & Logo -->
+      <div class="header-left">
+        <button id="menu-btn" aria-label="Abrir menú" class="btn-icon" onclick="toggleDropdown('categoriesDropdown')">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <a href="index.html" class="brand-logo">
+          <div class="logo-icon">
+            <img class="logo_header" src="img/Logo Header.png" alt="Logo header">
+          </div>
+          <span class="brand-name">RETRO <span class="white-text">PLAYER</span></span>
+        </a>
+      </div>
+
+      <!-- Centro: Barra de Búsqueda -->
+      <div class="search-container">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input type="text" id="search-input" placeholder="¿Qué juego buscás?" class="search-input">
+      </div>
+
+      <!-- Derecha: Perfil de Usuario -->
+      <div class="header-right">
+        <button id="profile-btn" class="profile-dropdown-btn" onclick="toggleDropdown('userDropdown')">
+          <i class="fa-solid fa-chevron-down arrow-icon"></i>
+          <div>
+            <img class="logo_usuario" src="img/Logo Usuario.png" alt="Logo Usuario">
+          </div>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- BREADCRUMB -->
+  <nav class="breadcrumb-container">
+    <span class="breadcrumb-current">Home <i class="fa-solid fa-play breadcrumb-separator"></i></span>
+  </nav>
+
+  <!-- CONTENIDO PRINCIPAL (LAYOUT EN 2 COLUMNAS) -->
+  <div class="main-layout">
+    
+    <!-- COLUMNA IZQUIERDA: CONTENIDO DEL HOME -->
+    <main class="content-column">
+      
+      <!-- SECCIÓN JUEGO DESTACADO DEL AÑO -->
+      <section class="featured-section">
+        <h2 class="section-title">Juego destacado del año</h2>
+        <div class="featured-card">
+          <div class="featured-banner-img">
+            <img src="img/Home Peg Solitary.png" alt="Pegs On Neon Cover">
+          </div>
+          <div class="featured-info">
+            <h3 class="featured-title">PEGS ON NEON: THE CIRCUIT SOLITAIRE</h3>
+            <p class="featured-desc">El solitario de circuito más adictivo. ¡Desafía tu mente en pixel art!</p>
+            <ul class="featured-bullets">
+              <li>👾 Estética retro-cyberpunk en pixel art</li>
+              <li>🧩 Más de 100 niveles de pura estrategia</li>
+              <li>🏆 ¡Desafíos semanales y récord de puntuación!</li>
+            </ul>
+            <a href="juego.html" class="btn-play">Jugar Ahora</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- CARRUSEL: JUEGOS NUEVOS -->
+      <section class="carousel-section">
+        <h2 class="section-title">Juegos Nuevos</h2>
+        <div class="carousel-wrapper">
+          <button type="button" class="carousel-btn prev" onclick="scrollCarousel('c1', -1)" aria-label="Anterior"><img src="img/carrusel/vector desplazamiento izquierda.png" alt="Anterior"></button>
+          <div class="carousel-viewport">
+          <div class="carousel-track" id="c1">
+            <div class="game-card">
+              <img src="img/carrusel/super mario.png" alt="Super Mario Bros">
+              <span class="game-name">SUPER MARIO B.</span>
+            </div>
+            <div class="game-card featured-badge">
+              <span class="badge">DESTACADO</span>
+              <img src="img/carrusel/mortal kombat 2.png" alt="Mortal Kombat">
+              <span class="game-name">MORTAL KOMBAT</span>
+            </div>
+            <div class="game-card">
+              <img src="img/carrusel/zelda.png" alt="Zelda">
+              <span class="game-name">ZELDA</span>
+            </div>
+            <div class="game-card">
+              <img src="img/carrusel/pacman.png" alt="Pac-Man">
+              <span class="game-name">PAC-MAN</span>
+            </div>
+            <div class="game-card">
+              <img src="img/carrusel/sonic.png" alt="Sonic">
+              <span class="game-name">SONIC</span>
+            </div>
+                      <div class="game-card">
+              <img loading="lazy" src="img/carrusel/contra.png" alt="Contra">
+              <span class="game-name">CONTRA</span>
+            </div>
+            <div class="game-card">
+              <img loading="lazy" src="https://picsum.photos/id/1036/200/130" alt="Bomberman">
+              <span class="game-name">BOMBERMAN</span>
+            </div>
+            <div class="game-card">
+              <img loading="lazy" src="https://picsum.photos/id/1039/200/130" alt="Donkey Kong Country">
+              <span class="game-name">DONKEY KONG COUNTRY</span>
+            </div></div>
+          </div>
+          <button type="button" class="carousel-btn next" onclick="scrollCarousel('c1', 1)" aria-label="Siguiente"><img src="img/carrusel/vector desplazmiento derecha.png" alt="Siguiente"></button>
+        </div>
+      </section>
+
+      <!-- CARRUSEL: JUEGOS POPULARES -->
+      <section class="carousel-section">
+        <h2 class="section-title">Juegos Populares</h2>
+        <div class="carousel-wrapper">
+          <button type="button" class="carousel-btn prev" onclick="scrollCarousel('c2', -1)" aria-label="Anterior"><img src="img/carrusel/vector desplazamiento izquierda.png" alt="Anterior"></button>
+          <div class="carousel-viewport">
+          <div class="carousel-track" id="c2">
+            <div class="game-card">
+              <img src="https://picsum.photos/id/1040/200/130" alt="Doom">
+              <span class="game-name">DOOM</span>
+            </div>
+            <div class="game-card featured-badge">
+              <span class="badge">DESTACADO</span>
+              <img src="img/carrusel/mortal kombat 2.png" alt="Mortal Kombat">
+              <span class="game-name">MORTAL KOMBAT</span>
+            </div>
+            <div class="game-card">
+              <img src="img/carrusel/tetris.png" alt="Tetris">
+              <span class="game-name">TETRIS</span>
+            </div>
+            <div class="game-card">
+              <img src="img/carrusel/pacman.png" alt="Pac-Man">
+              <span class="game-name">PAC-MAN</span>
+            </div>
+                      <div class="game-card">
+              <img loading="lazy" src="img/carrusel/sonic.png" alt="Sonic 2">
+              <span class="game-name">SONIC THE HEDGEHOG 2</span>
+            </div>
+            <div class="game-card">
+              <img loading="lazy" src="img/carrusel/pacman.png" alt="Pac-Man Championship">
+              <span class="game-name">PAC-MAN</span>
+            </div>
+            <div class="game-card">
+              <img loading="lazy" src="img/carrusel/street fighter.png" alt="Street Fighter II Turbo">
+              <span class="game-name">STREET FIGHTER II TURBO</span>
+            </div></div>
+          </div>
+          <button type="button" class="carousel-btn next" onclick="scrollCarousel('c2', 1)" aria-label="Siguiente"><img src="img/carrusel/vector desplazmiento derecha.png" alt="Siguiente"></button>
+        </div>
+      </section>
+
+      <!-- CARRUSEL: JUEGOS AVENTURA -->
+      <section class="carousel-section">
+        <h2 class="section-title">Juegos Aventura</h2>
+        <div class="carousel-wrapper">
+          <button type="button" class="carousel-btn prev" onclick="scrollCarousel('c3', -1)" aria-label="Anterior"><img src="img/carrusel/vector desplazamiento izquierda.png" alt="Anterior"></button>
+          <div class="carousel-viewport">
+          <div class="carousel-track" id="c3">
+            <div class="game-card">
+              <img src="img/carrusel/super mario.png" alt="Super Mario Bros">
+              <span class="game-name">SUPER MARIO B.</span>
+            </div>
+            <div class="game-card featured-badge">
+              <span class="badge">DESTACADO</span>
+              <img src="img/carrusel/mortal kombat 2.png" alt="Mortal Kombat">
+              <span class="game-name">MORTAL KOMBAT</span>
+            </div>
+            <div class="game-card">
+              <img src="img/carrusel/zelda.png" alt="Zelda">
+              <span class="game-name">ZELDA</span>
+            </div>
+            <div class="game-card">
+              <img src="img/carrusel/crash.png" alt="Crash">
+              <span class="game-name">CRASH BANDICOOT</span>
+            </div>
+                      <div class="game-card">
+              <img loading="lazy" src="https://picsum.photos/id/1054/200/130" alt="Monkey Island">
+              <span class="game-name">MONKEY ISLAND</span>
+            </div>
+            <div class="game-card">
+              <img loading="lazy" src="https://picsum.photos/id/1060/200/130" alt="Another World">
+              <span class="game-name">ANOTHER WORLD</span>
+            </div>
+            <div class="game-card">
+              <img loading="lazy" src="https://picsum.photos/id/1068/200/130" alt="Flashback">
+              <span class="game-name">FLASHBACK: QUEST OF IDENTITY</span>
+            </div></div>
+          </div>
+          <button type="button" class="carousel-btn next" onclick="scrollCarousel('c3', 1)" aria-label="Siguiente"><img src="img/carrusel/vector desplazmiento derecha.png" alt="Siguiente"></button>
+        </div>
+      </section>
+
+      <!-- CARRUSEL: JUEGOS ACCIÓN -->
+      <section class="carousel-section">
+        <h2 class="section-title">Juegos Acción</h2>
+        <div class="carousel-wrapper">
+          <button type="button" class="carousel-btn prev" onclick="scrollCarousel('c4', -1)" aria-label="Anterior"><img src="img/carrusel/vector desplazamiento izquierda.png" alt="Anterior"></button>
+          <div class="carousel-viewport">
+          <div class="carousel-track" id="c4">
+            <div class="game-card">
+              <img src="img/carrusel/street fighter.png" alt="Street Fighter II">
+              <span class="game-name">STREET FIGHTER</span>
+            </div>
+            <div class="game-card featured-badge">
+              <span class="badge">DESTACADO</span>
+              <img src="img/carrusel/mortal kombat 2.png" alt="Mortal Kombat">
+              <span class="game-name">MORTAL KOMBAT</span>
+            </div>
+            <div class="game-card">
+              <img src="img/carrusel/metal slug.png" alt="Metal Slug">
+              <span class="game-name">METAL SLUG</span>
+            </div>
+            <div class="game-card">
+              <img src="img/carrusel/sunsetriders.png" alt="Sunset Riders">
+              <span class="game-name">SUNSET RIDERS</span>
+            </div>
+                      <div class="game-card">
+              <img loading="lazy" src="img/carrusel/contra.png" alt="Contra III">
+              <span class="game-name">CONTRA III</span>
+            </div>
+            <div class="game-card">
+              <img loading="lazy" src="https://picsum.photos/id/1071/200/130" alt="Gunstar Heroes">
+              <span class="game-name">GUNSTAR HEROES</span>
+            </div>
+            <div class="game-card">
+              <img loading="lazy" src="https://picsum.photos/id/1076/200/130" alt="Shinobi">
+              <span class="game-name">SHINOBI III</span>
+            </div></div>
+          </div>
+          <button type="button" class="carousel-btn next" onclick="scrollCarousel('c4', 1)" aria-label="Siguiente"><img src="img/carrusel/vector desplazmiento derecha.png" alt="Siguiente"></button>
+        </div>
+      </section>
+
+      <!-- CARRUSEL: JUEGOS RPG -->
+      <section class="carousel-section">
+        <h2 class="section-title">Juegos RPG</h2>
+        <div class="carousel-wrapper">
+          <button type="button" class="carousel-btn prev" onclick="scrollCarousel('c5', -1)" aria-label="Anterior"><img src="img/carrusel/vector desplazamiento izquierda.png" alt="Anterior"></button>
+          <div class="carousel-viewport">
+          <div class="carousel-track" id="c5">
+            <div class="game-card">
+              <img src="img/carrusel/chrono trigger.png" alt="Chrono Trigger">
+              <span class="game-name">CHRONO TRIGGER</span>
+            </div>
+            <div class="game-card featured-badge">
+              <span class="badge">DESTACADO</span>
+              <img src="img/carrusel/mortal kombat 2.png" alt="Mortal Kombat">
+              <span class="game-name">MORTAL KOMBAT</span>
+            </div>
+            <div class="game-card">
+              <img src="img/carrusel/final fantasy.png" alt="Final Fantasy">
+              <span class="game-name">FINAL FANTASY</span>
+            </div>
+            <div class="game-card">
+              <img src="img/carrusel/dungeon & dragon.png" alt="Dungeon Quest">
+              <span class="game-name">DUNGEONS & DRAGONS</span>
+            </div>
+                      <div class="game-card">
+              <img loading="lazy" src="https://picsum.photos/id/1080/200/130" alt="Earthbound">
+              <span class="game-name">EARTHBOUND</span>
+            </div>
+            <div class="game-card">
+              <img loading="lazy" src="https://picsum.photos/id/1081/200/130" alt="Secret of Mana">
+              <span class="game-name">SECRET OF MANA</span>
+            </div>
+            <div class="game-card">
+              <img loading="lazy" src="https://picsum.photos/id/1029/200/130" alt="Dragon Quest V">
+              <span class="game-name">DRAGON QUEST V</span>
+            </div></div>
+          </div>
+          <button type="button" class="carousel-btn next" onclick="scrollCarousel('c5', 1)" aria-label="Siguiente"><img src="img/carrusel/vector desplazmiento derecha.png" alt="Siguiente"></button>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- COLUMNA DERECHA: SIDEBAR DE PUBLICIDAD -->
+    <aside class="sidebar-column">
+      
+      <!-- BANNERS SUPERIORES -->
+      <div class="ad-row">
+        <div class="ad-box">
+          <span class="ad-tag">Publicidad</span>
+          <div class="ad-content">
+            <h4>TU EQUIPO PRO: LOGITECH G</h4>
+            <p>ULTRALIGERO. RENDIMIENTO PRO.</p>
+          </div>
+        </div>
+        <div class="ad-box">
+          <span class="ad-tag">Publicidad</span>
+          <div class="ad-content">
+            <h4>TRUEFORCE G923</h4>
+            <p>VOLANTE Y PEDALES</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- BANNER TORNEO -->
+      <div class="tournament-card">
+        <h3>TORNEO SEMANAL DE PLATAFORMAS ABIERTO 🎮</h3>
+        <p>¡JUEGA CON CUALQUIER MANDO! PREMIOS EN CRÉDITOS DEL SITIO.</p>
+        <button class="btn-tournament">INSCRIBETE AQUÍ</button>
+      </div>
+
+      <!-- BANNERS INFERIORES -->
+      <div class="ad-row">
+        <div class="ad-box">
+          <span class="ad-tag">Publicidad</span>
+          <div class="ad-content">
+            <h4>MIYOO-mini</h4>
+            <p>Portable Retro Game Console</p>
+          </div>
+        </div>
+        <div class="ad-box">
+          <span class="ad-tag">Publicidad</span>
+          <div class="ad-content">
+            <h4>8BitDo</h4>
+            <p>Mandos Inalámbricos</p>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+  </div>
+
+  <!-- PIE DE PÁGINA / FOOTER -->
+  <footer class="footer">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="logo">
+          <img src="img/Logo RETRO PLAYER.png" alt="Logo Retro Player">
+        </div>
+        <p>"Revive la época dorada de los videojuegos. Accede a un catálogo de títulos retro 100% gratuitos y financiados por la comunidad a través de anuncios."</p>
+      </div>
+
+      <div class="footer-links">
+        <div class="footer-col">
+          <h4>Explorar</h4>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="#">Todos los Juegos</a></li>
+            <li><a href="#">Más Populares</a></li>
+            <li><a href="#">Recién Agregados</a></li>
+            <li><a href="#">Categorías</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Consolas</h4>
+          <ul>
+            <li><a href="#">NES</a></li>
+            <li><a href="#">SNES</a></li>
+            <li><a href="#">Sega Génesis</a></li>
+            <li><a href="#">Game Boy</a></li>
+            <li><a href="#">PlayStation</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Comunidad</h4>
+          <ul>
+            <li><a href="#">Quiénes Somos</a></li>
+            <li><a href="#">Foro de Gamers</a></li>
+            <li><a href="#">Unirse a Discord</a></li>
+            <li><a href="#">Sugerir un Juego</a></li>
+            <li><a href="#">Blog & Noticias</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Soporte</h4>
+          <ul>
+            <li><a href="#">Preguntas Frecuentes</a></li>
+            <li><a href="#">Soporte Técnico</a></li>
+            <li><a href="#">Tutoriales</a></li>
+            <li><a href="#">Estado del Servidor</a></li>
+            <li><a href="#">Contacto</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>© 2026 Retro Player. Todos los derechos reservados.</p>
+      <div class="footer-legal">
+        <a href="#">Términos y Condiciones</a>
+        <a href="#">Privacidad</a>
+        <a href="#">Cookies</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- MENÚ DESPLEGABLE DE CATEGORÍAS (Hamburguesa) -->
+  <div id="categoriesDropdown" class="dropdown-overlay hidden">
+    <div class="dropdown-card">
+      <button class="btn-close-dropdown" onclick="toggleDropdown('categoriesDropdown')">
+        <i class="fa-regular fa-circle-xmark"></i>
+      </button>
+      <nav class="dropdown-menu">
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-house"></i>
+          <span>Inicio</span>
+        </a>
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-rocket"></i>
+          <span>Nuevos</span>
+        </a>
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-trophy"></i>
+          <span>Populares</span>
+        </a>
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-star"></i>
+          <span>Destacados</span>
+        </a>
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-bomb"></i>
+          <span>Acción</span>
+        </a>
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-crosshairs"></i>
+          <span>RPG</span>
+        </a>
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-compass"></i>
+          <span>Aventura</span>
+        </a>
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-puzzle-piece"></i>
+          <span>Puzzle</span>
+        </a>
+      </nav>
+    </div>
+  </div>
+
+  <!-- MENÚ DESPLEGABLE DE USUARIO -->
+  <div id="userDropdown" class="dropdown-overlay hidden">
+    <div class="dropdown-card user-card">
+      <button class="btn-close-dropdown" onclick="toggleDropdown('userDropdown')">
+        <i class="fa-regular fa-circle-xmark"></i>
+      </button>
+      <h2 class="dropdown-title">Usuario</h2>
+      <nav class="dropdown-menu">
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-user"></i>
+          <span>Mi Perfil</span>
+        </a>
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-gamepad"></i>
+          <span>Mis Juegos</span>
+        </a>
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-gear"></i>
+          <span>Configuración</span>
+        </a>
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-circle-question"></i>
+          <span>Ayuda</span>
+        </a>
+      </nav>
+      <button class="btn-logout">Cerrar sesión</button>
+    </div>
+  </div>
+
+  <!-- SCRIPT JS PRINCIPAL -->
+  <script src="js/script.js"></script>
+
+</body>
+</html>

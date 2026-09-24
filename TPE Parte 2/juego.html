@@ -1,0 +1,361 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Retro Player - Pegs On Neon</title>
+
+  <!-- Fuentes e Iconos -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" >
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Hoja de Estilos Principal -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- ENCABEZADO (HEADER) -->
+  <header class="header">
+    <div class="header-container">
+        
+      <!-- Izquierda: Menú Hamburguesa & Logo -->
+      <div class="header-left">
+        <button id="menu-btn" aria-label="Abrir menú" class="btn-icon" onclick="toggleDropdown('categoriesDropdown')">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <a href="index.html" class="brand-logo">
+          <div class="logo-icon">
+            <img class="logo_header" src="img/Logo Header.png" alt="Logo header">
+          </div>
+          <span class="brand-name">RETRO <span class="white-text">PLAYER</span></span>
+        </a>
+      </div>
+
+      <!-- Centro: Barra de Búsqueda -->
+      <div class="search-container">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input type="text" id="search-input" placeholder="¿Qué juego buscás?" class="search-input">
+      </div>
+
+      <!-- Derecha: Perfil de Usuario -->
+      <div class="header-right">
+        <button id="profile-btn" class="profile-dropdown-btn" onclick="toggleDropdown('userDropdown')">
+          <i class="fa-solid fa-chevron-down arrow-icon"></i>
+          <div>
+            <img class="logo_usuario" src="img/Logo Usuario.png" alt="Logo Usuario">
+          </div>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- BREADCRUMB -->
+  <nav class="breadcrumb-container">
+    <a href="index.html" class="breadcrumb-link">Home</a> 
+    <span class="breadcrumb-separator"><i class="fa-solid fa-play"></i></span> 
+    <span class="breadcrumb-current">Pegs On Neon</span>
+  </nav>
+
+  <!-- CONTENIDO PRINCIPAL (LAYOUT EN 2 COLUMNAS) -->
+  <div class="main-layout">
+    
+    <!-- COLUMNA IZQUIERDA: CONTENIDO DEL JUEGO -->
+    <main class="content-column">
+      
+      <!-- REPRODUCTOR / MARCO DEL JUEGO -->
+      <section class="game-container">
+        <div class="game-screen" id="gameScreen">
+          <img src="img/Juego Peg Solitary.png" alt="Pegs On Neon Gameplay" class="game-cover">
+          <button class="btn-play-overlay" id="playBtn" aria-label="Iniciar Juego">
+            <i class="fa-solid fa-play"></i>
+          </button>
+        </div>
+
+        <!-- BARRA DE ACCIONES DEL JUEGO -->
+        <div class="game-toolbar">
+          <div class="toolbar-left">
+            <button class="btn-icon" title="Información"><i class="fa-solid fa-circle-info"></i></button>
+            <button class="btn-icon" title="Favorito"><i class="fa-solid fa-heart"></i></button>
+            <button class="btn-icon" title="Guardar"><i class="fa-solid fa-bookmark"></i></button>
+            <button class="btn-icon" title="Pantalla Completa" id="fullscreenBtn"><i class="fa-solid fa-expand"></i></button>
+          </div>
+          <div class="toolbar-right">
+            <button class="btn-icon"><i class="fa-solid fa-thumbs-up"></i></button>
+            <span class="rating-text">86%</span>
+            <button class="btn-icon"><i class="fa-solid fa-comment"></i></button>
+          </div>
+        </div>
+      </section>
+
+      <!-- DESCRIPCIÓN DEL JUEGO -->
+      <section class="info-card">
+        <h3 class="info-title">Descripción:</h3>
+        <p class="info-text">
+          Es un juego de rompecabezas táctico que reinterpreta el clásico solitario de clavijas. 
+          Debes saltar fichas sobre un tablero en forma de cruz para eliminarlas. Repleta de circuitos impresos, tubos de neón 
+          y efectos de electricidad.
+          El objetivo principal es planificar cada movimiento con precisión para ir despejando el circuito hasta dejar 
+          una sola esfera brillante en el centro del tablero.
+        </p>
+      </section>
+
+      <!-- CÓMO JUGAR -->
+      <section class="info-card">
+        <h3 class="info-title">¿Cómo jugar?</h3>
+        <ul class="instructions-list">
+          <li>Usa el clic del mouse o la pantalla táctil para seleccionar una esfera de neón y saltar sobre otra adyacente hacia un espacio vacío.</li>
+          <li>Cada esfera superada desaparece del tablero de circuito, despejando el camino. Anticipa cada jugada para no quedarte sin saltos disponibles.</li>
+          <li>Intenta despejar la mayor cantidad de fichas y dejar solo una esfera en el tablero para dominar el circuito.</li>
+        </ul>
+      </section>
+
+      <!-- GALERÍA DE IMÁGENES -->
+      <section class="gallery-section">
+        <h3 class="info-title">Galería de Imágenes</h3>
+        <div class="gallery-grid">
+          <div class="gallery-item"><img src="img/Galeria 1.png" alt="Captura 1"></div>
+          <div class="gallery-item"><img src="img/Galeria 2.png" alt="Captura 2"></div>
+          <div class="gallery-item"><img src="img/Galeria 3.png" alt="Captura 3"></div>
+          <div class="gallery-item"><img src="img/Galeria 4.png" alt="Captura 4"></div>
+          <div class="gallery-item"><img src="img/Galeria 5.png" alt="Captura 5"></div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN DE COMENTARIOS -->
+      <section class="comments-section">
+        <h3 class="info-title">Comentarios</h3>
+        
+        <!-- INPUT PARA UN NUEVO COMENTARIO -->
+        <div class="comment-input-box">
+          <input type="text" id="newComment" placeholder="💬 ¿Qué opinas del juego?">
+          <button id="sendCommentBtn" class="btn-send">Publicar</button>
+        </div>
+
+        <!-- LISTA DE COMENTARIOS EXISTENTES -->
+        <div class="comments-list" id="commentsList">
+          <div class="comment-card">
+            <div class="comment-avatar">👨‍💻</div>
+            <div class="comment-body">
+              <div class="comment-header">
+                <span class="comment-author">Jose</span>
+                <span class="comment-time">5 días</span>
+              </div>
+              <p class="comment-text">Es el típico rompecabezas perfecto para pasar el rato, ejercitar la mente unos minutos y desconectar.</p>
+            </div>
+          </div>
+
+          <div class="comment-card">
+            <div class="comment-avatar">🎮</div>
+            <div class="comment-body">
+              <div class="comment-header">
+                <span class="comment-author">Gonzalo</span>
+                <span class="comment-time">30 días</span>
+              </div>
+              <p class="comment-text">Es sorprendentemente adictivo. Reglas muy sencillas de entender, pero que te exigen pensar varios pasos adelante para no quedarte bloqueado.</p>
+            </div>
+          </div>
+
+          <div class="comment-card">
+            <div class="comment-avatar">👾</div>
+            <div class="comment-body">
+              <div class="comment-header">
+                <span class="comment-author">Agustín</span>
+                <span class="comment-time">1 mes</span>
+              </div>
+              <p class="comment-text">Muchos se quedan trabados al llegar a 2 o 3 fichas restantes. Cuando por fin descifras la secuencia para dejar solo una en el centro, la satisfacción es enorme.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- COLUMNA DERECHA: SIDEBAR DE PUBLICIDAD -->
+    <aside class="sidebar-column">
+      
+      <div class="ad-row">
+        <div class="ad-box">
+          <span class="ad-tag">Publicidad</span>
+          <div class="ad-content">
+            <h4>TU EQUIPO PRO: LOGITECH G</h4>
+            <p>ULTRALIGERO. RENDIMIENTO PRO.</p>
+          </div>
+        </div>
+        <div class="ad-box">
+          <span class="ad-tag">Publicidad</span>
+          <div class="ad-content">
+            <h4>TRUEFORCE G923</h4>
+            <p>VOLANTE Y PEDALES</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="tournament-card">
+        <h3>TORNEO SEMANAL DE PLATAFORMAS ABIERTO 🎮</h3>
+        <p>¡JUEGA CON CUALQUIER MANDO! PREMIOS EN CRÉDITOS DEL SITIO.</p>
+        <button class="btn-tournament">INSCRIBETE AQUÍ</button>
+      </div>
+
+      <div class="ad-row">
+        <div class="ad-box">
+          <span class="ad-tag">Publicidad</span>
+          <div class="ad-content">
+            <h4>MIYOO-mini</h4>
+            <p>Portable Retro Game Console</p>
+          </div>
+        </div>
+        <div class="ad-box">
+          <span class="ad-tag">Publicidad</span>
+          <div class="ad-content">
+            <h4>8BitDo</h4>
+            <p>Mandos Inalámbricos</p>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+  </div>
+
+  <!-- PIE DE PÁGINA / FOOTER -->
+  <footer class="footer">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="logo">
+          <div class="logo-icon"><img class="logo_footer" src="img/Logo RETRO PLAYER.png" alt="Logo Retro Player"></div>
+        </div>
+        <p>"Revive la época dorada de los videojuegos. Accede a un catálogo de títulos retro 100% gratuitos y financiados por la comunidad a través de anuncios."</p>
+      </div>
+
+      <div class="footer-links">
+        <div class="footer-col">
+          <h4>Explorar</h4>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="#">Todos los Juegos</a></li>
+            <li><a href="#">Más Populares</a></li>
+            <li><a href="#">Recién Agregados</a></li>
+            <li><a href="#">Categorías</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Consolas</h4>
+          <ul>
+            <li><a href="#">NES</a></li>
+            <li><a href="#">SNES</a></li>
+            <li><a href="#">Sega Génesis</a></li>
+            <li><a href="#">Game Boy</a></li>
+            <li><a href="#">PlayStation</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Comunidad</h4>
+          <ul>
+            <li><a href="#">Quiénes Somos</a></li>
+            <li><a href="#">Foro de Gamers</a></li>
+            <li><a href="#">Unirse a Discord</a></li>
+            <li><a href="#">Sugerir un Juego</a></li>
+            <li><a href="#">Blog & Noticias</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Soporte</h4>
+          <ul>
+            <li><a href="#">Preguntas Frecuentes</a></li>
+            <li><a href="#">Soporte Técnico</a></li>
+            <li><a href="#">Tutoriales</a></li>
+            <li><a href="#">Estado del Servidor</a></li>
+            <li><a href="#">Contacto</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>© 2026 Retro Player. Todos los derechos reservados.</p>
+      <div class="footer-legal">
+        <a href="#">Términos y Condiciones</a>
+        <a href="#">Privacidad</a>
+        <a href="#">Cookies</a>
+      </div>
+    </div>
+  </footer>
+
+    <!-- MENÚ DESPLEGABLE DE CATEGORÍAS (Hamburguesa) -->
+  <div id="categoriesDropdown" class="dropdown-overlay hidden">
+    <div class="dropdown-card">
+      <button class="btn-close-dropdown" onclick="toggleDropdown('categoriesDropdown')">
+        <i class="fa-regular fa-circle-xmark"></i>
+      </button>
+      <nav class="dropdown-menu">
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-house"></i>
+          <span>Inicio</span>
+        </a>
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-rocket"></i>
+          <span>Nuevos</span>
+        </a>
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-trophy"></i>
+          <span>Populares</span>
+        </a>
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-star"></i>
+          <span>Destacados</span>
+        </a>
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-bomb"></i>
+          <span>Acción</span>
+        </a>
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-crosshairs"></i>
+          <span>RPG</span>
+        </a>
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-compass"></i>
+          <span>Aventura</span>
+        </a>
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-puzzle-piece"></i>
+          <span>Puzzle</span>
+        </a>
+      </nav>
+    </div>
+  </div>
+
+  <!-- MENÚ DESPLEGABLE DE USUARIO -->
+  <div id="userDropdown" class="dropdown-overlay hidden">
+    <div class="dropdown-card user-card">
+      <button class="btn-close-dropdown" onclick="toggleDropdown('userDropdown')">
+        <i class="fa-regular fa-circle-xmark"></i>
+      </button>
+      <h2 class="dropdown-title">Usuario</h2>
+      <nav class="dropdown-menu">
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-user"></i>
+          <span>Mi Perfil</span>
+        </a>
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-gamepad"></i>
+          <span>Mis Juegos</span>
+        </a>
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-gear"></i>
+          <span>Configuración</span>
+        </a>
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-circle-question"></i>
+          <span>Ayuda</span>
+        </a>
+      </nav>
+      <button class="btn-logout">Cerrar sesión</button>
+    </div>
+  </div>
+
+  <!-- SCRIPT UNIFICADO -->
+  <script src="js/script.js"></script>
+</body>
+</html>
