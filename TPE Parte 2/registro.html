@@ -1,0 +1,284 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retro Player - Registro</title>
+    <!-- CSS Externo -->
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- Google Fonts & FontAwesome -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+      <!-- ENCABEZADO (HEADER) -->
+  <header class="header">
+    <div class="header-container">
+        
+      <!-- Izquierda: Menú Hamburguesa & Logo -->
+      <div class="header-left">
+        <button id="menu-btn" aria-label="Abrir menú" class="btn-icon" onclick="toggleDropdown('categoriesDropdown')">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <a href="index.html" class="brand-logo">
+          <div class="logo-icon">
+            <img class="logo_header" src="img/Logo Header.png" alt="Logo header">
+          </div>
+          <span class="brand-name">RETRO <span class="white-text">PLAYER</span></span>
+        </a>
+      </div>
+
+      <!-- Centro: Barra de Búsqueda -->
+      <div class="search-container">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input type="text" id="search-input" placeholder="¿Qué juego buscás?" class="search-input">
+      </div>
+
+      <!-- Derecha: Perfil de Usuario -->
+      <div class="header-right">
+        <button id="profile-btn" class="profile-dropdown-btn" onclick="toggleDropdown('userDropdown')">
+          <i class="fa-solid fa-chevron-down arrow-icon"></i>
+          <div class="avatar-circle">
+            <i class="fa-solid fa-user-ninja"></i>
+          </div>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="main-content">
+        
+        <!-- Ruta de Navegación (Breadcrumbs) -->
+        <nav class="breadcrumb">
+            <a href="index.html" class="breadcrumb-link">Home</a>
+            <i class="fa-solid fa-play breadcrumb-separator"></i>
+            <span class="breadcrumb-current">Registro</span>
+        </nav>
+        <!-- Tarjeta de Registro -->
+        <div class="register-card register-page-card">
+          <div class="register-header">
+            <h2>Crear una cuenta</h2>
+            <p>Registrate para empezar a jugar</p>
+          </div>
+
+          <form class="register-form" id="formRegister">
+            <div class="form-group">
+              <label for="reg-name">Nombre y Apellido<span class="required">*</span></label>
+              <input type="text" id="reg-name" required class="form-input">
+            </div>
+
+            <div class="form-group">
+              <label for="reg-nickname">Nickname<span class="required">*</span></label>
+              <input type="text" id="reg-nickname" required class="form-input">
+            </div>
+
+            <div class="form-group">
+              <label for="reg-age">Edad</label>
+              <input type="number" id="reg-age" min="1" max="120" class="form-input">
+            </div>
+
+            <div class="form-group">
+              <label for="reg-email">Mail</label>
+              <input type="email" id="reg-email" class="form-input">
+            </div>
+
+            <div class="form-group">
+              <label for="reg-pass">Contraseña<span class="required">*</span></label>
+              <input type="password" id="reg-pass" required class="form-input">
+            </div>
+
+            <div class="form-group">
+              <label for="reg-repeat-pass">Repetir contraseña<span class="required">*</span></label>
+              <input type="password" id="reg-repeat-pass" required class="form-input">
+            </div>
+
+            <span class="required-note"><span class="required">*</span> Campo obligatorio</span>
+
+            <div class="recaptcha-box">
+              <label class="recaptcha-check">
+                <input type="checkbox" id="captchaCheck" required>
+                <span class="checkmark"></span>
+                <span class="recaptcha-text">No soy un robot</span>
+              </label>
+              <div class="recaptcha-brand">
+                <div class="recaptcha-logo">🔄</div>
+                <span>reCAPTCHA</span>
+                <small>Privacidad - Términos</small>
+              </div>
+            </div>
+
+            <button type="submit" class="btn-submit-register">Registrarme</button>
+          </form>
+
+          <div class="social-login-divider">
+            <span>O registrate con</span>
+          </div>
+
+          <div class="social-buttons">
+            <button type="button" class="btn-social google">
+              <span class="social-icon">G</span>
+              <span>Continuar con Google</span>
+            </button>
+            <button type="button" class="btn-social facebook">
+              <span class="social-icon">f</span>
+              <span>Continuar con Facebook</span>
+            </button>
+          </div>
+
+          <div class="register-footer">
+            <span>¿Ya tenés cuenta?</span>
+            <a href="login.html">Iniciá sesión</a>
+          </div>
+        </div>
+    </main>
+
+  <!-- PIE DE PÁGINA / FOOTER -->
+  <footer class="footer">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="logo">
+          <div><img class="logo_footer" src="img/Logo RETRO PLAYER.png" alt="Logo Retro Player"></div>
+        </div>
+        <p>"Revive la época dorada de los videojuegos. Accede a un catálogo de títulos retro 100% gratuitos y financiados por la comunidad a través de anuncios."</p>
+      </div>
+
+      <div class="footer-links">
+        <div class="footer-col">
+          <h4>Explorar</h4>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="#">Todos los Juegos</a></li>
+            <li><a href="#">Más Populares</a></li>
+            <li><a href="#">Recién Agregados</a></li>
+            <li><a href="#">Categorías</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Consolas</h4>
+          <ul>
+            <li><a href="#">NES</a></li>
+            <li><a href="#">SNES</a></li>
+            <li><a href="#">Sega Génesis</a></li>
+            <li><a href="#">Game Boy</a></li>
+            <li><a href="#">PlayStation</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Comunidad</h4>
+          <ul>
+            <li><a href="#">Quiénes Somos</a></li>
+            <li><a href="#">Foro de Gamers</a></li>
+            <li><a href="#">Unirse a Discord</a></li>
+            <li><a href="#">Sugerir un Juego</a></li>
+            <li><a href="#">Blog & Noticias</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Soporte</h4>
+          <ul>
+            <li><a href="#">Preguntas Frecuentes</a></li>
+            <li><a href="#">Soporte Técnico</a></li>
+            <li><a href="#">Tutoriales</a></li>
+            <li><a href="#">Estado del Servidor</a></li>
+            <li><a href="#">Contacto</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>© 2026 Retro Player. Todos los derechos reservados.</p>
+            <div class="social-links">
+        <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+        <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+        <a href="#" aria-label="X"><i class="fa-brands fa-x-twitter"></i></a>
+        <a href="#" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+      </div>      <div class="footer-legal">
+        <a href="#">Términos y Condiciones</a>
+        <a href="#">Privacidad</a>
+        <a href="#">Cookies</a>
+      </div>
+    </div>
+  </footer>
+
+      <!-- MENÚ DESPLEGABLE DE CATEGORÍAS (Hamburguesa) -->
+  <div id="categoriesDropdown" class="dropdown-overlay hidden">
+    <div class="dropdown-card">
+      <button class="btn-close-dropdown" onclick="toggleDropdown('categoriesDropdown')">
+        <i class="fa-regular fa-circle-xmark"></i>
+      </button>
+      <nav class="dropdown-menu">
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-house"></i>
+          <span>Inicio</span>
+        </a>
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-rocket"></i>
+          <span>Nuevos</span>
+        </a>
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-trophy"></i>
+          <span>Populares</span>
+        </a>
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-star"></i>
+          <span>Destacados</span>
+        </a>
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-bomb"></i>
+          <span>Acción</span>
+        </a>
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-crosshairs"></i>
+          <span>RPG</span>
+        </a>
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-compass"></i>
+          <span>Aventura</span>
+        </a>
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-puzzle-piece"></i>
+          <span>Puzzle</span>
+        </a>
+      </nav>
+    </div>
+  </div>
+
+  <!-- MENÚ DESPLEGABLE DE USUARIO -->
+  <div id="userDropdown" class="dropdown-overlay hidden">
+    <div class="dropdown-card user-card">
+      <button class="btn-close-dropdown" onclick="toggleDropdown('userDropdown')">
+        <i class="fa-regular fa-circle-xmark"></i>
+      </button>
+      <h2 class="dropdown-title">Usuario</h2>
+      <nav class="dropdown-menu">
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-user"></i>
+          <span>Mi Perfil</span>
+        </a>
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-gamepad"></i>
+          <span>Mis Juegos</span>
+        </a>
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-gear"></i>
+          <span>Configuración</span>
+        </a>
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-circle-question"></i>
+          <span>Ayuda</span>
+        </a>
+      </nav>
+      <button class="btn-logout">Cerrar sesión</button>
+    </div>
+  </div>
+
+    <!-- JS Externo -->
+    <script src="js/script.js"></script>
+</body>
+</html>
