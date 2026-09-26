@@ -34,6 +34,51 @@ function initCarousels() {
   window.addEventListener('resize', () => {
     document.querySelectorAll('.carousel-track').forEach(updateCarouselButtons);
   });
+  initSkewOnScroll();
+}
+
+/* Skew + estiramiento proporcional a la velocidad del scroll.
+   Aplica skewX dinámico mientras se scrollea y lo retira al frenar. */
+/* Skew fluido y sin vibraciones/parpadeos al scrollear */
+function initSkewOnScroll() {
+  document.querySelectorAll('.carousel-track').forEach((track) => {
+    let lastX = track.scrollLeft;
+    let raf = null;
+    let resetTimer = null;
+
+    track.addEventListener('scroll', () => {
+      const currentX = track.scrollLeft;
+      const vel = currentX - lastX;
+      lastX = currentX;
+
+      // Ignora micro-movimientos para evitar que las tarjetas tiriten al detenerse
+      if (Math.abs(vel) < 1.5) return;
+
+      const skew = Math.max(-10, Math.min(10, vel * 0.25));
+      const stretch = 1 + Math.abs(skew) / 100;
+
+      if (raf) cancelAnimationFrame(raf);
+
+      raf = requestAnimationFrame(() => {
+        const cards = track.querySelectorAll('.game-card');
+        cards.forEach((c) => {
+          // translateZ(0) activa la aceleración por hardware (GPU)
+          c.style.transition = 'transform 0.05s ease-out';
+          c.style.transform = 'skewX(' + (-skew) + 'deg) scaleX(' + stretch + ') translateZ(0)';
+        });
+      });
+
+      // Se ejecuta SOLO cuando el scroll se detiene por completo
+      clearTimeout(resetTimer);
+      resetTimer = setTimeout(() => {
+        const cards = track.querySelectorAll('.game-card');
+        cards.forEach((c) => {
+          c.style.transition = 'transform 0.25s ease-out';
+          c.style.transform = 'skewX(0deg) scaleX(1) translateZ(0)';
+        });
+      }, 80);
+    }, { passive: true });
+  });
 }
 
 // 2. Controladores de eventos e interacción al cargar el DOM

@@ -263,8 +263,10 @@ body {
 }
 .footer-legal, .legal-links { display: flex; gap: 1rem; }
 .footer-legal a, .legal-links a { color: var(--text-muted); text-decoration: none; }
-.social-links { display: flex; gap: 1rem; font-size: 1.05rem; }
-.social-links a { color: #cfd6e6; }
+.social-links { display: flex; gap: 1rem; font-size: 1.05rem; align-items: center; }
+.social-links a { color: #cfd6e6; display: inline-flex; transition: transform 0.15s ease; }
+.social-links a:hover { transform: scale(1.15); }
+.social-links img { width: 26px; height: 26px; object-fit: contain; display: block; }
 @media (min-width: 900px) {
   .footer-top, .footer-grid { grid-template-columns: 300px 1fr; }
   .footer-links { grid-template-columns: repeat(4, 1fr); }
@@ -374,7 +376,7 @@ img.logo_footer { width: 5rem; height: auto; display: block; }
 .btn-social {
   display: flex; align-items: center; gap: 0; padding: 0; overflow: hidden;
   border: none; border-radius: 0.5rem; font-size: 0.82rem; color: white; cursor: pointer; font-weight: 500;
-  width: min(360px, 100%);
+  width: 20rem; height: auto;
 }
 .btn-social.google { background-color: #1e88ff; }
 .btn-social.facebook, .btn-social.btn-facebook { background-color: #2b5993; }
@@ -385,6 +387,12 @@ img.logo_footer { width: 5rem; height: auto; display: block; }
 .btn-social.google .social-icon, .btn-social.google .social-icon-wrapper { color: #1e88ff; }
 .btn-social.facebook .social-icon, .btn-social.btn-facebook .facebook-icon { color: #2b5993; background: white; }
 .btn-social span:last-child { flex: 1; text-align: center; }
+/* Botones sociales como imagen completa (proporción 676:79 preservada) */
+.btn-img-social {
+  background: none; border: none; padding: 0; cursor: pointer;
+  width: min(360px, 100%);
+}
+.btn-img-social img { width: 100%; height: auto; display: block; }
 .google-svg { width: 20px; height: 20px; }
 .card-footer, .register-footer { text-align: center; font-size: 0.85rem; color: #d6d2e4; margin-top: 1rem; display: flex; justify-content: center; gap: 0.4rem; }
 .register-link, .register-footer a { color: var(--accent-cyan); }
@@ -710,11 +718,9 @@ img.logo_footer { width: 5rem; height: auto; display: block; }
   }
 }
 
-
 #loader-percentage {
   font-size: 1.5rem;
   font-weight: 800;
   color: var(--text-main);
   font-variant-numeric: tabular-nums;
 }
-
