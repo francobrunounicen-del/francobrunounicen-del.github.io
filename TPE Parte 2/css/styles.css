@@ -151,9 +151,49 @@ body {
 .featured-desc { font-size: 0.85rem; color: #f1eaff; font-weight: 600; }
 .featured-bullets { list-style: none; font-size: 0.85rem; color: #fff; font-weight: 600; display: flex; flex-direction: column; gap: 0.2rem; }
 .btn-play {
-  align-self: flex-end; background-color: var(--accent-orange); color: white;
-  text-decoration: none; padding: 0.55rem 1.2rem; border-radius: 0.5rem;
-  font-weight: 700; font-size: 0.9rem; border: none; cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  align-self: flex-end;
+  background-color: var(--accent-orange);
+  color: white;
+  text-decoration: none;
+  padding: 0.55rem 1.2rem;
+  border-radius: 0.5rem;
+  font-weight: 700;
+  font-size: 0.9rem;
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+/* EFECTO DESTELLO DE LUZ (Seudoelemento) */
+.btn-play::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -150%;
+  width: 100%;
+  height: 200%;
+  background: linear-gradient(90deg,transparent 0%,
+  rgba(0, 229, 255, 0.3) 25%,
+  rgba(255, 255, 255, 0.95) 50%, /* Núcleo blanco brillante */
+  rgba(0, 229, 255, 0.3) 75%,
+  transparent 100%);
+  transform: rotate(45deg);
+  transition: left 0.7s ease;
+}
+/* EFECTO HOVER (Al pasar el cursor) */
+.btn-play:hover {
+  border-color: var(--accent-cyan);
+  transform: translateY(-3px) scale(1.11);
+  box-shadow: 0 6px 18px rgba(0, 229, 255, 0.45), 0 0 10px rgba(255, 107, 0, 0.35);
+}
+.btn-play:hover::before {
+  left: 150%; /* Desplaza la luz de izquierda a derecha */
+}
+/* ACTIVE: Feedback físico al hacer clic */
+.btn-play:active {
+  transform: translateY(-1px) scale(0.95);
+  box-shadow: 0 2px 6px rgba(0, 229, 255, 0.3);
 }
 @media (min-width: 720px) {
   .featured-card { flex-direction: row; align-items: stretch; }
@@ -367,9 +407,44 @@ img.logo_footer { width: 5rem; height: auto; display: block; }
 .error-text { font-size: 0.75rem; color: #ff9d9d; }
 .alert-box { border-radius: 0.5rem; padding: 0.6rem 0.8rem; font-size: 0.85rem; margin-bottom: 0.8rem; }
 .alert-box.hidden { display: none; }
-.btn-submit {
-  background-color: var(--accent-orange); color: white; border: none; border-radius: 0.5rem;
-  padding: 0.8rem; font-size: 1.05rem; font-weight: 800; cursor: pointer; margin-top: 0.4rem;
+.btn-login {
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  background-color: var(--accent-orange);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.8rem;
+  font-size: 1.05rem;
+  font-weight: 800;
+  cursor: pointer;
+  margin-top: 0.4rem;
+  transition: color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Capa neón oculta en el centro */
+.btn-login::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 0;
+  height: 100%;
+  background-color: var(--accent-cyan);
+  z-index: -1;
+  transition: width 0.3s ease, left 0.3s ease;
+}
+
+/* HOVER: Relleno desde el centro + texto oscuro de alto contraste */
+.btn-login:hover {
+  color: #1a1a2e; /* Color oscuro del fondo de la app */
+  box-shadow: 0 0 15px rgba(0, 229, 255, 0.6);
+}
+
+.btn-login:hover::before {
+  width: 100%;
+  left: 0;
 }
 .social-divider, .social-login-divider { font-size: 0.85rem; color: #d6d2e4; margin: 1rem 0 0.7rem 0; }
 .social-buttons { display: flex; flex-direction: column; gap: 0.55rem; align-items: center; }
