@@ -54,7 +54,7 @@ body {
   .logo-text, .brand-name { font-size: 0.62rem; }
   .logo-icon { width: 2rem; height: 2rem; font-size: 1rem; }
 }
-.nav-left, .header-left { display: flex; align-items: center; gap: 0.7rem; justify-self: start; }
+.nav-left, .header-left { display: flex; align-items: center; gap: 1.1rem; justify-self: start; }
 .header-right { display: flex; align-items: center; justify-self: end; }
 .btn-menu, #menu-btn {
   background-color: #cdc3ff; color: #1e1b3a; border: none;
@@ -68,7 +68,7 @@ body {
 }
 .logo-text, .brand-name {
   font-family: 'Press Start 2P', cursive; font-size: 0.95rem;
-  color: var(--accent-orange); letter-spacing: 0.04em;
+  color: var(--accent-orange); letter-spacing: 0; word-spacing: -0.18em;
 }
 .logo-text span, .brand-name .white-text { color: #d9d4ff; }
 .logo_header{width: 3rem; height: auto;
