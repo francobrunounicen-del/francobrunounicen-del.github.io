@@ -24,6 +24,12 @@
   --text-main: #ffffff;
   --text-muted: #b8c2d4;
   --border-color: #2b3648;
+  --neon-pink: #ff2fd6;
+  --neon-cyan: #00e5ff;
+  --neon-yellow: #facc15;
+  --neon-green: #39ff14;
+  --card-bg: #1a2232;
+  --pixel-border: #000000;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -572,3 +578,143 @@ img.logo_footer { width: 5rem; height: auto; display: block; }
   background-color: #e05d00;
   transform: translateY(-1px);
 }
+
+/* CARGA DE 'LOADING'*/
+/* OVERLAY DE CARGA - PANTALLA COMPLETA */
+#retro-loader-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: var(--bg-dark);
+  background-image:
+          radial-gradient(circle, rgba(0, 240, 255, 0.08) 1px, transparent 1px);
+  background-size: 16px 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+#retro-loader-overlay.hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* Contenedor estilo Arcade */
+.retro-box {
+  background: var(--card-bg);
+  border: 4px solid var(--pixel-border);
+  box-shadow:
+          8px 8px 0px #000000,
+          -4px -4px 0px var(--neon-pink),
+          4px 4px 0px var(--neon-cyan);
+  padding: 35px 25px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 25px;
+  width: 90%;
+  max-width: 450px;
+  text-align: center;
+}
+
+/* ========================================================================== /
+/ ANIMACIONES RETRO EN CSS CON KEYFRAMES DE PORCENTAJE (%)                  /
+/ ========================================================================== */
+
+/* --- FANTASMITA RETRO --- */
+.ghost-sprite {
+  width: 50px;
+  height: 55px;
+  background: var(--neon-pink);
+  border-radius: 25px 25px 0 0;
+  position: relative;
+  animation: animarFantasma 1.2s ease-in-out infinite;
+}
+
+.ghost-sprite::before, .ghost-sprite::after {
+  content: '';
+  position: absolute;
+  top: 15px;
+  width: 10px;
+  height: 12px;
+  background: #ffffff;
+  box-shadow: 3px 3px 0px #000000;
+}
+.ghost-sprite::before { left: 10px; }
+.ghost-sprite::after { right: 10px; }
+
+@keyframes animarFantasma {
+  0% {
+    transform: translateY(0px) scale(1);
+    background: var(--neon-pink);
+  }
+  25% {
+    transform: translateY(-12px) scale(1.05);
+    background: var(--neon-cyan);
+  }
+  50% {
+    transform: translateY(0px) scale(0.95);
+    background: var(--neon-yellow);
+  }
+  75% {
+    transform: translateY(-8px) scale(1.02);
+    background: var(--neon-green);
+  }
+  100% {
+    transform: translateY(0px) scale(1);
+    background: var(--neon-pink);
+  }
+}
+
+/* --- BLOQUE MÁGICO / ITEM BLOCK --- */
+.item-block {
+  width: 55px;
+  height: 55px;
+  background: var(--neon-yellow);
+  border: 4px solid #000;
+  box-shadow: inset -4px -4px 0px #b88600, inset 4px 4px 0px #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  color: #000;
+  animation: animarBloque 1.4s infinite ease-in-out;
+}
+
+@keyframes animarBloque {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    background: var(--neon-yellow);
+  }
+  30% {
+    transform: translateY(-20px) rotate(-8deg) scale(1.1);
+    background: var(--neon-green);
+  }
+  50% {
+    transform: translateY(-5px) rotate(4deg);
+  }
+  75% {
+    transform: translateY(-15px) rotate(-4deg);
+    background: var(--neon-pink);
+  }
+  100% {
+    transform: translateY(0) rotate(0deg);
+    background: var(--neon-yellow);
+  }
+}
+
+
+#loader-percentage {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-main);
+  font-variant-numeric: tabular-nums;
+}
+
