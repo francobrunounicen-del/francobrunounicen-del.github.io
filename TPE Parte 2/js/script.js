@@ -228,3 +228,82 @@ document.addEventListener('keydown', (e) => {
     });
   }
 });
+
+// LOADER DEL HOME: carga simulada de 5 segundos con animacion retro
+(function () {
+  var overlay = document.getElementById('retro-loader-overlay');
+  var percentageDisplay = document.getElementById('loader-percentage');
+  var healthBarFill = document.getElementById('health-bar-fill');
+  if (!overlay || !percentageDisplay) return;
+  var progress = 0;
+  var totalTimeMs = 5000;
+  var updateIntervalMs = 50;
+  var incrementPerStep = 100 / (totalTimeMs / updateIntervalMs);
+  var timerId = setInterval(function () {
+    progress += incrementPerStep;
+    if (progress >= 100) {
+      progress = 100;
+      clearInterval(timerId);
+      setTimeout(function () { overlay.classList.add('hidden'); }, 250);
+    }
+    percentageDisplay.textContent = Math.floor(progress) + '%';
+    if (healthBarFill) healthBarFill.style.width = progress + '%';
+  }, updateIntervalMs);
+})();
+
+
+/* PLUS TPE: carruseles desde la API v2 de la catedra (por tematica) */
+const API_URL = 'https://vj.interfaces.jima.com.ar/api/v2';
+
+document.addEventListener('DOMContentLoaded', () => {
+  cargarJuegosDesdeAPI();
+});
+
+async function cargarJuegosDesdeAPI() {
+  const mapa = { c1: null, c2: null, c3: null, c4: null, c5: null, cApi: null };
+  Object.keys(mapa).forEach((id) => { mapa[id] = document.getElementById(id); });
+  if (!mapa.c1 && !mapa.cApi) return;
+  try {
+    const response = await fetch(API_URL);
+    if (!response.ok) throw new Error('HTTP ' + response.status);
+    const juegos = await response.json();
+    const usados = new Set();
+    const tomar = (lista, n) => {
+      const res = [];
+      for (const j of lista) {
+        if (!usados.has(j.id)) { usados.add(j.id); res.push(j); }
+        if (res.length >= n) break;
+      }
+      return res;
+    };
+    const porRating = [...juegos].sort((a, b) => (b.rating || 0) - (a.rating || 0));
+    const porFecha = [...juegos].sort((a, b) => String(b.released || '').localeCompare(String(a.released || '')));
+    const porGenero = (g) => juegos.filter((j) => (j.genres || []).some((x) => x.name === g));
+    renderizarCarruselAPI(mapa.c1, tomar(porFecha, 10));
+    renderizarCarruselAPI(mapa.c2, tomar(porRating, 10));
+    renderizarCarruselAPI(mapa.c3, tomar(porGenero('Adventure'), 10));
+    renderizarCarruselAPI(mapa.c4, tomar(porGenero('Action'), 10));
+    renderizarCarruselAPI(mapa.c5, tomar(porGenero('RPG'), 10));
+    renderizarCarruselAPI(mapa.cApi, tomar(porGenero('Indie'), 10));
+  } catch (error) {
+    console.error('Error al cargar juegos desde la API:', error);
+  }
+  Object.values(mapa).forEach(updateCarouselButtons);
+}
+
+function renderizarCarruselAPI(track, juegos) {
+  if (!track || !juegos.length) return;
+  track.innerHTML = '';
+  juegos.forEach((juego) => {
+    const nombre = (juego.name || 'SIN TITULO').toUpperCase();
+    const img = juego.background_image_low_res || juego.background_image || '';
+    const generos = (juego.genres || []).map((g) => g.name).join(', ');
+    const card = document.createElement('div');
+    card.className = 'game-card featured-badge';
+    card.title = juego.name + ' - Rating: ' + juego.rating + ' (' + generos + ')';
+    card.innerHTML = '<span class="badge">★ ' + juego.rating + '</span>' +
+      '<img loading="lazy" src="' + img + '" alt="' + juego.name + '"> ' +
+      '<span class="game-name">' + nombre + '</span>';
+    track.appendChild(card);
+  });
+}
