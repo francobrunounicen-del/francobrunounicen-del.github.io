@@ -112,7 +112,31 @@
               </div>
             </div>
 
-            <button type="submit" class="btn-submit-register">Registrarme</button>
+            <button type="submit" class="btn-submit-register">
+              <!-- Mira de esquinas arcade (4 esquinas) -->
+              <span class="corner corner-tl"></span>
+              <span class="corner corner-tr"></span>
+              <span class="corner corner-bl"></span>
+              <span class="corner corner-br"></span>
+              <!-- Paso 0: Contenido Normal -->
+              <span class="btn-content">
+                <span class="btn-text">Registrarme</span>
+              </span>
+
+              <!-- Paso 1: Spinner de Carga -->
+              <span class="btn-loading-content" aria-hidden="true">
+                <span class="spinner-ring"></span>
+                <span class="btn-loading-text">Cargando...</span>
+              </span>
+
+              <!-- Paso 2: Éxito Limpio y Minimalista -->
+              <span class="btn-success-content" aria-hidden="true">
+                <svg class="check-icon" viewBox="0 0 24 24">
+                  <path d="M4 12l5 5L20 6" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <span class="btn-success-text">¡Listo!</span>
+              </span>
+            </button>
           </form>
 
           <div class="social-login-divider">
