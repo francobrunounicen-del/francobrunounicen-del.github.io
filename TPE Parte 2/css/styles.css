@@ -184,7 +184,7 @@ body {
 /* EFECTO HOVER (Al pasar el cursor) */
 .btn-play:hover {
   border-color: var(--accent-cyan);
-  transform: translateY(-3px) scale(1.11);
+  transform: translateY(-3px) scale(1.07);
   box-shadow: 0 6px 18px rgba(0, 229, 255, 0.45), 0 0 10px rgba(255, 107, 0, 0.35);
 }
 .btn-play:hover::before {
@@ -195,6 +195,16 @@ body {
   transform: translateY(-1px) scale(0.95);
   box-shadow: 0 2px 6px rgba(0, 229, 255, 0.3);
 }
+.btn-play:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 2px;
+  border-color: var(--accent-cyan);
+}
+@media (prefers-reduced-motion: reduce) {
+  .btn-play, .btn-play::before { transition: none; }
+  .btn-play:hover { transform: none; }
+}
+
 @media (min-width: 720px) {
   .featured-card { flex-direction: row; align-items: stretch; }
   .featured-banner-img { width: 38%; }
@@ -304,9 +314,27 @@ body {
 .footer-legal, .legal-links { display: flex; gap: 1rem; }
 .footer-legal a, .legal-links a { color: var(--text-muted); text-decoration: none; }
 .social-links { display: flex; gap: 1rem; font-size: 1.05rem; align-items: center; }
-.social-links a { color: #cfd6e6; display: inline-flex; transition: transform 0.15s ease; }
-.social-links a:hover { transform: scale(1.15); }
-.social-links img { width: 26px; height: 26px; object-fit: contain; display: block; }
+.social-links a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;  /* Cumple con la norma de accesibilidad UX (44px) */
+  height: 44px; /* Cumple con la norma de accesibilidad UX (44px) */
+  color: var(--text-muted);
+  border-radius: 50%;
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+.social-links img {
+  width: 24px;  /* Tamaño visual proporcional al diseño */
+  height: 24px;
+  object-fit: contain;
+}
+/* Estado Hover respetando la paleta oficial de Figma */
+.social-links a:hover {
+  transform: scale(1.15);
+  /* Brillo suave en tono Naranja Acento */
+  filter: drop-shadow(0 0 8px var(--accent-orange, #ff6b00));
+}
 @media (min-width: 900px) {
   .footer-top, .footer-grid { grid-template-columns: 300px 1fr; }
   .footer-links { grid-template-columns: repeat(4, 1fr); }
@@ -321,12 +349,112 @@ img.logo_footer { width: 5rem; height: auto; display: block; }
 }
 .game-screen { position: relative; aspect-ratio: 16/10; background: #0b0e1a; }
 .game-cover { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* ==========================================================================
+   BOTÓN PLAY OVERLAY (PÁGINA DE JUEGO) - MIRA ARCADE Y PULSO RETRO
+   ========================================================================== */
+
 .btn-play-overlay {
-  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-  width: 110px; height: 110px; border-radius: 50%; border: none; cursor: pointer;
-  background: rgba(230, 60, 40, 0.92); color: #7a1505; font-size: 2.4rem;
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 6px 24px rgba(0,0,0,0.5);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 3px solid var(--accent-orange, #ff6600);
+  background: rgba(22, 27, 46, 0.85);
+  backdrop-filter: blur(4px);
+  color: var(--accent-orange, #ff6600);
+  font-size: 2.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 0 20px rgba(255, 102, 0, 0.4), inset 0 0 15px rgba(255, 102, 0, 0.2);
+  transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+  background-color 0.25s ease,
+  border-color 0.25s ease,
+  color 0.25s ease,
+  box-shadow 0.25s ease;
+}
+
+/* Ajuste de centrado óptico para el ícono de triángulo */
+.btn-play-overlay i {
+  transform: translateX(3px);
+  transition: transform 0.25s ease;
+}
+
+/* Anillo de pulso neón exterior (Seudoelemento) */
+.btn-play-overlay::before {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  border: 2px solid var(--accent-cyan, #00e5ff);
+  opacity: 0;
+  transform: scale(0.8);
+  pointer-events: none;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* --- HOVER STATE --- */
+.btn-play-overlay:hover {
+  background: var(--accent-orange, #ff6600);
+  color: #ffffff;
+  border-color: var(--accent-cyan, #00e5ff);
+  transform: translate(-50%, -50%) scale(1.1);
+  box-shadow: 0 0 30px rgba(0, 229, 255, 0.7), 0 0 50px rgba(255, 102, 0, 0.5);
+}
+
+.btn-play-overlay:hover i {
+  transform: translateX(5px) scale(1.1);
+}
+
+.btn-play-overlay:hover::before {
+  opacity: 1;
+  animation: playPulse 1.2s infinite ease-out;
+}
+
+/* Animación del pulso de radar */
+@keyframes playPulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+}
+
+/* --- ACTIVE / PRESS STATE --- */
+.btn-play-overlay:active {
+  transform: translate(-50%, -50%) scale(0.95);
+  box-shadow: 0 0 15px rgba(0, 229, 255, 0.5);
+}
+
+/* --- ESTADO INICIADO / OCULTO TRAS CLIC --- */
+.btn-play-overlay.is-playing {
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(1.3);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* --- ACCESIBILIDAD Y FOCO POR TECLADO --- */
+.btn-play-overlay:focus-visible {
+  outline: 3px solid var(--accent-cyan, #00e5ff);
+  outline-offset: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-play-overlay,
+  .btn-play-overlay::before,
+  .btn-play-overlay i {
+    transition: none !important;
+    animation: none !important;
+  }
 }
 .game-toolbar {
   background-color: #17171f; display: flex; justify-content: space-between; align-items: center;
@@ -428,24 +556,45 @@ img.logo_footer { width: 5rem; height: auto; display: block; }
   content: "";
   position: absolute;
   top: 0;
-  left: 50%;
-  width: 0;
+  left: 0;
+  width: 100%;
   height: 100%;
   background-color: var(--accent-cyan);
   z-index: -1;
-  transition: width 0.3s ease, left 0.3s ease;
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: width 0.3s ease;
 }
-
 /* HOVER: Relleno desde el centro + texto oscuro de alto contraste */
 .btn-login:hover {
   color: #1a1a2e; /* Color oscuro del fondo de la app */
   box-shadow: 0 0 15px rgba(0, 229, 255, 0.6);
 }
-
 .btn-login:hover::before {
-  width: 100%;
-  left: 0;
+  transform: scaleX(1);
 }
+/* FOCUS: mismo relleno, con anillo visible para navegación por teclado */
+.btn-login:focus-visible {
+  color: #1a1a2e;
+  outline: 3px solid var(--accent-cyan);
+  outline-offset: 3px;
+}
+.btn-login:focus-visible::before {
+  transform: scaleX(1);
+}
+/* ACCESIBILIDAD: sin movimiento para quien lo prefiere */
+@media (prefers-reduced-motion: reduce) {
+  .btn-login,
+  .btn-login::before {
+    transition: none;
+  }
+  /* El relleno aparece de golpe, sin animación */
+  .btn-login:hover::before,
+  .btn-login:focus-visible::before {
+    transform: scaleX(1);
+  }
+}
+
 .social-divider, .social-login-divider { font-size: 0.85rem; color: #d6d2e4; margin: 1rem 0 0.7rem 0; }
 .social-buttons { display: flex; flex-direction: column; gap: 0.55rem; align-items: center; }
 .btn-social {
@@ -495,12 +644,166 @@ img.logo_footer { width: 5rem; height: auto; display: block; }
 .recaptcha-check { display: flex; align-items: center; gap: 0.6rem; cursor: pointer; }
 .recaptcha-text { color: #000; font-size: 0.8rem; }
 .recaptcha-brand { display: flex; flex-direction: column; align-items: center; color: #555; font-size: 0.55rem; }
+/* ==========================================================================
+   BOTÓN REGISTRARME - MIRA ARCADE + TRANSICIÓN SPINNER A ÉXITO (OPCIÓN B)
+   ========================================================================== */
+
 .btn-submit-register {
-  background-color: var(--accent-orange); color: #fff; border: none; padding: 0.8rem;
-  border-radius: 0.5rem; font-size: 1.05rem; font-weight: 800; cursor: pointer; position: relative;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  background-color: var(--accent-orange, #ff6600);
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  border: 2px solid var(--accent-orange, #ff6600);
+  border-radius: 4px;
+  cursor: pointer;
+  overflow: visible;
+  transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
 }
 
+/* --- Esquinas de la Mira Arcade --- */
+.btn-submit-register .corner {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--accent-cyan, #00f3ff);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.25s ease-out, opacity 0.25s ease-out;
+}
 
+.btn-submit-register .corner-tl { top: -6px; left: -6px; border-right: none; border-bottom: none; transform: translate(8px, 8px); }
+.btn-submit-register .corner-tr { top: -6px; right: -6px; border-left: none; border-bottom: none; transform: translate(-8px, 8px); }
+.btn-submit-register .corner-bl { bottom: -6px; left: -6px; border-right: none; border-top: none; transform: translate(8px, -8px); }
+.btn-submit-register .corner-br { bottom: -6px; right: -6px; border-left: none; border-top: none; transform: translate(-8px, -8px); }
+
+/* --- Hover --- */
+.btn-submit-register:hover {
+  border-color: var(--accent-cyan, #00f3ff);
+  box-shadow: 0 0 14px rgba(0, 243, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+.btn-submit-register:hover .corner {
+  opacity: 1;
+  transform: translate(0, 0);
+}
+
+/* Focus Visible */
+.btn-submit-register:focus-visible {
+  outline: 3px solid var(--accent-cyan, #00f3ff);
+  outline-offset: 4px;
+}
+
+/* --- Capas Internas del Botón --- */
+.btn-content,
+.btn-loading-content,
+.btn-success-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.btn-loading-content,
+.btn-success-content {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* --- Paso 1: Spinner Neón --- */
+.spinner-ring {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spinRing 0.6s linear infinite;
+}
+
+@keyframes spinRing {
+  to { transform: rotate(360deg); }
+}
+
+/* Estado Activo: CARGANDO */
+.btn-submit-register.is-loading {
+  background-color: var(--accent-orange, #ff6600);
+  pointer-events: none;
+}
+
+.btn-submit-register.is-loading .btn-content {
+  opacity: 0;
+  transform: translateY(-5px);
+}
+
+.btn-submit-register.is-loading .btn-loading-content {
+  opacity: 1;
+  position: relative;
+  transform: translateY(0);
+}
+
+/* --- Paso 2: Éxito con Check Trazado --- */
+.check-icon {
+  width: 20px;
+  height: 20px;
+  stroke-dasharray: 30;
+  stroke-dashoffset: 30;
+}
+
+/* Estado Activo: ÉXITO (Cian Neón) */
+.btn-submit-register.is-success {
+  background-color: var(--accent-cyan, #00f3ff);
+  color: #0d0e15;
+  border-color: var(--accent-cyan, #00f3ff);
+  box-shadow: 0 0 20px rgba(0, 243, 255, 0.7);
+  pointer-events: none;
+}
+
+.btn-submit-register.is-success .corner {
+  opacity: 0 !important;
+}
+
+.btn-submit-register.is-success .btn-loading-content {
+  opacity: 0;
+  transform: translateY(-5px);
+}
+
+.btn-submit-register.is-success .btn-success-content {
+  opacity: 1;
+  position: relative;
+  transform: translateY(0);
+}
+
+.btn-submit-register.is-success .check-icon path {
+  animation: drawCheck 0.4s ease-in-out forwards 0.15s;
+}
+
+@keyframes drawCheck {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Preferencias de Movimiento Reducido */
+@media (prefers-reduced-motion: reduce) {
+  .btn-submit-register,
+  .btn-submit-register .corner,
+  .spinner-ring,
+  .check-icon path {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  .btn-submit-register.is-success .check-icon path {
+    stroke-dashoffset: 0;
+  }
+}
 
 /* ==========================================
    MENÚS DESPLEGABLES (CATEGORÍAS Y USUARIO)

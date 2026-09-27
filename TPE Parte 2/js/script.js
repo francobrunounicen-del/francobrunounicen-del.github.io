@@ -3,10 +3,10 @@
    ========================================== */
 
 // 0. Menu desplegable de usuario
-document.querySelector('.btn-logout').addEventListener('click', () => {
+document.querySelector('.btn-logout')?.addEventListener('click', () => {
   window.location.href = "login.html";
-})
-  
+});
+
 // 1. Carruseles: desplazamiento proporcional al ancho visible + estado de flechas
 function scrollCarousel(carouselId, direction) {
   const track = document.getElementById(carouselId);
@@ -37,8 +37,6 @@ function initCarousels() {
   initSkewOnScroll();
 }
 
-/* Skew + estiramiento proporcional a la velocidad del scroll.
-   Aplica skewX dinámico mientras se scrollea y lo retira al frenar. */
 /* Skew fluido y sin vibraciones/parpadeos al scrollear */
 function initSkewOnScroll() {
   document.querySelectorAll('.carousel-track').forEach((track) => {
@@ -51,7 +49,6 @@ function initSkewOnScroll() {
       const vel = currentX - lastX;
       lastX = currentX;
 
-      // Ignora micro-movimientos para evitar que las tarjetas tiriten al detenerse
       if (Math.abs(vel) < 1.5) return;
 
       const skew = Math.max(-10, Math.min(10, vel * 0.25));
@@ -62,13 +59,11 @@ function initSkewOnScroll() {
       raf = requestAnimationFrame(() => {
         const cards = track.querySelectorAll('.game-card');
         cards.forEach((c) => {
-          // translateZ(0) activa la aceleración por hardware (GPU)
           c.style.transition = 'transform 0.05s ease-out';
           c.style.transform = 'skewX(' + (-skew) + 'deg) scaleX(' + stretch + ') translateZ(0)';
         });
       });
 
-      // Se ejecuta SOLO cuando el scroll se detiene por completo
       clearTimeout(resetTimer);
       resetTimer = setTimeout(() => {
         const cards = track.querySelectorAll('.game-card');
@@ -84,55 +79,24 @@ function initSkewOnScroll() {
 // 2. Controladores de eventos e interacción al cargar el DOM
 document.addEventListener('DOMContentLoaded', () => {
 
-  /* --- CONTROL DEL MODAL DE REGISTRO --- */
-  const modal = document.getElementById('registerModal');
-  const closeBtn = document.getElementById('closeRegisterModal');
-  const linkToLogin = document.getElementById('linkToLogin');
-  
-  // Captura solo los enlaces que abren el modal de registro.
-  // (El botón de perfil abre el dropdown de usuario, no el modal.)
-  const openBtns = document.querySelectorAll('.open-register-modal, #openRegisterModal');
+  /* --- INTERACCIÓN BOTÓN DE PLAY EN REPRODUCTOR --- */
+  const playBtn = document.getElementById('playBtn');
+  const gameCover = document.querySelector('.game-cover');
 
-  // Abrir Modal al hacer clic en cualquiera de los activadores
-  openBtns.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      if (modal) modal.classList.add('active');
-    });
-  });
+  if (playBtn) {
+    playBtn.addEventListener('click', () => {
+      // Transición visual al iniciar el juego
+      playBtn.classList.add('is-playing');
 
-  // Cerrar con el botón X
-  if (closeBtn) {
-    closeBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      modal.classList.remove('active');
+      // Opcional: Feedback visual en la portada
+      if (gameCover) {
+        gameCover.style.transition = 'filter 0.3s ease';
+        gameCover.style.filter = 'brightness(1.1)';
+      }
     });
   }
 
-  // Cerrar al hacer clic en "Iniciá sesión" dentro del modal
-  if (linkToLogin) {
-    linkToLogin.addEventListener('click', (e) => {
-      e.preventDefault();
-      modal.classList.remove('active');
-    });
-  }
-
-  // Cerrar al hacer clic fuera de la tarjeta modal
-  window.addEventListener('click', (e) => {
-    if (e.target === modal) {
-      modal.classList.remove('active');
-    }
-  });
-
-  // Cerrar presionando la tecla Escape
-  window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && modal && modal.classList.contains('active')) {
-      modal.classList.remove('active');
-    }
-  });
-
-
-  /* --- PUNTO 1: REGISTRO CORRECTO CON ANIMACION (keyframes %) --- */
+  /* --- VALIDACIÓN DE REGISTRO Y ANIMACIÓN EN 2 PASOS (SPINNER -> ÉXITO) --- */
   const formRegister = document.getElementById('formRegister');
   if (formRegister) {
     formRegister.addEventListener('submit', (e) => {
@@ -140,51 +104,56 @@ document.addEventListener('DOMContentLoaded', () => {
       const pass = document.getElementById('reg-pass');
       const pass2 = document.getElementById('reg-repeat-pass');
       const captcha = document.getElementById('captchaCheck');
+
       if (pass && pass2 && pass.value !== pass2.value) {
         pass2.setCustomValidity('Las contraseñas no coinciden');
         pass2.reportValidity();
         return;
       }
       if (pass2) pass2.setCustomValidity('');
+
       if (captcha && !captcha.checked) {
         captcha.reportValidity();
         return;
       }
+
       const btn = formRegister.querySelector('.btn-submit-register');
-      if (btn) {
-        btn.classList.add('loading');
-        btn.textContent = 'Registrando...';
-      }
-      // Simula validación y muestra éxito animado
+      const loadingContent = btn ? btn.querySelector('.btn-loading-content') : null;
+      const successContent = btn ? btn.querySelector('.btn-success-content') : null;
+
+      if (!btn) return;
+
+      // PASO 1: Iniciar estado de Carga (Spinner)
+      btn.classList.add('is-loading');
+      if (loadingContent) loadingContent.setAttribute('aria-hidden', 'false');
+
+      // PASO 2: Después de 600ms pasa a estado de Éxito (Cian + Check Trazado)
       setTimeout(() => {
-        const card = formRegister.closest('.register-card');
-        if (!card || card.querySelector('.register-success')) return;
-        const colors = ['#ff6b00', '#8b5cf6', '#00e5ff', '#facc15', '#22c55e', '#ec4899'];
-        let confetti = '';
-        for (let i = 0; i < 24; i++) {
-          const left = 5 + Math.random() * 90;
-          const delay = (Math.random() * 0.5).toFixed(2);
-          const c = colors[i % colors.length];
-          confetti += `<span class="confetti" style="left:${left}%;background:${c};animation-delay:${delay}s"></span>`;
-        }
-        card.insertAdjacentHTML('beforeend', `
-          <div class="register-success">
-            ${confetti}
-            <div class="check-circle">
-              <svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg>
-            </div>
-            <h3>¡Registro exitoso!</h3>
-            <p>Tu cuenta fue creada. Ya podés empezar a jugar.</p>
-          </div>`);
+        btn.classList.remove('is-loading');
+        if (loadingContent) loadingContent.setAttribute('aria-hidden', 'true');
+
+        btn.classList.add('is-success');
+        if (successContent) successContent.setAttribute('aria-hidden', 'false');
+
+        // Mantiene el estado de éxito durante 2 segundos y redirige
         setTimeout(() => {
-          if (modal) modal.classList.remove('active');
-          const ok = card.querySelector('.register-success');
-          if (ok) ok.remove();
-          if (btn) { btn.classList.remove('loading'); btn.textContent = 'Registrarme'; }
+          btn.classList.remove('is-success');
+          if (successContent) successContent.setAttribute('aria-hidden', 'true');
+
           formRegister.reset();
           window.location.href = 'index.html';
-        }, 2200);
-      }, 900);
+        }, 2000);
+
+      }, 600);
+    });
+  }
+
+  const loginForm = document.getElementById('login-form');
+  if (loginForm) {
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      // Simula el ingreso y redirige a la home
+      window.location.href = 'index.html';
     });
   }
 
@@ -219,9 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     sendCommentBtn.addEventListener('click', postComment);
     commentInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        postComment();
-      }
+      if (e.key === 'Enter') postComment();
     });
   }
 
@@ -248,12 +215,10 @@ function toggleDropdown(id) {
   if (!dropdown) return;
   if (window.event) window.event.stopPropagation();
 
-  // Ocultar el otro menú si está abierto para evitar solapamientos
   const otherId = id === 'categoriesDropdown' ? 'userDropdown' : 'categoriesDropdown';
   const other = document.getElementById(otherId);
   if (other) other.classList.add('hidden');
 
-  // Alternar visibilidad del menú seleccionado
   dropdown.classList.toggle('hidden');
 }
 
@@ -265,6 +230,7 @@ document.addEventListener('click', (e) => {
     if (d) d.classList.add('hidden');
   });
 });
+
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
     ['categoriesDropdown', 'userDropdown'].forEach((dropId) => {
@@ -278,7 +244,6 @@ document.addEventListener('keydown', (e) => {
 (function () {
   var overlay = document.getElementById('retro-loader-overlay');
   var percentageDisplay = document.getElementById('loader-percentage');
-  var healthBarFill = document.getElementById('health-bar-fill');
   if (!overlay || !percentageDisplay) return;
   var progress = 0;
   var totalTimeMs = 5000;
@@ -292,10 +257,8 @@ document.addEventListener('keydown', (e) => {
       setTimeout(function () { overlay.classList.add('hidden'); }, 250);
     }
     percentageDisplay.textContent = Math.floor(progress) + '%';
-    if (healthBarFill) healthBarFill.style.width = progress + '%';
   }, updateIntervalMs);
 })();
-
 
 /* PLUS TPE: carruseles desde la API v2 de la catedra (por tematica) */
 const API_URL = 'https://vj.interfaces.jima.com.ar/api/v2';
@@ -347,8 +310,8 @@ function renderizarCarruselAPI(track, juegos) {
     card.className = 'game-card featured-badge';
     card.title = juego.name + ' - Rating: ' + juego.rating + ' (' + generos + ')';
     card.innerHTML = '<span class="badge">★ ' + juego.rating + '</span>' +
-      '<img loading="lazy" src="' + img + '" alt="' + juego.name + '"> ' +
-      '<span class="game-name">' + nombre + '</span>';
+        '<img loading="lazy" src="' + img + '" alt="' + juego.name + '"> ' +
+        '<span class="game-name">' + nombre + '</span>';
     track.appendChild(card);
   });
 }
