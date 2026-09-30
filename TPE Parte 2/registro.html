@@ -41,9 +41,7 @@
       <div class="header-right">
         <button id="profile-btn" class="profile-dropdown-btn" onclick="toggleDropdown('userDropdown')">
           <i class="fa-solid fa-chevron-down arrow-icon"></i>
-          <div class="avatar-circle">
-            <i class="fa-solid fa-user-ninja"></i>
-          </div>
+          <div><img class="logo_usuario" src="img/Logo Usuario.png" alt="Logo Usuario"></div>
         </button>
       </div>
 
@@ -54,9 +52,9 @@
     <main class="main-content">
         
         <!-- Ruta de Navegación (Breadcrumbs) -->
-        <nav class="breadcrumb">
+        <nav class="breadcrumb-container">
             <a href="index.html" class="breadcrumb-link">Home</a>
-            <i class="fa-solid fa-play breadcrumb-separator"></i>
+            <span class="breadcrumb-separator"><i class="fa-solid fa-play"></i></span>
             <span class="breadcrumb-current">Registro</span>
         </nav>
         <!-- Tarjeta de Registro -->
@@ -134,7 +132,7 @@
                 <svg class="check-icon" viewBox="0 0 24 24">
                   <path d="M4 12l5 5L20 6" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
-                <span class="btn-success-text">¡Listo!</span>
+                <span class="btn-success-text">Registro Exitoso!</span>
               </span>
             </button>
           </form>
