@@ -3,8 +3,10 @@
    ========================================== */
 
 // 0. Menu desplegable de usuario
-document.querySelector('.btn-logout')?.addEventListener('click', () => {
-  window.location.href = "login.html";
+document.querySelectorAll('.btn-logout').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    window.location.href = "login.html";
+  });
 });
 
 // 1. Carruseles: desplazamiento proporcional al ancho visible + estado de flechas
@@ -158,6 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   initCarousels();
+  cargarJuegosDesdeAPI();
 
   /* --- PUBLICAR COMENTARIOS EN PAGINA DE JUEGO --- */
   const sendCommentBtn = document.getElementById('sendCommentBtn');
@@ -223,33 +226,34 @@ function toggleDropdown(id) {
 }
 
 // Cerrar dropdowns al hacer clic fuera o con Escape
-document.addEventListener('click', (e) => {
-  if (e.target.closest && (e.target.closest('.dropdown-card') || e.target.closest('#menu-btn') || e.target.closest('#profile-btn'))) return;
+function closeDropdowns() {
   ['categoriesDropdown', 'userDropdown'].forEach((dropId) => {
     const d = document.getElementById(dropId);
     if (d) d.classList.add('hidden');
   });
+}
+
+document.addEventListener('click', (e) => {
+  if (e.target.closest && (e.target.closest('.dropdown-card') || e.target.closest('#menu-btn') || e.target.closest('#profile-btn'))) return;
+  closeDropdowns();
 });
 
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
-    ['categoriesDropdown', 'userDropdown'].forEach((dropId) => {
-      const d = document.getElementById(dropId);
-      if (d) d.classList.add('hidden');
-    });
+    closeDropdowns();
   }
 });
 
 // LOADER DEL HOME: carga simulada de 5 segundos con animacion retro
 (function () {
-  var overlay = document.getElementById('retro-loader-overlay');
-  var percentageDisplay = document.getElementById('loader-percentage');
+  const overlay = document.getElementById('retro-loader-overlay');
+  const percentageDisplay = document.getElementById('loader-percentage');
   if (!overlay || !percentageDisplay) return;
-  var progress = 0;
-  var totalTimeMs = 5000;
-  var updateIntervalMs = 50;
-  var incrementPerStep = 100 / (totalTimeMs / updateIntervalMs);
-  var timerId = setInterval(function () {
+  let progress = 0;
+  const totalTimeMs = 5000;
+  const updateIntervalMs = 50;
+  const incrementPerStep = 100 / (totalTimeMs / updateIntervalMs);
+  let timerId = setInterval(function () {
     progress += incrementPerStep;
     if (progress >= 100) {
       progress = 100;
@@ -262,10 +266,6 @@ document.addEventListener('keydown', (e) => {
 
 /* PLUS TPE: carruseles desde la API v2 de la catedra (por tematica) */
 const API_URL = 'https://vj.interfaces.jima.com.ar/api/v2';
-
-document.addEventListener('DOMContentLoaded', () => {
-  cargarJuegosDesdeAPI();
-});
 
 async function cargarJuegosDesdeAPI() {
   const mapa = { c1: null, c2: null, c3: null, c4: null, c5: null, cApi: null };
