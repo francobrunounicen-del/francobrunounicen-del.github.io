@@ -144,6 +144,7 @@ body {
 .featured-title { font-size: 1.35rem; color: #c9b3ff; font-weight: 800; text-align: center; line-height: 1.25; }
 .featured-desc { font-size: 0.85rem; color: #f1eaff; font-weight: 600; }
 .featured-bullets { list-style: none; font-size: 0.85rem; color: #fff; font-weight: 600; display: flex; flex-direction: column; gap: 0.2rem; }
+/* Boton Jugar ahora*/
 .btn-play {
   position: relative;
   overflow: hidden;
@@ -257,7 +258,7 @@ body {
   font-size: 0.62rem; font-weight: 800; padding: 3px 8px; text-align: center;
 }
 
-/* 7. SIDEBAR ADS + TORNEO */
+/* 7. SIDEBAR PUBLICIDADES */
 .ad-row { display: flex; gap: 0.6rem; }
 .ad-box {
   flex: 1; background-color: #1d2233; border-radius: 0.6rem; padding: 0.55rem;
@@ -358,9 +359,7 @@ img.logo_footer { width: 5rem; height: auto; display: block; }
 }
 .game-screen { position: relative; aspect-ratio: 16/10; background: #0b0e1a; }
 .game-cover { width: 100%; height: 100%; object-fit: cover; display: block; }
-/* ==========================================================================
-   BOTÓN PLAY OVERLAY (PÁGINA DE JUEGO) - MIRA ARCADE Y PULSO RETRO
-   ========================================================================== */
+/* BOTÓN PLAY OVERLAY (PÁGINA DE JUEGO) - MIRA ARCADE Y PULSO RETRO */
 
 .btn-play-overlay {
   position: absolute;
@@ -655,9 +654,7 @@ img.logo_footer { width: 5rem; height: auto; display: block; }
 .recaptcha-check { display: flex; align-items: center; gap: 0.6rem; cursor: pointer; }
 .recaptcha-text { color: #000; font-size: 0.8rem; }
 .recaptcha-brand { display: flex; flex-direction: column; align-items: center; color: #555; font-size: 0.55rem; }
-/* ==========================================================================
-   BOTÓN REGISTRARME - MIRA ARCADE + TRANSICIÓN SPINNER A ÉXITO (OPCIÓN B)
-   ========================================================================== */
+/*   BOTÓN REGISTRARME - MIRA ARCADE + TRANSICIÓN SPINNER A ÉXITO (OPCIÓN B) */
 
 .btn-submit-register {
   position: relative;
@@ -821,9 +818,7 @@ img.logo_footer { width: 5rem; height: auto; display: block; }
   }
 }
 
-/* ==========================================
-   MENÚS DESPLEGABLES (CATEGORÍAS Y USUARIO)
-   ========================================== */
+/*   MENÚS DESPLEGABLES (CATEGORÍAS Y USUARIO)  */
 
 /* Capa contenedor / Posicionamiento */
 .dropdown-overlay {
@@ -986,9 +981,7 @@ img.logo_footer { width: 5rem; height: auto; display: block; }
   text-align: center;
 }
 
-/* ========================================================================== /
-/ ANIMACIONES RETRO EN CSS CON KEYFRAMES DE PORCENTAJE (%)                  /
-/ ========================================================================== */
+/*  ANIMACIONES RETRO EN CSS CON KEYFRAMES DE PORCENTAJE (%)  */
 
 /* --- FANTASMITA RETRO --- */
 .ghost-sprite {
