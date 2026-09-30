@@ -1,7 +1,4 @@
-﻿/* ==========================================
-   ARCHIVO: js/script.js
-   ========================================== */
-
+﻿
 // 0. Menu desplegable de usuario
 document.querySelectorAll('.btn-logout').forEach((btn) => {
   btn.addEventListener('click', () => {
