@@ -1,5 +1,6 @@
 TPE - Plataforma de Videojuegos (Entrega Final)
-Trabajo Práctico Evaluativo correspondiente a la materia. Grupo 20
+Trabajo Práctico Evaluativo correspondiente a la materia Interfaces. 
+Grupo 20
 
 Integrantes:
 Bruno, Franco
