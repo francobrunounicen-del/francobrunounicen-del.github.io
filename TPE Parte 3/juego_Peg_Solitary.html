@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Retro Player - Home</title>
+  <title>Retro Player - Pegs On Neon</title>
 
   <!-- Fuentes e Iconos -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" >
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -43,7 +43,9 @@
       <div class="header-right">
         <button id="profile-btn" class="profile-dropdown-btn" onclick="toggleDropdown('userDropdown')">
           <i class="fa-solid fa-chevron-down arrow-icon"></i>
-          <div><img class="logo_usuario" src="img/Logo Usuario.png" alt="Logo Usuario"></div>
+          <div>
+            <img class="logo_usuario" src="img/Logo Usuario.png" alt="Logo Usuario">
+          </div>
         </button>
       </div>
 
@@ -52,127 +54,128 @@
 
   <!-- BREADCRUMB -->
   <nav class="breadcrumb-container">
-    <span class="breadcrumb-current">Home</span>
+    <a href="index.html" class="breadcrumb-link">Home</a> 
+    <span class="breadcrumb-separator"><i class="fa-solid fa-play"></i></span> 
+    <span class="breadcrumb-current">Pegs On Neon</span>
   </nav>
 
   <!-- CONTENIDO PRINCIPAL (LAYOUT EN 2 COLUMNAS) -->
   <div class="main-layout">
     
-    <!-- COLUMNA IZQUIERDA: CONTENIDO DEL HOME -->
+    <!-- COLUMNA IZQUIERDA: CONTENIDO DEL JUEGO -->
     <main class="content-column">
       
-      <!-- SECCIÓN JUEGO DESTACADO DEL AÑO -->
-      <section class="featured-section">
-        <h2 class="section-title">Juego destacado del año</h2>
-        <div class="featured-card">
-          <div class="featured-banner-img">
-            <img src="img/Home Peg Solitary.png" alt="Pegs On Neon Cover">
+      <!-- REPRODUCTOR / MARCO DEL JUEGO -->
+      <section class="game-container">
+        <div class="game-screen" id="gameScreen">
+          <img src="img/Juego Peg Solitary.png" alt="Pegs On Neon Gameplay" class="game-cover">
+          <button class="btn-play-overlay" id="playBtn" aria-label="Iniciar Juego">
+            <i class="fa-solid fa-play"></i>
+          </button>
+        </div>
+
+        <!-- BARRA DE ACCIONES DEL JUEGO -->
+        <div class="game-toolbar">
+          <div class="toolbar-left">
+            <button class="btn-icon" title="Información"><i class="fa-solid fa-circle-info"></i></button>
+            <button class="btn-icon" title="Favorito"><i class="fa-solid fa-heart"></i></button>
+            <button class="btn-icon" title="Guardar"><i class="fa-solid fa-bookmark"></i></button>
+            <button class="btn-icon" title="Pantalla Completa" id="fullscreenBtn"><i class="fa-solid fa-expand"></i></button>
           </div>
-          <div class="featured-info">
-            <h3 class="featured-title">PEGS ON NEON: THE CIRCUIT SOLITAIRE</h3>
-            <p class="featured-desc">El solitario de circuito más adictivo. ¡Desafía tu mente en pixel art!</p>
-            <ul class="featured-bullets">
-              <li>👾 Estética retro-cyberpunk en pixel art</li>
-              <li>🧩 Más de 100 niveles de pura estrategia</li>
-              <li>🏆 ¡Desafíos semanales y récord de puntuación!</li>
-            </ul>
-            <a href="juego_Peg_Solitary.html" class="btn-play">Jugar Ahora</a>
+          <div class="toolbar-right">
+            <button class="btn-icon" title="Me gusta"><i class="fa-solid fa-thumbs-up"></i></button>
+            <span class="rating-text">86%</span>
+            <button class="btn-icon" title="No me gusta"><i class="fa-solid fa-thumbs-down"></i></button>
           </div>
         </div>
       </section>
 
-      <!-- CARRUSEL: JUEGOS NUEVOS (API de la cátedra - Plus TPE) -->
-      <section class="carousel-section">
-        <h2 class="section-title">Juegos Nuevos</h2>
-        <div class="carousel-wrapper">
-          <button type="button" class="carousel-btn prev" onclick="scrollCarousel('c1', -1)" aria-label="Anterior"><img src="img/carrusel/vector desplazamiento izquierda.png" alt="Anterior"></button>
-          <div class="carousel-viewport">
-          <div class="carousel-track" id="c1">
-            <div class="game-card"><span class="game-name">CARGANDO JUEGOS...</span></div>
-          </div>
-          </div>
-          <button type="button" class="carousel-btn next" onclick="scrollCarousel('c1', 1)" aria-label="Siguiente"><img src="img/carrusel/vector desplazmiento derecha.png" alt="Siguiente"></button>
+      <!-- DESCRIPCIÓN DEL JUEGO -->
+      <section class="info-card">
+        <h3 class="info-title">Descripción:</h3>
+        <p class="info-text">
+          Es un juego de rompecabezas táctico que reinterpreta el clásico solitario de clavijas. 
+          Debes saltar fichas sobre un tablero en forma de cruz para eliminarlas. Repleta de circuitos impresos, tubos de neón 
+          y efectos de electricidad.
+          El objetivo principal es planificar cada movimiento con precisión para ir despejando el circuito hasta dejar 
+          una sola esfera brillante en el centro del tablero.
+        </p>
+      </section>
+
+      <!-- CÓMO JUGAR -->
+      <section class="info-card">
+        <h3 class="info-title">¿Cómo jugar?</h3>
+        <ul class="instructions-list">
+          <li>Usa el clic del mouse o la pantalla táctil para seleccionar una esfera de neón y saltar sobre otra adyacente hacia un espacio vacío.</li>
+          <li>Cada esfera superada desaparece del tablero de circuito, despejando el camino. Anticipa cada jugada para no quedarte sin saltos disponibles.</li>
+          <li>Intenta despejar la mayor cantidad de fichas y dejar solo una esfera en el tablero para dominar el circuito.</li>
+        </ul>
+      </section>
+
+      <!-- GALERÍA DE IMÁGENES -->
+      <section class="gallery-section">
+        <h3 class="info-title">Galería de Imágenes</h3>
+        <div class="gallery-grid">
+          <div class="gallery-item"><img src="img/Galeria 1.png" alt="Captura 1"></div>
+          <div class="gallery-item"><img src="img/Galeria 2.png" alt="Captura 2"></div>
+          <div class="gallery-item"><img src="img/Galeria 3.png" alt="Captura 3"></div>
+          <div class="gallery-item"><img src="img/Galeria 4.png" alt="Captura 4"></div>
+          <div class="gallery-item"><img src="img/Galeria 5.png" alt="Captura 5"></div>
         </div>
       </section>
 
-      <!-- CARRUSEL: JUEGOS DESTACADOS -->
-      <section class="carousel-section">
-        <h2 class="section-title">Juegos Destacados</h2>
-        <div class="carousel-wrapper">
-          <button type="button" class="carousel-btn prev" onclick="scrollCarousel('cApi', -1)" aria-label="Anterior"><img src="img/carrusel/vector desplazamiento izquierda.png" alt="Anterior"></button>
-          <div class="carousel-viewport">
-          <div class="carousel-track" id="cApi">
-            <div class="game-card"><span class="game-name">CARGANDO JUEGOS...</span></div>
+      <!-- SECCIÓN DE COMENTARIOS -->
+      <section class="comments-section">
+        <h3 class="info-title">Comentarios</h3>
+        
+        <!-- INPUT PARA UN NUEVO COMENTARIO -->
+        <div class="comment-input-box">
+          <input type="text" id="newComment" placeholder="💬 ¿Qué opinas del juego?">
+          <button id="sendCommentBtn" class="btn-send">Publicar</button>
+        </div>
+
+        <!-- LISTA DE COMENTARIOS EXISTENTES -->
+        <div class="comments-list" id="commentsList">
+          <div class="comment-card">
+            <div class="comment-avatar">👨‍💻</div>
+            <div class="comment-body">
+              <div class="comment-header">
+                <span class="comment-author">Jose</span>
+                <span class="comment-time">5 días</span>
+              </div>
+              <p class="comment-text">Es el típico rompecabezas perfecto para pasar el rato, ejercitar la mente unos minutos y desconectar.</p>
+            </div>
           </div>
+
+          <div class="comment-card">
+            <div class="comment-avatar">🎮</div>
+            <div class="comment-body">
+              <div class="comment-header">
+                <span class="comment-author">Gonzalo</span>
+                <span class="comment-time">30 días</span>
+              </div>
+              <p class="comment-text">Es sorprendentemente adictivo. Reglas muy sencillas de entender, pero que te exigen pensar varios pasos adelante para no quedarte bloqueado.</p>
+            </div>
           </div>
-          <button type="button" class="carousel-btn next" onclick="scrollCarousel('cApi', 1)" aria-label="Siguiente"><img src="img/carrusel/vector desplazmiento derecha.png" alt="Siguiente"></button>
+
+          <div class="comment-card">
+            <div class="comment-avatar">👾</div>
+            <div class="comment-body">
+              <div class="comment-header">
+                <span class="comment-author">Agustín</span>
+                <span class="comment-time">1 mes</span>
+              </div>
+              <p class="comment-text">Muchos se quedan trabados al llegar a 2 o 3 fichas restantes. Cuando por fin descifras la secuencia para dejar solo una en el centro, la satisfacción es enorme.</p>
+            </div>
+          </div>
         </div>
       </section>
-
-      <!-- CARRUSEL: JUEGOS POPULARES -->
-      <section class="carousel-section">
-        <h2 class="section-title">Juegos Populares</h2>
-        <div class="carousel-wrapper">
-          <button type="button" class="carousel-btn prev" onclick="scrollCarousel('c2', -1)" aria-label="Anterior"><img src="img/carrusel/vector desplazamiento izquierda.png" alt="Anterior"></button>
-          <div class="carousel-viewport">
-          <div class="carousel-track" id="c2">
-            <div class="game-card"><span class="game-name">CARGANDO JUEGOS...</span></div>
-          </div>
-          </div>
-          <button type="button" class="carousel-btn next" onclick="scrollCarousel('c2', 1)" aria-label="Siguiente"><img src="img/carrusel/vector desplazmiento derecha.png" alt="Siguiente"></button>
-        </div>
-      </section>
-
-      <!-- CARRUSEL: JUEGOS AVENTURA -->
-      <section class="carousel-section">
-        <h2 class="section-title">Juegos Aventura</h2>
-        <div class="carousel-wrapper">
-          <button type="button" class="carousel-btn prev" onclick="scrollCarousel('c3', -1)" aria-label="Anterior"><img src="img/carrusel/vector desplazamiento izquierda.png" alt="Anterior"></button>
-          <div class="carousel-viewport">
-          <div class="carousel-track" id="c3">
-            <div class="game-card"><span class="game-name">CARGANDO JUEGOS...</span></div>
-          </div>
-          </div>
-          <button type="button" class="carousel-btn next" onclick="scrollCarousel('c3', 1)" aria-label="Siguiente"><img src="img/carrusel/vector desplazmiento derecha.png" alt="Siguiente"></button>
-        </div>
-      </section>
-
-      <!-- CARRUSEL: JUEGOS ACCION -->
-      <section class="carousel-section">
-        <h2 class="section-title">Juegos Acción</h2>
-        <div class="carousel-wrapper">
-          <button type="button" class="carousel-btn prev" onclick="scrollCarousel('c4', -1)" aria-label="Anterior"><img src="img/carrusel/vector desplazamiento izquierda.png" alt="Anterior"></button>
-          <div class="carousel-viewport">
-          <div class="carousel-track" id="c4">
-            <div class="game-card"><span class="game-name">CARGANDO JUEGOS...</span></div>
-          </div>
-          </div>
-          <button type="button" class="carousel-btn next" onclick="scrollCarousel('c4', 1)" aria-label="Siguiente"><img src="img/carrusel/vector desplazmiento derecha.png" alt="Siguiente"></button>
-        </div>
-      </section>
-
-      <!-- CARRUSEL: JUEGOS RPG -->
-      <section class="carousel-section">
-        <h2 class="section-title">Juegos RPG</h2>
-        <div class="carousel-wrapper">
-          <button type="button" class="carousel-btn prev" onclick="scrollCarousel('c5', -1)" aria-label="Anterior"><img src="img/carrusel/vector desplazamiento izquierda.png" alt="Anterior"></button>
-          <div class="carousel-viewport">
-          <div class="carousel-track" id="c5">
-            <div class="game-card"><span class="game-name">CARGANDO JUEGOS...</span></div>
-          </div>
-          </div>
-          <button type="button" class="carousel-btn next" onclick="scrollCarousel('c5', 1)" aria-label="Siguiente"><img src="img/carrusel/vector desplazmiento derecha.png" alt="Siguiente"></button>
-        </div>
-      </section>
-
-
 
     </main>
 
     <!-- COLUMNA DERECHA: SIDEBAR DE PUBLICIDAD -->
     <aside class="sidebar-column">
       
-      <!-- BANNERS SUPERIORES -->
       <div class="ad-row">
         <div class="ad-box">
           <span class="ad-tag">Publicidad</span>
@@ -188,13 +191,11 @@
         </div>
       </div>
 
-      <!-- BANNER TORNEO -->
       <div class="tournament-card">
         <img src="img/Pub1.jpg" alt="Torneo semanal de plataformas abierto" loading="lazy">
         <button class="btn-tournament">INSCRIBETE AQUÍ</button>
       </div>
 
-      <!-- BANNERS INFERIORES -->
       <div class="ad-row">
         <div class="ad-box">
           <span class="ad-tag">Publicidad</span>
@@ -218,7 +219,7 @@
     <div class="footer-top">
       <div class="footer-brand">
         <div class="logo">
-          <div><img class="logo_footer" src="img/Logo RETRO PLAYER.png" alt="Logo Retro Player"></div>
+          <div ><img class="logo_footer" src="img/Logo RETRO PLAYER.png" alt="Logo Retro Player"></div>
         </div>
         <p>"Revive la época dorada de los videojuegos. Accede a un catálogo de títulos retro 100% gratuitos y financiados por la comunidad a través de anuncios."</p>
       </div>
@@ -274,8 +275,7 @@
         <a href="#" aria-label="Facebook"><img src="img/Vector.png" alt="Facebook"></a>
         <a href="#" aria-label="X"><img src="img/Icon (2).png" alt="X"></a>
         <a href="#" aria-label="YouTube"><img src="img/Icon (1).png" alt="YouTube"></a>
-      </div>
-      <div class="footer-legal">
+      </div>      <div class="footer-legal">
         <a href="#">Términos y Condiciones</a>
         <a href="#">Privacidad</a>
         <a href="#">Cookies</a>
@@ -283,7 +283,7 @@
     </div>
   </footer>
 
-  <!-- MENÚ DESPLEGABLE DE CATEGORÍAS (Hamburguesa) -->
+    <!-- MENÚ DESPLEGABLE DE CATEGORÍAS (Hamburguesa) -->
   <div id="categoriesDropdown" class="dropdown-overlay hidden">
     <div class="dropdown-card">
       <button class="btn-close-dropdown" onclick="toggleDropdown('categoriesDropdown')">
@@ -355,17 +355,7 @@
     </div>
   </div>
 
-  <!-- OVERLAY DE CARGA (Pantalla completa) -->
-  <div id="retro-loader-overlay">
-    <div class="retro-box">
-      <div id="retro-animation-container"><div class="ghost-sprite"></div></div>
-      <h1>Loading...</h1>
-      <span id="loader-percentage">0%</span>
-    </div>
-  </div>
-
-  <!-- SCRIPT JS PRINCIPAL -->
+  <!-- SCRIPT UNIFICADO -->
   <script src="js/script.js"></script>
-
 </body>
 </html>
