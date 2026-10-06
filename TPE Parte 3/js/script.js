@@ -247,7 +247,7 @@ document.addEventListener('keydown', (e) => {
   const percentageDisplay = document.getElementById('loader-percentage');
   if (!overlay || !percentageDisplay) return;
   let progress = 0;
-  const totalTimeMs = 5000;
+  const totalTimeMs = 1000;
   const updateIntervalMs = 50;
   const incrementPerStep = 100 / (totalTimeMs / updateIntervalMs);
   let timerId = setInterval(function () {
