@@ -491,7 +491,7 @@ img.logo_footer { width: 5rem; height: auto; display: block; }
 .instructions-list li::before { content: "• "; font-weight: 900; }
 
 /* Galería: miniaturas retrato 3:5 como en Figma, sin recortes */
-.gallery-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.7rem; }
+.gallery-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.7rem; }
 .gallery-item {
   border-radius: 0.6rem; overflow: hidden; cursor: pointer;
   border: 2px solid #22d3ee; box-shadow: 0 0 12px rgba(34, 211, 238, 0.35);
@@ -500,8 +500,6 @@ img.logo_footer { width: 5rem; height: auto; display: block; }
 .gallery-item:nth-child(3n) { border-color: #f0f; box-shadow: 0 0 12px rgba(255, 0, 255, 0.35); }
 .gallery-item:nth-child(4n) { border-color: #f43f5e; }
 .gallery-item img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
-@media (max-width: 1024px) { .gallery-grid { grid-template-columns: repeat(3, 1fr); } }
-@media (max-width: 640px) { .gallery-grid { grid-template-columns: repeat(2, 1fr); } }
 
 /* Comentarios: tarjeta lavanda + burbujas blancas */
 .comments-section .comment-input-box { display: flex; gap: 0.5rem; }
