@@ -464,14 +464,6 @@ img.logo_footer { width: 5rem; height: auto; display: block; }
   outline-offset: 6px;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .btn-play-overlay,
-  .btn-play-overlay::before,
-  .btn-play-overlay i {
-    transition: none !important;
-    animation: none !important;
-  }
-}
 .game-toolbar {
   background-color: #17171f; display: flex; justify-content: space-between; align-items: center;
   padding: 0.45rem 0.8rem;

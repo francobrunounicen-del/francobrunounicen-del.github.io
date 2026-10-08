@@ -86,11 +86,11 @@ document.addEventListener('DOMContentLoaded', () => {
     playBtn.addEventListener('click', () => {
       // Transición visual al iniciar el juego
       playBtn.classList.add('is-playing');
-
       // Opcional: Feedback visual en la portada
       if (gameCover) {
         gameCover.style.transition = 'filter 0.3s ease';
         gameCover.style.filter = 'brightness(1.1)';
+        gameCover.src = "img/blockA_fondo.jpg";
       }
     });
   }
