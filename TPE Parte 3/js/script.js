@@ -314,27 +314,193 @@ function renderizarCarruselAPI(track, juegos) {
 }
 
 /*CANVAS!! */
-let ctx=document.getElementById("canvas").getContext("2d");
-let img=new Image();
-img.src="img//galeria_BlockA/4.png";
-img.onload=function () {
-  myDrawImageMethod(this);
-}
-function myDrawImageMethod(image){
-  ctx.drawImage(image,200,100)
-}
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
 
-for(x=0;x<img.width;x++){
-  for(y=0;y<img.height;y++){
-    let r,g,b,a=0;
-    setPixel(img,x,y,r,g,b,a);
+// Estado global del nivel
+const estadoJuego = {
+  piezas: [],             // Arreglo con la información de las 4, 6 u 8 partes
+  bancoImagenes: [
+    'img/galeria_BlockA/1.png', 'img/galeria_BlockA/2.png', 'img/galeria_BlockA/3.png',
+    'img/galeria_BlockA/4.png', 'img/galeria_BlockA/5.png', 'img/galeria_BlockA/6.png'
+  ],
+  filtroActual: 'grises', // 'grises', 'brillo', 'negativo'
+  tiempoTranscurrido: 0,
+  timerInterval: null,
+  juegoTerminado: false,
+  cantPartes: 4,          // 4, 6 u 8 partes
+  offsetLeft: 50,
+  offsetTop: 50
+};
+
+function aplicarFiltro(imageData, tipoFiltro) {
+  const data = imageData.data;
+
+  for (let i = 0; i < data.length; i += 4) {
+    if (tipoFiltro === 'grises') {
+      // Luminancia BT.601 (Diapositiva 21)[cite: 21]
+      const gris = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+      data[i] = gris;
+      data[i + 1] = gris;
+      data[i + 2] = gris;
+    }
+    else if (tipoFiltro === 'brillo') {
+      // Brillo +30% (Diapositiva 23)[cite: 23]
+      data[i] *= 1.3;
+      data[i + 1] *= 1.3;
+      data[i + 2] *= 1.3;
+    }
+    else if (tipoFiltro === 'negativo') {
+      // Negativo (Diapositiva 22)[cite: 22]
+      data[i] = 255 - data[i];
+      data[i + 1] = 255 - data[i + 1];
+      data[i + 2] = 255 - data[i + 2];
+    }
   }
 }
 
-function setPixel(img,x,y,r,g,b,a){
-  index=(x+y*img.width)*4;
-  img.data[index+0]=r;
-  img.data[index+1]=g;
-  img.data[index+2]=b;
-  img.data[index+3]=a;
+function iniciarNivel() {
+  const rutaImagen = estadoJuego.bancoImagenes[Math.floor(Math.random() * estadoJuego.bancoImagenes.length)];
+  const img = new Image();
+  img.src = rutaImagen;
+
+  img.onload = function () {
+    setupPiezas(this);
+  };
 }
+
+function setupPiezas(imagen) {
+  estadoJuego.piezas = [];
+
+  // Determinar filas y columnas según la cantidad de partes seleccionadas (4, 6 u 8)[cite: 1]
+  let cols = 2, filas = 2;
+  if (estadoJuego.cantPartes === 6) { cols = 3; filas = 2; }
+  if (estadoJuego.cantPartes === 8) { cols = 4; filas = 2; }
+
+  const subWidth = imagen.width / cols;
+  const subHeight = imagen.height / filas;
+  const angulos = [0, 90, 180, 270];
+
+  // Canvas auxiliar en memoria para recortar y procesar filtros[cite: 17, 19]
+  const canvasAux = document.createElement('canvas');
+  canvasAux.width = subWidth;
+  canvasAux.height = subHeight;
+  const ctxAux = canvasAux.getContext('2d');
+
+  let id = 0;
+  for (let r = 0; r < filas; r++) {
+    for (let c = 0; c < cols; c++) {
+
+      // Recortar subimagen
+      ctxAux.clearRect(0, 0, subWidth, subHeight);
+      ctxAux.drawImage(imagen, c * subWidth, r * subHeight, subWidth, subHeight, 0, 0, subWidth, subHeight);
+
+      // Obtener ImageData original y con filtro (Tema 3)[cite: 1, 17]
+      const imgDataOrig = ctxAux.getImageData(0, 0, subWidth, subHeight);
+      const imgDataFilt = ctxAux.getImageData(0, 0, subWidth, subHeight);
+
+      // Aplicar el filtro de la consigna sobre la copia[cite: 1, 22]
+      aplicarFiltro(imgDataFilt, estadoJuego.filtroActual);
+
+      // Guardar el objeto estructural con los datos de la subimagen
+      estadoJuego.piezas.push({
+        id: id++,
+        col: c,
+        row: r,
+        width: subWidth,
+        height: subHeight,
+        rotacion: angulos[Math.floor(Math.random() * angulos.length)], //[cite: 1]
+        fijada: false,                                                // Para "Ayudita"[cite: 2]
+        canvasPropio: crearCanvasDePieza(subWidth, subHeight, imgDataFilt),
+        imgDataOriginal: imgDataOrig
+      });
+    }
+  }
+
+  dibujarJuego();
+}
+
+// Función auxiliar para pasar de ImageData a un Canvas que se pueda dibujar fácil con drawImage[cite: 17, 19]
+function crearCanvasDePieza(w, h, imageData) {
+  const c = document.createElement('canvas');
+  c.width = w;
+  c.height = h;
+  c.getContext('2d').putImageData(imageData, 0, 0); //[cite: 17]
+  return c;
+}
+
+function dibujarJuego() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  estadoJuego.piezas.forEach(pieza => {
+    const dx = estadoJuego.offsetLeft + (pieza.col * pieza.width);
+    const dy = estadoJuego.offsetTop + (pieza.row * pieza.height);
+
+    ctx.save();
+    // Trasladar y rotar según el centro de la subimagen[cite: 1]
+    ctx.translate(dx + pieza.width / 2, dy + pieza.height / 2);
+    ctx.rotate((pieza.rotacion * Math.PI) / 180);
+
+    // Dibujar el canvas interno procesado[cite: 19]
+    ctx.drawImage(pieza.canvasPropio, -pieza.width / 2, -pieza.height / 2);
+    ctx.restore();
+
+    // Borde si la pieza fue fijada por "Ayudita"[cite: 2]
+    if (pieza.fijada) {
+      ctx.strokeStyle = 'gold';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(dx + 2, dy + 2, pieza.width - 4, pieza.height - 4);
+    }
+  });
+}
+
+// Desactivar menú derecho en el canvas[cite: 1]
+canvas.addEventListener('contextmenu', e => e.preventDefault());
+
+canvas.addEventListener('mousedown', function (e) {
+  if (estadoJuego.juegoTerminado) return;
+
+  const rect = canvas.getBoundingClientRect();
+  const clickX = e.clientX - rect.left;
+  const clickY = e.clientY - rect.top;
+
+  estadoJuego.piezas.forEach(pieza => {
+    const px = estadoJuego.offsetLeft + (pieza.col * pieza.width);
+    const py = estadoJuego.offsetTop + (pieza.row * pieza.height);
+
+    // Detectar si el click fue dentro de esta subimagen
+    if (clickX >= px && clickX <= px + pieza.width &&
+        clickY >= py && clickY <= py + pieza.height) {
+
+      if (!pieza.fijada) {
+        // Rotar: Clic Derecho = 90°, Clic Izquierdo = -90°[cite: 1]
+        const sentido = (e.button === 2) ? 90 : -90;
+        pieza.rotacion = (pieza.rotacion + sentido + 360) % 360;
+
+        dibujarJuego();
+        comprobarVictoria();
+      }
+    }
+  });
+});
+
+function comprobarVictoria() {
+  // Si todas las piezas tienen rotación 0°[cite: 1]
+  const gano = estadoJuego.piezas.every(p => p.rotacion === 0);
+
+  if (gano) {
+    estadoJuego.juegoTerminado = true;
+    clearInterval(estadoJuego.timerInterval);
+
+    // Al ganar: quitar filtros restaurando el ImageData RGB original (Funcionalidad General)[cite: 1, 17]
+    estadoJuego.piezas.forEach(pieza => {
+      const ctxPieza = pieza.canvasPropio.getContext('2d');
+      ctxPieza.putImageData(pieza.imgDataOriginal, 0, 0); //[cite: 17]
+    });
+
+    dibujarJuego();
+    setTimeout(() => alert("¡Nivel superado!"), 200);
+  }
+}
+
+iniciarNivel();
