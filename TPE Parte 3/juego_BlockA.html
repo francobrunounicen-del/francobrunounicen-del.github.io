@@ -64,11 +64,12 @@
     
     <!-- COLUMNA IZQUIERDA: CONTENIDO DEL JUEGO -->
     <main class="content-column">
-      
+
       <!-- REPRODUCTOR / MARCO DEL JUEGO -->
       <section class="game-container">
+        <canvas id="canvas" width="700" height="600" style="border: #000000 solid 5px"></canvas>
         <div class="game-screen" id="gameScreen">
-          <img src="img/juego_BlockA.jpg" alt="BlockA Gameplay" class="game-cover" id="juego_block">
+          <img src="img/juego_BlockA.jpg" alt="BlockA Gameplay" class="game-cover">
           <button class="btn-play-overlay" id="playBtn" aria-label="Iniciar Juego">
             <i class="fa-solid fa-play"></i>
           </button>
@@ -108,8 +109,8 @@
           <li>Al iniciar cada nivel, la pantalla te mostrará una Blocka: una imagen dividida en un cuadrante de 4 piezas
             2x2, donde cada subimagen se encuentra desorientada o rotada.</li>
           <li>Hacé clic (o tocá en pantallas táctiles) sobre la subimagen que quieras corregir.
-            Cada clic rotará el cuadrante 90° en el sentido de las agujas del reloj.</li>
-          <li>Continuá girando los 4 bloques individualmente hasta que todos coincidan en la posición orientación correcta.</li>
+            Cada clic rotará el cuadrante 90° en el sentido de las agujas del reloj. Continuá girando los 4 bloques individualmente hasta que todos
+            coincidan en la posición orientación correcta.</li>
           <li>Al colocar la última pieza correctamente, el tablero detectará automáticamente la imagen conformada y desbloqueará el siguiente nivel.</li>
         </ul>
       </section>

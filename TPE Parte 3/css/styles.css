@@ -1033,3 +1033,9 @@ img.logo_footer { width: 5rem; height: auto; display: block; }
   color: var(--text-main);
   font-variant-numeric: tabular-nums;
 }
+
+/*canvas*/
+
+#canvas{
+
+}

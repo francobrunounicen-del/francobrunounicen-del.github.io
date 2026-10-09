@@ -88,9 +88,9 @@ document.addEventListener('DOMContentLoaded', () => {
       playBtn.classList.add('is-playing');
       // Opcional: Feedback visual en la portada
       if (gameCover) {
-        gameCover.style.transition = 'filter 0.3s ease';
-        gameCover.style.filter = 'brightness(1.1)';
-        gameCover.src = "img/blockA_fondo.jpg";
+        gameCover.style.transition = 'filter 4s ease';
+        //gameCover.style.filter = 'brightness(0.7)';
+        gameCover.src = "img/blockA_fondo_menu.jpg";
       }
     });
   }
@@ -311,4 +311,30 @@ function renderizarCarruselAPI(track, juegos) {
         '<span class="game-name">' + nombre + '</span>';
     track.appendChild(card);
   });
+}
+
+/*CANVAS!! */
+let ctx=document.getElementById("canvas").getContext("2d");
+let img=new Image();
+img.src="img//galeria_BlockA/4.png";
+img.onload=function () {
+  myDrawImageMethod(this);
+}
+function myDrawImageMethod(image){
+  ctx.drawImage(image,200,100)
+}
+
+for(x=0;x<img.width;x++){
+  for(y=0;y<img.height;y++){
+    let r,g,b,a=0;
+    setPixel(img,x,y,r,g,b,a);
+  }
+}
+
+function setPixel(img,x,y,r,g,b,a){
+  index=(x+y*img.width)*4;
+  img.data[index+0]=r;
+  img.data[index+1]=g;
+  img.data[index+2]=b;
+  img.data[index+3]=a;
 }
