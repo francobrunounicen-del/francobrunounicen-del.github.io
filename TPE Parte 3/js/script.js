@@ -319,18 +319,19 @@ const ctx = canvas.getContext("2d");
 
 // Estado global del nivel
 const estadoJuego = {
+  nivelActual: 1,         // Nivel 1, 2 o 3
   piezas: [],             // Arreglo con la información de las 4, 6 u 8 partes
   bancoImagenes: [
     'img/galeria_BlockA/1.png', 'img/galeria_BlockA/2.png', 'img/galeria_BlockA/3.png',
     'img/galeria_BlockA/4.png', 'img/galeria_BlockA/5.png', 'img/galeria_BlockA/6.png'
   ],
-  filtroActual: 'grises', // 'grises', 'brillo', 'negativo'
-  tiempoTranscurrido: 0,
-  timerInterval: null,
+  filtrosDisponibles: ['grises', 'brillo', 'negativo'],
   juegoTerminado: false,
   cantPartes: 4,          // 4, 6 u 8 partes
   offsetLeft: 50,
-  offsetTop: 50
+  offsetTop: 50,
+  anchoTablero: 600,
+  altoTablero: 500
 };
 
 function aplicarFiltro(imageData, tipoFiltro) {
@@ -372,7 +373,7 @@ function iniciarNivel() {
 function setupPiezas(imagen) {
   estadoJuego.piezas = [];
 
-  // Determinar filas y columnas según la cantidad de partes seleccionadas (4, 6 u 8)[cite: 1]
+  // Determinar filas y columnas según la cantidad de partes seleccionadas (4, 6 u 8)
   let cols = 2, filas = 2;
   if (estadoJuego.cantPartes === 6) { cols = 3; filas = 2; }
   if (estadoJuego.cantPartes === 8) { cols = 4; filas = 2; }
