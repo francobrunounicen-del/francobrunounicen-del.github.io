@@ -346,13 +346,13 @@ function aplicarFiltro(imageData, tipoFiltro) {
       data[i + 2] = gris;
     }
     else if (tipoFiltro === 'brillo') {
-      // Brillo +30% (Diapositiva 23)[cite: 23]
+      // Brillo +30% (Diapositiva 23)
       data[i] *= 1.3;
       data[i + 1] *= 1.3;
       data[i + 2] *= 1.3;
     }
     else if (tipoFiltro === 'negativo') {
-      // Negativo (Diapositiva 22)[cite: 22]
+      // Negativo (Diapositiva 22)
       data[i] = 255 - data[i];
       data[i + 1] = 255 - data[i + 1];
       data[i + 2] = 255 - data[i + 2];
@@ -361,6 +361,7 @@ function aplicarFiltro(imageData, tipoFiltro) {
 }
 
 function iniciarNivel() {
+  if (!estadoJuego.bancoImagenes.length) return;
   const rutaImagen = estadoJuego.bancoImagenes[Math.floor(Math.random() * estadoJuego.bancoImagenes.length)];
   const img = new Image();
   img.src = rutaImagen;
@@ -382,7 +383,7 @@ function setupPiezas(imagen) {
   const subHeight = imagen.height / filas;
   const angulos = [0, 90, 180, 270];
 
-  // Canvas auxiliar en memoria para recortar y procesar filtros[cite: 17, 19]
+  // Canvas auxiliar en memoria para recortar y procesar filtros
   const canvasAux = document.createElement('canvas');
   canvasAux.width = subWidth;
   canvasAux.height = subHeight;
@@ -396,11 +397,11 @@ function setupPiezas(imagen) {
       ctxAux.clearRect(0, 0, subWidth, subHeight);
       ctxAux.drawImage(imagen, c * subWidth, r * subHeight, subWidth, subHeight, 0, 0, subWidth, subHeight);
 
-      // Obtener ImageData original y con filtro (Tema 3)[cite: 1, 17]
+      // Obtener ImageData original y con filtro
       const imgDataOrig = ctxAux.getImageData(0, 0, subWidth, subHeight);
       const imgDataFilt = ctxAux.getImageData(0, 0, subWidth, subHeight);
 
-      // Aplicar el filtro de la consigna sobre la copia[cite: 1, 22]
+      // Aplicar el filtro de la consigna sobre la copia
       aplicarFiltro(imgDataFilt, estadoJuego.filtroActual);
 
       // Guardar el objeto estructural con los datos de la subimagen
@@ -410,8 +411,8 @@ function setupPiezas(imagen) {
         row: r,
         width: subWidth,
         height: subHeight,
-        rotacion: angulos[Math.floor(Math.random() * angulos.length)], //[cite: 1]
-        fijada: false,                                                // Para "Ayudita"[cite: 2]
+        rotacion: angulos[Math.floor(Math.random() * angulos.length)],
+        fijada: false,                                                // Para "Ayudita"
         canvasPropio: crearCanvasDePieza(subWidth, subHeight, imgDataFilt),
         imgDataOriginal: imgDataOrig
       });
@@ -421,12 +422,12 @@ function setupPiezas(imagen) {
   dibujarJuego();
 }
 
-// Función auxiliar para pasar de ImageData a un Canvas que se pueda dibujar fácil con drawImage[cite: 17, 19]
+// Función auxiliar para pasar de ImageData a un Canvas que se pueda dibujar fácil con drawImage
 function crearCanvasDePieza(w, h, imageData) {
   const c = document.createElement('canvas');
   c.width = w;
   c.height = h;
-  c.getContext('2d').putImageData(imageData, 0, 0); //[cite: 17]
+  c.getContext('2d').putImageData(imageData, 0, 0);
   return c;
 }
 
@@ -438,15 +439,15 @@ function dibujarJuego() {
     const dy = estadoJuego.offsetTop + (pieza.row * pieza.height);
 
     ctx.save();
-    // Trasladar y rotar según el centro de la subimagen[cite: 1]
+    // Trasladar y rotar según el centro de la subimagen
     ctx.translate(dx + pieza.width / 2, dy + pieza.height / 2);
     ctx.rotate((pieza.rotacion * Math.PI) / 180);
 
-    // Dibujar el canvas interno procesado[cite: 19]
+    // Dibujar el canvas interno procesado
     ctx.drawImage(pieza.canvasPropio, -pieza.width / 2, -pieza.height / 2);
     ctx.restore();
 
-    // Borde si la pieza fue fijada por "Ayudita"[cite: 2]
+    // Borde si la pieza fue fijada por "Ayudita"
     if (pieza.fijada) {
       ctx.strokeStyle = 'gold';
       ctx.lineWidth = 3;
@@ -455,7 +456,7 @@ function dibujarJuego() {
   });
 }
 
-// Desactivar menú derecho en el canvas[cite: 1]
+// Desactivar menú derecho en el canvas
 canvas.addEventListener('contextmenu', e => e.preventDefault());
 
 canvas.addEventListener('mousedown', function (e) {
@@ -474,7 +475,7 @@ canvas.addEventListener('mousedown', function (e) {
         clickY >= py && clickY <= py + pieza.height) {
 
       if (!pieza.fijada) {
-        // Rotar: Clic Derecho = 90°, Clic Izquierdo = -90°[cite: 1]
+        // Rotar: Clic Derecho = 90°, Clic Izquierdo = -90°
         const sentido = (e.button === 2) ? 90 : -90;
         pieza.rotacion = (pieza.rotacion + sentido + 360) % 360;
 
@@ -486,17 +487,17 @@ canvas.addEventListener('mousedown', function (e) {
 });
 
 function comprobarVictoria() {
-  // Si todas las piezas tienen rotación 0°[cite: 1]
+  // Si todas las piezas tienen rotación 0°
   const gano = estadoJuego.piezas.every(p => p.rotacion === 0);
 
   if (gano) {
     estadoJuego.juegoTerminado = true;
     clearInterval(estadoJuego.timerInterval);
 
-    // Al ganar: quitar filtros restaurando el ImageData RGB original (Funcionalidad General)[cite: 1, 17]
+    // Al ganar: quitar filtros restaurando el ImageData RGB original (Funcionalidad General)
     estadoJuego.piezas.forEach(pieza => {
       const ctxPieza = pieza.canvasPropio.getContext('2d');
-      ctxPieza.putImageData(pieza.imgDataOriginal, 0, 0); //[cite: 17]
+      ctxPieza.putImageData(pieza.imgDataOriginal, 0, 0);
     });
 
     dibujarJuego();
