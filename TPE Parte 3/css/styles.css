@@ -1044,3 +1044,21 @@ img.logo_footer { width: 5rem; height: auto; display: block; }
   left: 0;
   z-index: 2;
 }
+.botonera{
+  position: absolute;
+  flex-direction: column;
+  gap: 0.2rem;
+  display: none;
+  z-index: 2;
+  transform: translate(18rem,10rem);
+}
+.btn-retro {
+  width: 25rem;
+  padding: 1.1rem 4rem;
+  background: #050d2b;
+  color: #62d9f2;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 1rem;
+  border: 2px solid #168acb;
+  border-radius: 1rem;
+}

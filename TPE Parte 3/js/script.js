@@ -81,6 +81,8 @@ document.addEventListener('DOMContentLoaded', () => {
   /* --- INTERACCIÓN BOTÓN DE PLAY EN REPRODUCTOR --- */
   const playBtn = document.getElementById('playBtn');
   const gameCover = document.querySelector('.game-cover');
+  const gameBotonera = document.querySelector('.botonera');
+
 
   if (playBtn) {
     playBtn.addEventListener('click', () => {
@@ -91,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
         gameCover.style.transition = 'filter 4s ease';
         //gameCover.style.filter = 'brightness(0.7)';
         gameCover.src = "img/blockA_fondo_menu.jpg";
-        iniciarNivel();
+        gameBotonera.style.display="flex";
       }
     });
   }
