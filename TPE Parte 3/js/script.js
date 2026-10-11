@@ -81,7 +81,8 @@ document.addEventListener('DOMContentLoaded', () => {
   /* --- INTERACCIÓN BOTÓN DE PLAY EN REPRODUCTOR --- */
   const playBtn = document.getElementById('playBtn');
   const gameCover = document.querySelector('.game-cover');
-  const gameBotonera = document.getElementById('botonera1');
+  const gameBotonera1 = document.getElementById('botonera1');
+  const gameBotonera2 = document.getElementById('botonera2');
   const btnIniciarJuego=document.getElementById("iniciar_juego");
   const canvas = document.getElementById('canvas');
   const btnSiguienteNivel=document.getElementById("siguiente_nivel");
@@ -94,10 +95,10 @@ document.addEventListener('DOMContentLoaded', () => {
       playBtn.classList.add('is-playing');
       // Opcional: Feedback visual en la portada
       if (gameCover) {
-        gameCover.style.display= 'none';
+        gameCover.src= 'img/blockA_fondo_menu.jpg';
       }
-      if (gameBotonera) {
-        gameBotonera.style.display = "flex";
+      if (gameBotonera1) {
+        gameBotonera1.style.display = "flex";
       }
     });
   }
@@ -125,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnIniciarJuego) {
     btnIniciarJuego.addEventListener('click', () => {
       // Ocultar la botonera
-      if (gameBotonera) gameBotonera.style.display = 'none';
+      if (gameBotonera1) gameBotonera1.style.display = 'none';
       // Establecer la imagen de fondo con estrellas
       if (gameScreen) {
         gameCover.src = "img/blockA_fondo.jpg";
@@ -140,7 +141,24 @@ document.addEventListener('DOMContentLoaded', () => {
       iniciarTemporizador();
     });
   }
-
+  if(btnMenuPrincipal){
+    btnMenuPrincipal.addEventListener('click', () => {
+      gameBotonera2.style.display='none';
+      gameBotonera1.style.display='flex';
+      gameCover.src= 'img/blockA_fondo_menu.jpg';
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      document.getElementById("timer-display").style.display='none';
+    })
+  }
+  if(btnSiguienteNivel){
+    btnSiguienteNivel.addEventListener('click', () => {
+      estadoJuego.nivelActual ++;
+      estadoJuego.juegoTerminado = false;
+      gameBotonera2.style.display='none';
+      iniciarNivel();
+      iniciarTemporizador();
+    })
+  }
   /* --- VALIDACIÓN DE REGISTRO Y ANIMACIÓN EN 2 PASOS (SPINNER -> ÉXITO) --- */
   const formRegister = document.getElementById('formRegister');
   if (formRegister) {
