@@ -329,7 +329,7 @@ const estadoJuego = {
   filtrosDisponibles: ['grises', 'brillo', 'negativo'],
   juegoTerminado: false,
   cantPartes: 4,          // 4, 6 u 8 partes
-  offsetLeft: 50,
+  offsetLeft: 250,
   offsetTop: 50,
   anchoTablero: 600,
   altoTablero: 500
@@ -499,8 +499,8 @@ function comprobarVictoria() {
       const ctxPieza = pieza.canvasPropio.getContext('2d');
       ctxPieza.putImageData(pieza.imgDataOriginal, 0, 0);
     });
-
     dibujarJuego();
+    document.querySelector('.game-cover').src = "img/blockA_victoria.png";
     setTimeout(() => alert("¡Nivel superado!"), 200);
   }
 }
