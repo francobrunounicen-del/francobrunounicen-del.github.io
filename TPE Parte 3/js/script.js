@@ -155,6 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
       estadoJuego.nivelActual ++;
       estadoJuego.juegoTerminado = false;
       gameBotonera2.style.display='none';
+      gameCover.src = "img/blockA_fondo.jpg";
       iniciarNivel();
       iniciarTemporizador();
     })
