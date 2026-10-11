@@ -507,3 +507,8 @@ function comprobarVictoria() {
   }
 }
 
+let iniciar_juego=document.getElementById("iniciar_juego");
+iniciar_juego.addEventListener('click',()=>{
+  iniciarNivel();
+  document.querySelector('.botonera').style.display="none";
+})
