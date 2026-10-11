@@ -541,7 +541,8 @@ function comprobarVictoria() {
 
   if (gano) {
     estadoJuego.juegoTerminado = true;
-    clearInterval(estadoJuego.timerInterval);
+    // Detener temporizador y obtener los tiempos
+    const resultado = detenerTemporizador();
 
     // Al ganar: quitar filtros restaurando el ImageData RGB original (Funcionalidad General)
     estadoJuego.piezas.forEach(pieza => {
@@ -550,8 +551,18 @@ function comprobarVictoria() {
     });
     dibujarJuego();
     document.querySelector('.game-cover').src = "img/blockA_victoria.png";
-    setTimeout(() => alert("¡Nivel superado!"), 200);
-    document.getElementById('botonera2').style.display='flex';
+
+    // Mensaje de victoria con récord
+    setTimeout(() => {
+      let mensaje = `¡Nivel superado en ${resultado.tiempoTexto}!`;
+      document.getElementById('botonera2').style.display='flex';
+      if (resultado.esNuevoRecord) {
+        mensaje += `\n¡Felicidades, marcaste un NUEVO RÉCORD para este nivel! 🎉`;
+      } else {
+        mensaje += `\nMejor récord: ${resultado.recordTexto}`;
+      }
+      alert(mensaje);
+    }, 200);
   }
 }
 
