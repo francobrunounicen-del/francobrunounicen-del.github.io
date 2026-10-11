@@ -1065,3 +1065,20 @@ img.logo_footer { width: 5rem; height: auto; display: block; }
   border: 2px solid #168acb;
   border-radius: 1rem;
 }
+
+/* Temporizador retro neón */
+.timer-display {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  z-index: 5;
+  background-color: rgba(13, 14, 21, 0.85);
+  border: 2px solid var(--accent-cyan);
+  color: var(--accent-cyan);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.85rem;
+  padding: 0.5rem 0.8rem;
+  border-radius: 0.4rem;
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.4);
+  display: none; /* Se muestra al iniciar la partida */
+}

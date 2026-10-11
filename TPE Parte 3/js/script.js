@@ -116,6 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
       estadoJuego.nivelActual = 1;
       estadoJuego.juegoTerminado = false;
       iniciarNivel();
+      iniciarTemporizador();
     });
   }
 
@@ -352,10 +353,14 @@ const estadoJuego = {
   filtrosDisponibles: ['grises', 'brillo', 'negativo'],
   juegoTerminado: false,
   cantPartes: 4,          // 4, 6 u 8 partes
-  offsetLeft: 250,
+  offsetLeft: 200,
   offsetTop: 50,
   anchoTablero: 600,
-  altoTablero: 500
+  altoTablero: 500,
+  // VARIABLES DEL TEMPORIZADOR
+  segundosTranscurridos: 0,
+  timerInterval: null,
+  recordSegundos: null,
 };
 
 function aplicarFiltro(imageData, tipoFiltro) {
@@ -526,5 +531,52 @@ function comprobarVictoria() {
     document.querySelector('.game-cover').src = "img/blockA_victoria.png";
     setTimeout(() => alert("¡Nivel superado!"), 200);
   }
+}
+
+// Función para formatear segundos a MM:SS
+function formatearTiempo(segundos) {
+  const mins = Math.floor(segundos / 60);
+  const segs = segundos % 60;
+  const mm = mins < 10 ? '0' + mins : mins;
+  const ss = segs < 10 ? '0' + segs : segs;
+  return `${mm}:${ss}`;
+}
+
+// Iniciar temporizador
+function iniciarTemporizador() {
+  clearInterval(estadoJuego.timerInterval);
+  estadoJuego.segundosTranscurridos = 0;
+
+  const timerDisplay = document.getElementById('timer-display');
+  if (timerDisplay) {
+    timerDisplay.style.display = 'block';
+    timerDisplay.textContent = 'Tiempo: 00:00';
+  }
+
+  estadoJuego.timerInterval = setInterval(() => {
+    estadoJuego.segundosTranscurridos++;
+    if (timerDisplay) {
+      timerDisplay.textContent = 'Tiempo: ' + formatearTiempo(estadoJuego.segundosTranscurridos);
+    }
+  }, 1000);
+}
+
+// Detener temporizador y calcular récord
+function detenerTemporizador() {
+  clearInterval(estadoJuego.timerInterval);
+
+  const tiempoActual = estadoJuego.segundosTranscurridos;
+  let esNuevoRecord = false;
+
+  if (estadoJuego.recordSegundos === null || tiempoActual < estadoJuego.recordSegundos) {
+    estadoJuego.recordSegundos = tiempoActual;
+    esNuevoRecord = true;
+  }
+
+  return {
+    tiempoTexto: formatearTiempo(tiempoActual),
+    recordTexto: formatearTiempo(estadoJuego.recordSegundos),
+    esNuevoRecord: esNuevoRecord
+  };
 }
 
