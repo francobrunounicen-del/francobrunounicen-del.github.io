@@ -91,6 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
         gameCover.style.transition = 'filter 4s ease';
         //gameCover.style.filter = 'brightness(0.7)';
         gameCover.src = "img/blockA_fondo_menu.jpg";
+        iniciarNivel();
       }
     });
   }
@@ -418,7 +419,6 @@ function setupPiezas(imagen) {
       });
     }
   }
-
   dibujarJuego();
 }
 
@@ -505,4 +505,3 @@ function comprobarVictoria() {
   }
 }
 
-iniciarNivel();
