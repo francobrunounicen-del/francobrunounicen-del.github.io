@@ -81,9 +81,11 @@ document.addEventListener('DOMContentLoaded', () => {
   /* --- INTERACCIÓN BOTÓN DE PLAY EN REPRODUCTOR --- */
   const playBtn = document.getElementById('playBtn');
   const gameCover = document.querySelector('.game-cover');
-  const gameBotonera = document.querySelector('.botonera');
+  const gameBotonera = document.getElementById('botonera1');
   const btnIniciarJuego=document.getElementById("iniciar_juego");
   const canvas = document.getElementById('canvas');
+  const btnSiguienteNivel=document.getElementById("siguiente_nivel");
+  const btnMenuPrincipal=document.getElementById("menu_principal");
 
 // Al presionar el botón central PLAY de la portada
   if (playBtn) {
@@ -92,13 +94,32 @@ document.addEventListener('DOMContentLoaded', () => {
       playBtn.classList.add('is-playing');
       // Opcional: Feedback visual en la portada
       if (gameCover) {
-        gameCover.src = "img/blockA_fondo_menu.jpg";
+        gameCover.style.display= 'none';
       }
       if (gameBotonera) {
         gameBotonera.style.display = "flex";
       }
     });
   }
+/*  function dibujarFondo() {
+    let canvas = document.getElementById("canvas");
+    let ctx = canvas.getContext('2d');
+    let imagenData = ctx.createImageData(600, 600);
+    for (let x = 0; x < 600; x++) {
+      for (let y = 0; y < 600; y++) {
+        setPixel(imagenData, x, y, x * 255 / 600, x * 255 / 600, 0, 255);
+      }
+    }
+    ctx.putImageData(imagenData, 0, 0);
+  }
+  function setPixel(imagenData, x, y, r, g, b, a) {
+    let index = (x + y * imagenData.width) * 4;
+
+    imagenData.data[index + 0] = r;
+    imagenData.data[index + 1] = g;
+    imagenData.data[index + 2] = b;
+    imagenData.data[index + 3] = a;
+  }*/
 
   // Presionar boton iniciar juego en el menú
   if (btnIniciarJuego) {
@@ -460,7 +481,7 @@ function crearCanvasDePieza(w, h, imageData) {
 }
 
 function dibujarJuego() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  //ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   estadoJuego.piezas.forEach(pieza => {
     const dx = estadoJuego.offsetLeft + (pieza.col * pieza.width);
@@ -530,6 +551,7 @@ function comprobarVictoria() {
     dibujarJuego();
     document.querySelector('.game-cover').src = "img/blockA_victoria.png";
     setTimeout(() => alert("¡Nivel superado!"), 200);
+    document.getElementById('botonera2').style.display='flex';
   }
 }
 
