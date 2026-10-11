@@ -82,19 +82,40 @@ document.addEventListener('DOMContentLoaded', () => {
   const playBtn = document.getElementById('playBtn');
   const gameCover = document.querySelector('.game-cover');
   const gameBotonera = document.querySelector('.botonera');
+  const btnIniciarJuego=document.getElementById("iniciar_juego");
+  const canvas = document.getElementById('canvas');
 
-
+// Al presionar el botón central PLAY de la portada
   if (playBtn) {
     playBtn.addEventListener('click', () => {
       // Transición visual al iniciar el juego
       playBtn.classList.add('is-playing');
       // Opcional: Feedback visual en la portada
       if (gameCover) {
-        gameCover.style.transition = 'filter 4s ease';
-        //gameCover.style.filter = 'brightness(0.7)';
         gameCover.src = "img/blockA_fondo_menu.jpg";
-        gameBotonera.style.display="flex";
       }
+      if (gameBotonera) {
+        gameBotonera.style.display = "flex";
+      }
+    });
+  }
+
+  // Presionar boton iniciar juego en el menú
+  if (btnIniciarJuego) {
+    btnIniciarJuego.addEventListener('click', () => {
+      // Ocultar la botonera
+      if (gameBotonera) gameBotonera.style.display = 'none';
+      // Establecer la imagen de fondo con estrellas
+      if (gameScreen) {
+        gameCover.src = "img/blockA_fondo.jpg";
+      }
+      // Mostrar el canvas encima de la imagen
+      if (canvas) {
+        canvas.style.display = 'block';
+      }
+      estadoJuego.nivelActual = 1;
+      estadoJuego.juegoTerminado = false;
+      iniciarNivel();
     });
   }
 
@@ -342,20 +363,20 @@ function aplicarFiltro(imageData, tipoFiltro) {
 
   for (let i = 0; i < data.length; i += 4) {
     if (tipoFiltro === 'grises') {
-      // Luminancia BT.601 (Diapositiva 21)[cite: 21]
+      // Grises
       const gris = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
       data[i] = gris;
       data[i + 1] = gris;
       data[i + 2] = gris;
     }
     else if (tipoFiltro === 'brillo') {
-      // Brillo +30% (Diapositiva 23)
+      // Brillo +30%
       data[i] *= 1.3;
       data[i + 1] *= 1.3;
       data[i + 2] *= 1.3;
     }
     else if (tipoFiltro === 'negativo') {
-      // Negativo (Diapositiva 22)
+      // Negativo
       data[i] = 255 - data[i];
       data[i + 1] = 255 - data[i + 1];
       data[i + 2] = 255 - data[i + 2];
@@ -507,8 +528,3 @@ function comprobarVictoria() {
   }
 }
 
-let iniciar_juego=document.getElementById("iniciar_juego");
-iniciar_juego.addEventListener('click',()=>{
-  iniciarNivel();
-  document.querySelector('.botonera').style.display="none";
-})
