@@ -458,10 +458,10 @@ function aplicarFiltro(imageData, tipoFiltro) {
       data[i + 2] = gris;
     }
     else if (tipoFiltro === 'brillo') {
-      // Brillo +30%
-      data[i] *= 1.3;
-      data[i + 1] *= 1.3;
-      data[i + 2] *= 1.3;
+      // Brillo +100%
+      data[i] *= 2;
+      data[i + 1] *= 2;
+      data[i + 2] *= 2;
     }
     else if (tipoFiltro === 'negativo') {
       // Negativo
@@ -477,7 +477,9 @@ function iniciarNivel() {
   const rutaImagen = estadoJuego.bancoImagenes[Math.floor(Math.random() * estadoJuego.bancoImagenes.length)];
   const img = new Image();
   img.src = rutaImagen;
-
+  if(estadoJuego.nivelActual===2){
+    estadoJuego.filtroActual=estadoJuego.filtrosDisponibles[Math.floor(Math.random() * 3)];
+  }
   img.onload = function () {
     setupPiezas(this);
   };
@@ -514,6 +516,9 @@ function setupPiezas(imagen) {
       const imgDataFilt = ctxAux.getImageData(0, 0, subWidth, subHeight);
 
       // Aplicar el filtro de la consigna sobre la copia
+      if(estadoJuego.nivelActual>=3){
+        estadoJuego.filtroActual=estadoJuego.filtrosDisponibles[Math.floor(Math.random() * 3)];
+      }
       aplicarFiltro(imgDataFilt, estadoJuego.filtroActual);
 
       // Guardar el objeto estructural con los datos de la subimagen
@@ -627,7 +632,7 @@ function comprobarVictoria() {
         mensaje += `\nMejor récord: ${resultado.recordTexto}`;
       }
       alert(mensaje);
-    }, 200);
+    }, 1500);
   }
 }
 
