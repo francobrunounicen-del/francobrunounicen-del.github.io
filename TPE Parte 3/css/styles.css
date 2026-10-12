@@ -1066,6 +1066,11 @@ img.logo_footer { width: 5rem; height: auto; display: block; }
   border-radius: 1rem;
 }
 
+.btn-retro:hover{
+  background-color: #e05d00;
+  transform: translateY(-4px);
+}
+
 /* Temporizador retro neón */
 .timer-display {
   position: absolute;
