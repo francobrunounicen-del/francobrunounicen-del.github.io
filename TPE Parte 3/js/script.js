@@ -109,6 +109,7 @@ function initPlayMenu() {
         gameCover.src= 'img/blockA_fondo_menu.jpg';
       }
       setBotonera(gameBotonera1, true);
+      gameCover.style.opacity="1";
     });
   }
 /*  function dibujarFondo() {
@@ -458,10 +459,10 @@ function aplicarFiltro(imageData, tipoFiltro) {
       data[i + 2] = gris;
     }
     else if (tipoFiltro === 'brillo') {
-      // Brillo +100%
-      data[i] *= 2;
-      data[i + 1] *= 2;
-      data[i + 2] *= 2;
+      // Brillo +150%
+      data[i] *= 2.5;
+      data[i + 1] *= 2.5;
+      data[i + 2] *= 2.5;
     }
     else if (tipoFiltro === 'negativo') {
       // Negativo
@@ -632,7 +633,7 @@ function comprobarVictoria() {
         mensaje += `\nMejor récord: ${resultado.recordTexto}`;
       }
       alert(mensaje);
-    }, 1500);
+    }, 1000);
   }
 }
 
