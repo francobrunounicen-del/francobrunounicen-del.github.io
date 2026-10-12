@@ -27,66 +27,77 @@ function updateCarouselButtons(track) {
 
 function initCarousels() {
   document.querySelectorAll('.carousel-track').forEach((track) => {
+    const state = { lastX: track.scrollLeft, raf: null, resetTimer: null };
     updateCarouselButtons(track);
-    track.addEventListener('scroll', () => updateCarouselButtons(track), { passive: true });
+    track.addEventListener('scroll', () => onTrackScroll(track, state), { passive: true });
   });
   window.addEventListener('resize', () => {
     document.querySelectorAll('.carousel-track').forEach(updateCarouselButtons);
   });
-  initSkewOnScroll();
 }
 
-/* Skew fluido y sin vibraciones/parpadeos al scrollear */
-function initSkewOnScroll() {
-  document.querySelectorAll('.carousel-track').forEach((track) => {
-    let lastX = track.scrollLeft;
-    let raf = null;
-    let resetTimer = null;
+/* Un solo listener por track: flechas + skew fluido sin vibraciones */
+function onTrackScroll(track, state) {
+  updateCarouselButtons(track);
 
-    track.addEventListener('scroll', () => {
-      const currentX = track.scrollLeft;
-      const vel = currentX - lastX;
-      lastX = currentX;
+  const currentX = track.scrollLeft;
+  const vel = currentX - state.lastX;
+  state.lastX = currentX;
 
-      if (Math.abs(vel) < 1.5) return;
+  if (Math.abs(vel) < 1.5) return;
 
-      const skew = Math.max(-10, Math.min(10, vel * 0.25));
-      const stretch = 1 + Math.abs(skew) / 100;
+  const skew = Math.max(-10, Math.min(10, vel * 0.25));
+  const stretch = 1 + Math.abs(skew) / 100;
+  const cards = track.querySelectorAll('.game-card');
+  if (!cards.length) return;
 
-      if (raf) cancelAnimationFrame(raf);
+  if (state.raf) cancelAnimationFrame(state.raf);
 
-      raf = requestAnimationFrame(() => {
-        const cards = track.querySelectorAll('.game-card');
-        cards.forEach((c) => {
-          c.style.transition = 'transform 0.05s ease-out';
-          c.style.transform = 'skewX(' + (-skew) + 'deg) scaleX(' + stretch + ') translateZ(0)';
-        });
-      });
-
-      clearTimeout(resetTimer);
-      resetTimer = setTimeout(() => {
-        const cards = track.querySelectorAll('.game-card');
-        cards.forEach((c) => {
-          c.style.transition = 'transform 0.25s ease-out';
-          c.style.transform = 'skewX(0deg) scaleX(1) translateZ(0)';
-        });
-      }, 80);
-    }, { passive: true });
+  state.raf = requestAnimationFrame(() => {
+    cards.forEach((c) => {
+      c.style.transition = 'transform 0.05s ease-out';
+      c.style.transform = 'skewX(' + (-skew) + 'deg) scaleX(' + stretch + ') translateZ(0)';
+    });
   });
+
+  clearTimeout(state.resetTimer);
+  state.resetTimer = setTimeout(() => {
+    cards.forEach((c) => {
+      c.style.transition = 'transform 0.25s ease-out';
+      c.style.transform = 'skewX(0deg) scaleX(1) translateZ(0)';
+    });
+  }, 80);
 }
 
-// 2. Controladores de eventos e interacción al cargar el DOM
-document.addEventListener('DOMContentLoaded', () => {
+// Helpers UI juego (evitan lookups repetidos y null-crashes)
+function setBotonera(el, show) { if (el) el.style.display = show ? 'flex' : 'none'; }
+function setCover(src) { const c = document.querySelector('.game-cover'); if (c && src) c.src = src; }
+function showTimer(show, text) {
+  const t = document.getElementById('timer-display');
+  if (!t) return;
+  t.style.display = show ? 'block' : 'none';
+  if (text !== undefined) t.textContent = text;
+}
 
+// 2. Inits por página (early-returns: cada init sale si no está en esa página)
+document.addEventListener('DOMContentLoaded', () => {
+  initPlayMenu();
+  initRegistro();
+  initLogin();
+  initComments();
+  initHome();
+});
+
+function initPlayMenu() {
   /* --- INTERACCIÓN BOTÓN DE PLAY EN REPRODUCTOR --- */
   const playBtn = document.getElementById('playBtn');
   const gameCover = document.querySelector('.game-cover');
   const gameBotonera1 = document.getElementById('botonera1');
   const gameBotonera2 = document.getElementById('botonera2');
   const btnIniciarJuego=document.getElementById("iniciar_juego");
-  const canvas = document.getElementById('canvas');
   const btnSiguienteNivel=document.getElementById("siguiente_nivel");
   const btnMenuPrincipal=document.getElementById("menu_principal");
+  if (!playBtn && !btnIniciarJuego && !btnMenuPrincipal && !btnSiguienteNivel) return;
 
 // Al presionar el botón central PLAY de la portada
   if (playBtn) {
@@ -97,9 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (gameCover) {
         gameCover.src= 'img/blockA_fondo_menu.jpg';
       }
-      if (gameBotonera1) {
-        gameBotonera1.style.display = "flex";
-      }
+      setBotonera(gameBotonera1, true);
     });
   }
 /*  function dibujarFondo() {
@@ -121,14 +130,13 @@ document.addEventListener('DOMContentLoaded', () => {
     imagenData.data[index + 2] = b;
     imagenData.data[index + 3] = a;
   }*/
-
   // Presionar boton iniciar juego en el menú
   if (btnIniciarJuego) {
     btnIniciarJuego.addEventListener('click', () => {
       // Ocultar la botonera
-      if (gameBotonera1) gameBotonera1.style.display = 'none';
+      setBotonera(gameBotonera1, false);
       // Establecer la imagen de fondo con estrellas
-      if (gameScreen) {
+      if (gameCover) {
         gameCover.src = "img/blockA_fondo.jpg";
       }
       // Mostrar el canvas encima de la imagen
@@ -143,28 +151,59 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   if(btnMenuPrincipal){
     btnMenuPrincipal.addEventListener('click', () => {
-      gameBotonera2.style.display='none';
-      gameBotonera1.style.display='flex';
-      gameCover.src= 'img/blockA_fondo_menu.jpg';
-      ctx.clearRect(0,0,canvas.width,canvas.height);
-      document.getElementById("timer-display").style.display='none';
-    })
+      // Alternar botoneras
+      setBotonera(gameBotonera2, false);
+      setBotonera(gameBotonera1, true);
+
+      // Restaurar imagen del menú y ocultar el canvas
+      if (gameCover) {
+        gameCover.src = 'img/blockA_fondo_menu.jpg';
+        gameCover.style.display = 'block';
+      }
+      if (canvas) {
+        canvas.style.display = 'none';
+        if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height); // Limpia el canvas
+      }
+
+      // Detener temporizador
+      clearInterval(estadoJuego.timerInterval);
+      showTimer(false);
+
+      // Marcar juego como terminado para bloquear clics
+      estadoJuego.juegoTerminado = true;
+    });
   }
   if(btnSiguienteNivel){
     btnSiguienteNivel.addEventListener('click', () => {
-      estadoJuego.nivelActual ++;
+      // Ocultar la botonera de victoria
+      setBotonera(gameBotonera2, false);
+
+      // Limpiar el lienzo del nivel anterior
+      if (canvas && ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Incrementar nivel y configurar dificultad
+      estadoJuego.nivelActual++;
       estadoJuego.juegoTerminado = false;
-      gameBotonera2.style.display='none';
+
+      // Asegurar que el canvas esté visible y fondo correcto
+      if (gameCover) gameCover.src = 'img/blockA_fondo.jpg';
+      if (canvas) canvas.style.display = 'block';
+
+      // Iniciar nuevo nivel
       gameCover.src = "img/blockA_fondo.jpg";
       iniciarNivel();
       iniciarTemporizador();
-    })
+    });
   }
+
+}
+
+function initRegistro() {
   /* --- VALIDACIÓN DE REGISTRO Y ANIMACIÓN EN 2 PASOS (SPINNER -> ÉXITO) --- */
   const formRegister = document.getElementById('formRegister');
-  if (formRegister) {
-    formRegister.addEventListener('submit', (e) => {
-      e.preventDefault();
+  if (!formRegister) return;
+  formRegister.addEventListener('submit', (e) => {
+    e.preventDefault();
       const pass = document.getElementById('reg-pass');
       const pass2 = document.getElementById('reg-repeat-pass');
       const captcha = document.getElementById('captchaCheck');
@@ -212,27 +251,31 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+function initLogin() {
   const loginForm = document.getElementById('login-form');
-  if (loginForm) {
-    loginForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      // Simula el ingreso y redirige a la home
-      window.location.href = 'index.html';
-    });
-  }
+  if (!loginForm) return;
+  loginForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    // Simula el ingreso y redirige a la home
+    window.location.href = 'index.html';
+  });
+}
 
-  initCarousels();
-  cargarJuegosDesdeAPI();
+function initHome() {
+  if (document.querySelector('.carousel-track')) initCarousels();
+  if (document.getElementById('c1') || document.getElementById('cApi')) cargarJuegosDesdeAPI();
+}
 
+function initComments() {
   /* --- PUBLICAR COMENTARIOS EN PAGINA DE JUEGO --- */
   const sendCommentBtn = document.getElementById('sendCommentBtn');
   const commentInput = document.getElementById('newComment');
   const commentsList = document.getElementById('commentsList');
+  if (!sendCommentBtn || !commentInput || !commentsList) return;
 
-  if (sendCommentBtn && commentInput && commentsList) {
-    const postComment = () => {
-      const text = commentInput.value.trim();
-      if (text === '') return;
+  const postComment = () => {
+    const text = commentInput.value.trim();
+    if (text === '') return;
 
       const newCommentHTML = `
         <div class="comment-card">
@@ -251,13 +294,11 @@ document.addEventListener('DOMContentLoaded', () => {
       commentInput.value = '';
     };
 
-    sendCommentBtn.addEventListener('click', postComment);
-    commentInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') postComment();
-    });
-  }
-
-});
+  sendCommentBtn.addEventListener('click', postComment);
+  commentInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') postComment();
+  });
+}
 
 // SOPORTE PARA PANTALLA COMPLETA EN EL JUEGO
 const fullscreenBtn = document.getElementById('fullscreenBtn');
@@ -275,10 +316,12 @@ if (fullscreenBtn && gameScreen) {
   });
 }
 
-function toggleDropdown(id) {
+function toggleDropdown(e, id) {
+  // Compat: onclick="toggleDropdown('x')" (sin evento) o toggleDropdown(event,'x')
+  if (typeof e === 'string' && id === undefined) { id = e; e = undefined; }
+  if (e && e.stopPropagation) e.stopPropagation();
   const dropdown = document.getElementById(id);
   if (!dropdown) return;
-  if (window.event) window.event.stopPropagation();
 
   const otherId = id === 'categoriesDropdown' ? 'userDropdown' : 'categoriesDropdown';
   const other = document.getElementById(otherId);
@@ -380,7 +423,7 @@ function renderizarCarruselAPI(track, juegos) {
 
 /*CANVAS!! */
 const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
+const ctx = canvas ? canvas.getContext("2d") : null;
 
 // Estado global del nivel
 const estadoJuego = {
@@ -500,7 +543,8 @@ function crearCanvasDePieza(w, h, imageData) {
 }
 
 function dibujarJuego() {
-  //ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (!canvas || !ctx) return;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   estadoJuego.piezas.forEach(pieza => {
     const dx = estadoJuego.offsetLeft + (pieza.col * pieza.width);
@@ -525,6 +569,7 @@ function dibujarJuego() {
 }
 
 // Desactivar menú derecho en el canvas
+if (canvas && ctx) {
 canvas.addEventListener('contextmenu', e => e.preventDefault());
 
 canvas.addEventListener('mousedown', function (e) {
@@ -553,6 +598,7 @@ canvas.addEventListener('mousedown', function (e) {
     }
   });
 });
+}
 
 function comprobarVictoria() {
   // Si todas las piezas tienen rotación 0°
@@ -569,12 +615,12 @@ function comprobarVictoria() {
       ctxPieza.putImageData(pieza.imgDataOriginal, 0, 0);
     });
     dibujarJuego();
-    document.querySelector('.game-cover').src = "img/blockA_victoria.png";
+    setCover("img/blockA_victoria.png");
 
     // Mensaje de victoria con récord
     setTimeout(() => {
       let mensaje = `¡Nivel superado en ${resultado.tiempoTexto}!`;
-      document.getElementById('botonera2').style.display='flex';
+      setBotonera(document.getElementById('botonera2'), true);
       if (resultado.esNuevoRecord) {
         mensaje += `\n¡Felicidades, marcaste un NUEVO RÉCORD para este nivel! 🎉`;
       } else {
@@ -599,17 +645,11 @@ function iniciarTemporizador() {
   clearInterval(estadoJuego.timerInterval);
   estadoJuego.segundosTranscurridos = 0;
 
-  const timerDisplay = document.getElementById('timer-display');
-  if (timerDisplay) {
-    timerDisplay.style.display = 'block';
-    timerDisplay.textContent = 'Tiempo: 00:00';
-  }
+  showTimer(true, 'Tiempo: 00:00');
 
   estadoJuego.timerInterval = setInterval(() => {
     estadoJuego.segundosTranscurridos++;
-    if (timerDisplay) {
-      timerDisplay.textContent = 'Tiempo: ' + formatearTiempo(estadoJuego.segundosTranscurridos);
-    }
+    showTimer(true, 'Tiempo: ' + formatearTiempo(estadoJuego.segundosTranscurridos));
   }, 1000);
 }
 
