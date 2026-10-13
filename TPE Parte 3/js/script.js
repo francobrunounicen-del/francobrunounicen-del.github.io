@@ -78,6 +78,12 @@ function showTimer(show, text) {
   t.style.display = show ? 'block' : 'none';
   if (text !== undefined) t.textContent = text;
 }
+function showNivel(show) {
+  const el = document.getElementById('level-display');
+  if (!el) return;
+  el.style.display = show ? 'block' : 'none';
+  if (show) el.textContent = 'Nivel: ' + estadoJuego.nivelActual;
+}
 
 // 2. Inits por página (early-returns: cada init sale si no está en esa página)
 document.addEventListener('DOMContentLoaded', () => {
@@ -177,6 +183,7 @@ function initPlayMenu() {
       estadoJuego.timerInterval = null;
       estadoJuego.segundosTranscurridos = 0;
       showTimer(false);
+      showNivel(false);
 
       // Reiniciar progreso desde cero (los récords persisten para comparar)
       estadoJuego.nivelActual = 1;
@@ -469,8 +476,6 @@ const estadoJuego = {
   cantPartes: 4,          // 4, 6 u 8 partes
   offsetLeft: 290,
   offsetTop: 41,
-  anchoTablero: 600,
-  altoTablero: 500,
   // VARIABLES DEL TEMPORIZADOR
   segundosTranscurridos: 0,
   timerInterval: null,
@@ -506,6 +511,7 @@ function aplicarFiltro(imageData, tipoFiltro) {
 
 function iniciarNivel() {
   if (!estadoJuego.bancoImagenes.length) return;
+  showNivel(true);
 
   if(estadoJuego.nivelActual===2){
     estadoJuego.filtroActual=estadoJuego.filtrosDisponibles[Math.floor(Math.random() * estadoJuego.filtrosDisponibles.length)];

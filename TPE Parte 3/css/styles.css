@@ -1087,3 +1087,20 @@ img.logo_footer { width: 5rem; height: auto; display: block; }
   box-shadow: 0 0 10px rgba(0, 229, 255, 0.4);
   display: none; /* Se muestra al iniciar la partida */
 }
+
+/* Nivel actual retro neón (esquina opuesta al temporizador) */
+.level-display {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  z-index: 5;
+  background-color: rgba(13, 14, 21, 0.85);
+  border: 2px solid var(--neon-yellow);
+  color: var(--neon-yellow);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.85rem;
+  padding: 0.5rem 0.8rem;
+  border-radius: 0.4rem;
+  box-shadow: 0 0 10px rgba(250, 204, 21, 0.4);
+  display: none; /* Se muestra al iniciar la partida */
+}
