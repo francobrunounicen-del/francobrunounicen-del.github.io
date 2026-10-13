@@ -158,7 +158,7 @@ function initPlayMenu() {
   }
   if(btnMenuPrincipal){
     btnMenuPrincipal.addEventListener('click', () => {
-      // Alternar botoneras
+      // Reinicio total: volver al menú con el juego desde cero
       setBotonera(gameBotonera2, false);
       setBotonera(gameBotonera1, true);
 
@@ -174,7 +174,14 @@ function initPlayMenu() {
 
       // Detener temporizador
       clearInterval(estadoJuego.timerInterval);
+      estadoJuego.timerInterval = null;
+      estadoJuego.segundosTranscurridos = 0;
       showTimer(false);
+
+      // Reiniciar progreso desde cero (los récords persisten para comparar)
+      estadoJuego.nivelActual = 1;
+      estadoJuego.piezas = [];
+      estadoJuego.filtroActual = null;
 
       // Marcar juego como terminado para bloquear clics
       estadoJuego.juegoTerminado = true;
@@ -431,6 +438,24 @@ function renderizarCarruselAPI(track, juegos) {
 const canvas = document.getElementById("canvas");
 const ctx = canvas ? canvas.getContext("2d") : null;
 
+// Récords por nivel persistentes (sobreviven a recargas: hay contra qué comparar)
+const RECORD_KEY = 'blocka_records_v1';
+function cargarRecords() {
+  const base = { 1: null, 2: null, 3: null };
+  try {
+    const raw = localStorage.getItem(RECORD_KEY);
+    if (!raw) return base;
+    const data = JSON.parse(raw);
+    [1, 2, 3].forEach((n) => {
+      if (typeof data[n] === 'number' && data[n] >= 0) base[n] = data[n];
+    });
+  } catch (e) { /* dato corrupto: se usa base */ }
+  return base;
+}
+function guardarRecords(records) {
+  try { localStorage.setItem(RECORD_KEY, JSON.stringify(records)); } catch (e) {}
+}
+
 // Estado global del nivel
 const estadoJuego = {
   nivelActual: 1,         // Nivel 1, 2 o 3
@@ -442,14 +467,14 @@ const estadoJuego = {
   filtrosDisponibles: ['grises', 'brillo', 'negativo'],
   juegoTerminado: false,
   cantPartes: 4,          // 4, 6 u 8 partes
-  offsetLeft: 200,
-  offsetTop: 50,
+  offsetLeft: 290,
+  offsetTop: 41,
   anchoTablero: 600,
   altoTablero: 500,
   // VARIABLES DEL TEMPORIZADOR
   segundosTranscurridos: 0,
   timerInterval: null,
-  recordPorNivel: { 1: null, 2: null, 3: null },
+  recordPorNivel: cargarRecords(),
 };
 
 function aplicarFiltro(imageData, tipoFiltro) {
@@ -686,6 +711,7 @@ function detenerTemporizador() {
   if (recordPrevio === null || tiempoActual < recordPrevio) {
     estadoJuego.recordPorNivel[nivel] = tiempoActual;
     esNuevoRecord = true;
+    guardarRecords(estadoJuego.recordPorNivel);
   }
 
   return {
