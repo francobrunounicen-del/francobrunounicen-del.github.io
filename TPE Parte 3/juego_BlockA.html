@@ -71,15 +71,12 @@
           <button class="btn-retro" id="iniciar_juego">
             Iniciar Juego
           </button>
-          <button class="btn-retro">
-            Galeria
-          </button>
-          <button class="btn-retro">
-            Opciones
-          </button>
-          <button class="btn-retro">
-            Salir
-          </button>
+          <label class="dificultad-label" for="dificultad">Dificultad</label>
+          <select class="btn-retro" id="dificultad">
+            <option value="4">Fácil (4 piezas)</option>
+            <option value="6">Media (6 piezas)</option>
+            <option value="8">Difícil (8 piezas)</option>
+          </select>
         </div>
         <div class="botonera" id="botonera2">
           <button class="btn-retro" id="siguiente_nivel">
@@ -130,11 +127,12 @@
       <section class="info-card">
         <h3 class="info-title">¿Cómo jugar?</h3>
         <ul class="instructions-list">
-          <li>Cada partida tiene 3 niveles: la imagen aparece dividida en 4 piezas (2x2) rotadas al azar.
+          <li>Cada partida tiene 3 niveles: elegí la dificultad en el menú (4, 6 u 8 piezas) y la imagen aparece dividida
+            en partes rotadas al azar.
             El nivel 1 es normal, el nivel 2 aplica un filtro sorpresa (grises, brillo o negativo) y el nivel 3 un filtro
             distinto por pieza. Al ganar, los filtros se quitan y ves la imagen original.</li>
           <li>Hacé clic izquierdo (o tocá en pantallas táctiles) sobre la pieza que quieras corregir para girarla 90° en
-            sentido antihorario, o clic derecho para girarla 90° en sentido horario. Repetí hasta que las 4 piezas queden
+            sentido antihorario, o clic derecho para girarla 90° en sentido horario. Repetí hasta que todas las piezas queden
             en su orientación correcta.</li>
           <li>El cronómetro suma hacia arriba sin límite de tiempo: tu mejor tiempo de cada nivel queda guardado en el
             navegador como récord a superar. El nivel actual se muestra arriba a la izquierda del marco.</li>

@@ -158,6 +158,9 @@ function initPlayMenu() {
       estadoJuego.nivelActual = 1;
       estadoJuego.juegoTerminado = false;
       estadoJuego.filtroActual = null;
+      const selDificultad = document.getElementById('dificultad');
+      const partes = selDificultad ? parseInt(selDificultad.value, 10) : 4;
+      estadoJuego.cantPartes = [4, 6, 8].includes(partes) ? partes : 4;
       iniciarNivel();
       iniciarTemporizador();
     });
