@@ -104,12 +104,17 @@ function initPlayMenu() {
     playBtn.addEventListener('click', () => {
       // Transición visual al iniciar el juego
       playBtn.classList.add('is-playing');
-      // Opcional: Feedback visual en la portada
-      if (gameCover) {
-        gameCover.src= 'img/blockA_fondo_menu.jpg';
+      if (gameBotonera1) {
+        // Flujo BlockA: muestra el menú con botonera
+        setCover('img/blockA_fondo_menu.jpg');
+        setBotonera(gameBotonera1, true);
+        if (gameCover) gameCover.style.opacity = "1";
+      } else if (gameCover) {
+        // Flujo Peg (Parte 2): solo desaparece el botón, no se cambia la imagen
+        gameCover.style.transition = 'filter 0.3s ease';
+        gameCover.style.filter = 'brightness(1.1)';
+        gameCover.style.opacity = "1";
       }
-      setBotonera(gameBotonera1, true);
-      gameCover.style.opacity="1";
     });
   }
 /*  function dibujarFondo() {
@@ -138,7 +143,7 @@ function initPlayMenu() {
       setBotonera(gameBotonera1, false);
       // Establecer la imagen de fondo con estrellas
       if (gameCover) {
-        gameCover.src = "img/blockA_fondo.jpg";
+        gameCover.src = "img/BlockA_fondo.jpg";
       }
       // Mostrar el canvas encima de la imagen
       if (canvas) {
@@ -146,6 +151,7 @@ function initPlayMenu() {
       }
       estadoJuego.nivelActual = 1;
       estadoJuego.juegoTerminado = false;
+      estadoJuego.filtroActual = null;
       iniciarNivel();
       iniciarTemporizador();
     });
@@ -182,16 +188,15 @@ function initPlayMenu() {
       // Limpiar el lienzo del nivel anterior
       if (canvas && ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Incrementar nivel y configurar dificultad
-      estadoJuego.nivelActual++;
+      // Incrementar nivel y configurar dificultad (máximo 3)
+      if (estadoJuego.nivelActual < 3) estadoJuego.nivelActual++;
       estadoJuego.juegoTerminado = false;
 
       // Asegurar que el canvas esté visible y fondo correcto
-      if (gameCover) gameCover.src = 'img/blockA_fondo.jpg';
+      if (gameCover) gameCover.src = 'img/BlockA_fondo.jpg';
       if (canvas) canvas.style.display = 'block';
 
       // Iniciar nuevo nivel
-      gameCover.src = "img/blockA_fondo.jpg";
       iniciarNivel();
       iniciarTemporizador();
     });
@@ -350,7 +355,7 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-// LOADER DEL HOME: carga simulada de 5 segundos con animacion retro
+// LOADER DEL HOME: carga simulada de 1 segundo con animacion retro
 (function () {
   const overlay = document.getElementById('retro-loader-overlay');
   const percentageDisplay = document.getElementById('loader-percentage');
@@ -444,10 +449,11 @@ const estadoJuego = {
   // VARIABLES DEL TEMPORIZADOR
   segundosTranscurridos: 0,
   timerInterval: null,
-  recordSegundos: null,
+  recordPorNivel: { 1: null, 2: null, 3: null },
 };
 
 function aplicarFiltro(imageData, tipoFiltro) {
+  if (!tipoFiltro) return; // Nivel 1
   const data = imageData.data;
 
   for (let i = 0; i < data.length; i += 4) {
@@ -459,10 +465,10 @@ function aplicarFiltro(imageData, tipoFiltro) {
       data[i + 2] = gris;
     }
     else if (tipoFiltro === 'brillo') {
-      // Brillo +150%
-      data[i] *= 2.5;
-      data[i + 1] *= 2.5;
-      data[i + 2] *= 2.5;
+      // Brillo +30%
+      data[i] *= 1.3;
+      data[i + 1] *= 1.3;
+      data[i + 2] *= 1.3;
     }
     else if (tipoFiltro === 'negativo') {
       // Negativo
@@ -475,12 +481,14 @@ function aplicarFiltro(imageData, tipoFiltro) {
 
 function iniciarNivel() {
   if (!estadoJuego.bancoImagenes.length) return;
+
+  if(estadoJuego.nivelActual===2){
+    estadoJuego.filtroActual=estadoJuego.filtrosDisponibles[Math.floor(Math.random() * estadoJuego.filtrosDisponibles.length)];
+  }
+
   const rutaImagen = estadoJuego.bancoImagenes[Math.floor(Math.random() * estadoJuego.bancoImagenes.length)];
   const img = new Image();
   img.src = rutaImagen;
-  if(estadoJuego.nivelActual===2){
-    estadoJuego.filtroActual=estadoJuego.filtrosDisponibles[Math.floor(Math.random() * 3)];
-  }
   img.onload = function () {
     setupPiezas(this);
   };
@@ -516,11 +524,12 @@ function setupPiezas(imagen) {
       const imgDataOrig = ctxAux.getImageData(0, 0, subWidth, subHeight);
       const imgDataFilt = ctxAux.getImageData(0, 0, subWidth, subHeight);
 
-      // Aplicar el filtro de la consigna sobre la copia
-      if(estadoJuego.nivelActual>=3){
-        estadoJuego.filtroActual=estadoJuego.filtrosDisponibles[Math.floor(Math.random() * 3)];
+      // Nivel 3: Filtro aleatorio distinto por cada subimagen (sobre una copia)
+      let filtroParaPieza = estadoJuego.filtroActual;
+      if (estadoJuego.nivelActual >= 3) {
+        filtroParaPieza = estadoJuego.filtrosDisponibles[Math.floor(Math.random() * estadoJuego.filtrosDisponibles.length)];
       }
-      aplicarFiltro(imgDataFilt, estadoJuego.filtroActual);
+      aplicarFiltro(imgDataFilt, filtroParaPieza);
 
       // Guardar el objeto estructural con los datos de la subimagen
       estadoJuego.piezas.push({
@@ -582,8 +591,10 @@ canvas.addEventListener('mousedown', function (e) {
   if (estadoJuego.juegoTerminado) return;
 
   const rect = canvas.getBoundingClientRect();
-  const clickX = e.clientX - rect.left;
-  const clickY = e.clientY - rect.top;
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  const clickX = (e.clientX - rect.left) * scaleX;
+  const clickY = (e.clientY - rect.top) * scaleY;
 
   estadoJuego.piezas.forEach(pieza => {
     const px = estadoJuego.offsetLeft + (pieza.col * pieza.width);
@@ -632,6 +643,10 @@ function comprobarVictoria() {
       } else {
         mensaje += `\nMejor récord: ${resultado.recordTexto}`;
       }
+      if (estadoJuego.nivelActual >= 3) {
+        mensaje += `\n\n🏆 ¡FELICIDADES! Has completado todos los niveles del juego.`;
+      }
+
       alert(mensaje);
     }, 1000);
   }
@@ -659,21 +674,23 @@ function iniciarTemporizador() {
   }, 1000);
 }
 
-// Detener temporizador y calcular récord
+// Detener temporizador y calcular récord del nivel actual
 function detenerTemporizador() {
   clearInterval(estadoJuego.timerInterval);
 
   const tiempoActual = estadoJuego.segundosTranscurridos;
+  const nivel = estadoJuego.nivelActual;
+  const recordPrevio = estadoJuego.recordPorNivel[nivel] ?? null;
   let esNuevoRecord = false;
 
-  if (estadoJuego.recordSegundos === null || tiempoActual < estadoJuego.recordSegundos) {
-    estadoJuego.recordSegundos = tiempoActual;
+  if (recordPrevio === null || tiempoActual < recordPrevio) {
+    estadoJuego.recordPorNivel[nivel] = tiempoActual;
     esNuevoRecord = true;
   }
 
   return {
     tiempoTexto: formatearTiempo(tiempoActual),
-    recordTexto: formatearTiempo(estadoJuego.recordSegundos),
+    recordTexto: formatearTiempo(estadoJuego.recordPorNivel[nivel]),
     esNuevoRecord: esNuevoRecord
   };
 }
