@@ -662,6 +662,8 @@ function comprobarVictoria() {
     // Mensaje de victoria con récord
     setTimeout(() => {
       let mensaje = `¡Nivel superado en ${resultado.tiempoTexto}!`;
+      const btnSiguiente = document.getElementById('siguiente_nivel');
+      if (btnSiguiente) btnSiguiente.style.display = estadoJuego.nivelActual >= 3 ? 'none' : '';
       setBotonera(document.getElementById('botonera2'), true);
       if (resultado.esNuevoRecord) {
         mensaje += `\n¡Felicidades, marcaste un NUEVO RÉCORD para este nivel! 🎉`;
