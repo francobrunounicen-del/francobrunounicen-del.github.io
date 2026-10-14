@@ -497,12 +497,12 @@ img.logo_footer { width: 5rem; height: auto; display: block; }
 .instructions-list { list-style: none; display: flex; flex-direction: column; gap: 0.4rem; }
 .instructions-list li::before { content: "• "; font-weight: 900; }
 
-/* Galería: miniaturas cuadradas 1:1, sin deformación */
+/* Galería: miniaturas con la proporción de las capturas (16:10), sin recortar */
 .gallery-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.7rem; }
 .gallery-item {
   border-radius: 0.6rem; overflow: hidden; cursor: pointer;
   border: 2px solid #22d3ee; box-shadow: 0 0 12px rgba(34, 211, 238, 0.35);
-  aspect-ratio: 1 / 1; background: #0b0e1a;
+  aspect-ratio: 16 / 10; background: #0b0e1a;
 }
 .gallery-item:nth-child(3n) { border-color: #f0f; box-shadow: 0 0 12px rgba(255, 0, 255, 0.35); }
 .gallery-item:nth-child(4n) { border-color: #f43f5e; }
