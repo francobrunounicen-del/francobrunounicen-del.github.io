@@ -141,25 +141,7 @@ function initPlayMenu() {
       }
     });
   }
-/*  function dibujarFondo() {
-    let canvas = document.getElementById("canvas");
-    let ctx = canvas.getContext('2d');
-    let imagenData = ctx.createImageData(600, 600);
-    for (let x = 0; x < 600; x++) {
-      for (let y = 0; y < 600; y++) {
-        setPixel(imagenData, x, y, x * 255 / 600, x * 255 / 600, 0, 255);
-      }
-    }
-    ctx.putImageData(imagenData, 0, 0);
-  }
-  function setPixel(imagenData, x, y, r, g, b, a) {
-    let index = (x + y * imagenData.width) * 4;
 
-    imagenData.data[index + 0] = r;
-    imagenData.data[index + 1] = g;
-    imagenData.data[index + 2] = b;
-    imagenData.data[index + 3] = a;
-  }*/
   // Presionar boton iniciar juego en el menú
   if (btnIniciarJuego) {
     btnIniciarJuego.addEventListener('click', () => {
