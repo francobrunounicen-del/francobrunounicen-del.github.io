@@ -471,8 +471,8 @@ const estadoJuego = {
   nivelActual: 1,         // Nivel 1, 2 o 3
   piezas: [],             // Arreglo con la información de las 4, 6 u 8 partes
   bancoImagenes: [
-    'img/galeria_BlockA/1.png', 'img/galeria_BlockA/2.png', 'img/galeria_BlockA/3.png',
-    'img/galeria_BlockA/4.png', 'img/galeria_BlockA/5.png', 'img/galeria_BlockA/6.png'
+    'img/galeria_BlockA/1.jpg', 'img/galeria_BlockA/2.jpg', 'img/galeria_BlockA/3.jpg',
+    'img/galeria_BlockA/4.jpg', 'img/galeria_BlockA/5.jpg', 'img/galeria_BlockA/6.jpg'
   ],
   filtrosDisponibles: ['grises', 'brillo', 'negativo'],
   juegoTerminado: false,
