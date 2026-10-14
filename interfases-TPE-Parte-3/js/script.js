@@ -592,7 +592,8 @@ function setupPiezas(imagen) {
   // Centrar el área de juego (y el marco) dentro de la zona segura
   estadoJuego.offsetLeft = Math.max(0, (canvas.width - estadoJuego.tableroW) / 2);
   estadoJuego.offsetTop = Math.max(0, topRes + (canvas.height - topRes - bottomRes - estadoJuego.tableroH) / 2);
-  const angulos = [0, 90, 180, 270];
+  // Sin 0°: garantiza que ninguna pieza nazca ya resuelta, siempre hay algo que rotar
+  const angulos = [90, 180, 270];
 
   // Canvas auxiliar en memoria para recortar y procesar filtros
   const canvasAux = document.createElement('canvas');
