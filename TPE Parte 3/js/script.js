@@ -84,6 +84,24 @@ function showNivel(show) {
   el.style.display = show ? 'block' : 'none';
   if (show) el.textContent = 'Nivel: ' + estadoJuego.nivelActual;
 }
+function showVeil(show) {
+  const v = document.getElementById('gameVeil');
+  if (!v) return;
+  v.style.display = show ? 'block' : 'none';
+}
+function showMarco(show) {
+  const f = document.getElementById('boardFrame');
+  if (!f || !canvas) return;
+  if (show) {
+    f.style.left = (estadoJuego.offsetLeft / canvas.width * 100) + '%';
+    f.style.top = (estadoJuego.offsetTop / canvas.height * 100) + '%';
+    f.style.width = (estadoJuego.tableroW / canvas.width * 100) + '%';
+    f.style.height = (estadoJuego.tableroH / canvas.height * 100) + '%';
+    f.style.display = 'block';
+  } else {
+    f.style.display = 'none';
+  }
+}
 
 // 2. Inits por página (early-returns: cada init sale si no está en esa página)
 document.addEventListener('DOMContentLoaded', () => {
@@ -155,6 +173,8 @@ function initPlayMenu() {
       if (canvas) {
         canvas.style.display = 'block';
       }
+      showVeil(true);
+      ocultarPanelVictoria();
       estadoJuego.nivelActual = 1;
       estadoJuego.juegoTerminado = false;
       estadoJuego.filtroActual = null;
@@ -187,6 +207,9 @@ function initPlayMenu() {
       estadoJuego.segundosTranscurridos = 0;
       showTimer(false);
       showNivel(false);
+      showVeil(false);
+      showMarco(false);
+      ocultarPanelVictoria();
 
       // Reiniciar progreso desde cero (los récords persisten para comparar)
       estadoJuego.nivelActual = 1;
@@ -212,6 +235,8 @@ function initPlayMenu() {
       // Asegurar que el canvas esté visible y fondo correcto
       if (gameCover) gameCover.src = 'img/BlockA_fondo.jpg';
       if (canvas) canvas.style.display = 'block';
+      showVeil(true);
+      ocultarPanelVictoria();
 
       // Iniciar nuevo nivel
       iniciarNivel();
@@ -479,6 +504,8 @@ const estadoJuego = {
   cantPartes: 4,          // 4, 6 u 8 partes
   offsetLeft: 290,
   offsetTop: 41,
+  tableroW: 0,
+  tableroH: 0,
   // VARIABLES DEL TEMPORIZADOR
   segundosTranscurridos: 0,
   timerInterval: null,
@@ -529,6 +556,7 @@ function iniciarNivel() {
 }
 
 function setupPiezas(imagen) {
+  if (!canvas || canvas.style.display !== 'block') return; // se salió al menú durante la carga
   estadoJuego.piezas = [];
 
   // Determinar filas y columnas según la cantidad de partes seleccionadas (4, 6 u 8)
@@ -538,6 +566,29 @@ function setupPiezas(imagen) {
 
   const subWidth = imagen.width / cols;
   const subHeight = imagen.height / filas;
+  // Zona segura en px del canvas: reserva arriba (timer/nivel) y abajo (toolbar)
+  const contRect = canvas.getBoundingClientRect();
+  const ky = contRect.height > 0 ? canvas.height / contRect.height : 1;
+  const screenEl = document.getElementById('gameScreen');
+  const screenRect = screenEl ? screenEl.getBoundingClientRect() : null;
+  const bottomCss = screenRect ? Math.max(0, contRect.bottom - screenRect.bottom) : 0;
+  const bordeInf = (id) => {
+    const el = document.getElementById(id);
+    if (!el || !screenRect) return 0;
+    return Math.max(0, el.getBoundingClientRect().bottom - screenRect.top);
+  };
+  const topCss = Math.max(bordeInf('timer-display'), bordeInf('level-display'), 50) + 10;
+  const topRes = topCss * ky;
+  const bottomRes = bottomCss * ky + 8 * ky;
+  // Escala para que el tablero entre en la zona segura (1 = sin cambios)
+  const esc = Math.min(1, canvas.width / (cols * subWidth), (canvas.height - topRes - bottomRes) / (filas * subHeight));
+  const wPieza = subWidth * esc;
+  const hPieza = subHeight * esc;
+  estadoJuego.tableroW = cols * wPieza;
+  estadoJuego.tableroH = filas * hPieza;
+  // Centrar el área de juego (y el marco) dentro de la zona segura
+  estadoJuego.offsetLeft = Math.max(0, (canvas.width - estadoJuego.tableroW) / 2);
+  estadoJuego.offsetTop = Math.max(0, topRes + (canvas.height - topRes - bottomRes - estadoJuego.tableroH) / 2);
   const angulos = [0, 90, 180, 270];
 
   // Canvas auxiliar en memoria para recortar y procesar filtros
@@ -570,8 +621,8 @@ function setupPiezas(imagen) {
         id: id++,
         col: c,
         row: r,
-        width: subWidth,
-        height: subHeight,
+        width: wPieza,
+        height: hPieza,
         rotacion: angulos[Math.floor(Math.random() * angulos.length)],
         fijada: false,                                                // Para "Ayudita"
         canvasPropio: crearCanvasDePieza(subWidth, subHeight, imgDataFilt),
@@ -580,6 +631,7 @@ function setupPiezas(imagen) {
     }
   }
   dibujarJuego();
+  showMarco(true);
 }
 
 // Función auxiliar para pasar de ImageData a un Canvas que se pueda dibujar fácil con drawImage
@@ -604,8 +656,8 @@ function dibujarJuego() {
     ctx.translate(dx + pieza.width / 2, dy + pieza.height / 2);
     ctx.rotate((pieza.rotacion * Math.PI) / 180);
 
-    // Dibujar el canvas interno procesado
-    ctx.drawImage(pieza.canvasPropio, -pieza.width / 2, -pieza.height / 2);
+    // Dibujar el canvas interno procesado (escalado al tamaño de juego)
+    ctx.drawImage(pieza.canvasPropio, -pieza.width / 2, -pieza.height / 2, pieza.width, pieza.height);
     ctx.restore();
 
     // Borde si la pieza fue fijada por "Ayudita"
@@ -659,33 +711,45 @@ function comprobarVictoria() {
     estadoJuego.juegoTerminado = true;
     // Detener temporizador y obtener los tiempos
     const resultado = detenerTemporizador();
+    const nivel = estadoJuego.nivelActual;
 
-    // Al ganar: quitar filtros restaurando el ImageData RGB original (Funcionalidad General)
+    // Fase 1: mostrar la imagen original armada, con el fondo de juego
     estadoJuego.piezas.forEach(pieza => {
       const ctxPieza = pieza.canvasPropio.getContext('2d');
       ctxPieza.putImageData(pieza.imgDataOriginal, 0, 0);
     });
     dibujarJuego();
-    setCover("img/blockA_victoria.png");
 
-    // Mensaje de victoria con récord
+    // Fase 2: fondo de victoria + panel de resultados + botonera
     setTimeout(() => {
-      let mensaje = `¡Nivel superado en ${resultado.tiempoTexto}!`;
+      if (canvas) canvas.style.display = 'none';
+      setCover("img/blockA_victoria.png");
+      showVeil(false);
+      showMarco(false);
+      showTimer(false);
+      showNivel(false);
+      mostrarPanelVictoria(resultado, nivel);
       const btnSiguiente = document.getElementById('siguiente_nivel');
-      if (btnSiguiente) btnSiguiente.style.display = estadoJuego.nivelActual >= 3 ? 'none' : '';
+      if (btnSiguiente) btnSiguiente.style.display = nivel >= 3 ? 'none' : '';
       setBotonera(document.getElementById('botonera2'), true);
-      if (resultado.esNuevoRecord) {
-        mensaje += `\n¡Felicidades, marcaste un NUEVO RÉCORD para este nivel! 🎉`;
-      } else {
-        mensaje += `\nMejor récord: ${resultado.recordTexto}`;
-      }
-      if (estadoJuego.nivelActual >= 3) {
-        mensaje += `\n\n🏆 ¡FELICIDADES! Has completado todos los niveles del juego.`;
-      }
-
-      alert(mensaje);
-    }, 1000);
+    }, 1500);
   }
+}
+
+function mostrarPanelVictoria(resultado, nivel) {
+  const panel = document.getElementById('panelVictoria');
+  if (!panel) return;
+  document.getElementById('vTiempo').textContent = resultado.tiempoTexto;
+  document.getElementById('vNivel').textContent = nivel;
+  document.getElementById('vRecord').textContent = resultado.recordTexto;
+  document.getElementById('vNuevoRecord').style.display = resultado.esNuevoRecord ? '' : 'none';
+  document.getElementById('vFinal').style.display = nivel >= 3 ? '' : 'none';
+  panel.style.display = 'block';
+}
+
+function ocultarPanelVictoria() {
+  const panel = document.getElementById('panelVictoria');
+  if (panel) panel.style.display = 'none';
 }
 
 // Función para formatear segundos a MM:SS

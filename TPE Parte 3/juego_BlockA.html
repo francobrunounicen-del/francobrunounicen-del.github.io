@@ -78,19 +78,30 @@
             <option value="8">Difícil (8 piezas)</option>
           </select>
         </div>
-        <div class="botonera" id="botonera2">
-          <button class="btn-retro" id="siguiente_nivel">
-            Siguiente Nivel
-          </button>
-          <button class="btn-retro" id="menu_principal">
-            Menu Principal
-          </button>
-        </div>
         <canvas id="canvas" width="755" height="472"></canvas>
+        <div class="board-frame" id="boardFrame"></div>
         <div class="game-screen" id="gameScreen">
           <div id="timer-display" class="timer-display">Tiempo: 00:00</div>
           <div id="level-display" class="level-display">Nivel: 1</div>
           <img src="img/Juego BlockA.jpg" alt="BlockA Gameplay" class="game-cover">
+          <div class="game-veil" id="gameVeil"></div>
+          <div class="victoria-col" id="columnaVictoria">
+            <div class="victoria-panel" id="panelVictoria">
+              <h3 class="victoria-titulo">¡Nivel superado!</h3>
+              <p class="victoria-linea">Tiempo: <span id="vTiempo">00:00</span></p>
+              <p class="victoria-linea">Nivel: <span id="vNivel">1</span></p>
+              <p class="victoria-linea">Récord del nivel: <span id="vRecord">--:--</span> <span class="victoria-record" id="vNuevoRecord">¡Nuevo récord! 🎉</span></p>
+              <p class="victoria-linea victoria-final" id="vFinal">🏆 ¡Felicidades! Completaste todos los niveles.</p>
+            </div>
+            <div class="botonera" id="botonera2">
+              <button class="btn-retro" id="siguiente_nivel">
+                Siguiente Nivel
+              </button>
+              <button class="btn-retro" id="menu_principal">
+                Menu Principal
+              </button>
+            </div>
+          </div>
           <button class="btn-play-overlay" id="playBtn" aria-label="Iniciar Juego">
             <i class="fa-solid fa-play"></i>
           </button>

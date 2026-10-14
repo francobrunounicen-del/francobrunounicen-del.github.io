@@ -1127,3 +1127,83 @@ img.logo_footer { width: 5rem; height: auto; display: block; }
   box-shadow: 0 0 10px rgba(250, 204, 21, 0.4);
   display: none; /* Se muestra al iniciar la partida */
 }
+
+/* Velo oscuro: apaga el fondo solo durante la partida (debajo del canvas) */
+.game-veil {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(11, 14, 26, 0.82);
+  z-index: 1;
+  display: none;
+  pointer-events: none;
+}
+
+/* Marco del tablero: delimita la zona de juego, solo durante la partida */
+.board-frame {
+  position: absolute;
+  border: 2px solid var(--accent-cyan);
+  border-radius: 0.4rem;
+  box-shadow: 0 0 12px rgba(0, 229, 255, 0.35);
+  z-index: 2;
+  display: none;
+  pointer-events: none;
+}
+
+/* Panel de victoria + botonera 2 a la derecha (el personaje está a la izquierda) */
+/* Columna de victoria a la derecha (el personaje está a la izquierda) */
+.victoria-col {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 16%;
+  width: min(25rem, 48%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  gap: 1rem;
+  padding-right: 4%;
+  z-index: 4;
+  pointer-events: none;
+}
+.victoria-panel {
+  width: 100%;
+  max-height: 55%;
+  overflow-y: auto;
+  display: none;
+  background-color: rgba(13, 14, 21, 0.9);
+  border: 2px solid var(--neon-yellow);
+  border-radius: 0.6rem;
+  padding: 0.9rem 1.1rem;
+  box-shadow: 0 0 16px rgba(250, 204, 21, 0.35);
+}
+.victoria-titulo {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 1rem;
+  color: var(--neon-yellow);
+  margin-bottom: 0.6rem;
+}
+.victoria-linea { font-size: 0.9rem; color: #fff; margin: 0.3rem 0; }
+.victoria-linea span { font-weight: 800; }
+#vTiempo, #vNivel, #vRecord { color: var(--accent-cyan); }
+.victoria-record { color: var(--neon-green); font-weight: 800; }
+.victoria-final { color: var(--neon-yellow); font-weight: 700; margin-top: 0.5rem; }
+#columnaVictoria #botonera2 {
+  position: static;
+  transform: none;
+  width: 100%;
+}
+#columnaVictoria .btn-retro { pointer-events: auto; }
+@media (max-width: 640px) {
+  .victoria-col {
+    left: 0;
+    right: 0;
+    width: 100%;
+    padding: 0.8rem 4%;
+  }
+  .victoria-panel {
+    padding: 0.7rem 0.9rem;
+    max-height: 50%;
+  }
+  .victoria-titulo { font-size: 0.8rem; }
+}
