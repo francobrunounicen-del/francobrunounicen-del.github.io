@@ -471,6 +471,19 @@ img.logo_footer { width: 5rem; height: auto; display: block; }
 }
 .toolbar-left, .toolbar-right { display: flex; align-items: center; gap: 0.7rem; }
 .btn-icon { background: none; border: none; color: #e8e4ff; font-size: 1.15rem; cursor: pointer; }
+.btn-ayuda {
+  background: transparent;
+  border: 2px solid var(--neon-yellow);
+  color: var(--neon-yellow);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.65rem;
+  padding: 0.4rem 0.7rem;
+  border-radius: 0.4rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+.btn-ayuda:hover:not(:disabled) { background-color: var(--neon-yellow); color: #1a1a2e; }
+.btn-ayuda:disabled { opacity: 0.4; cursor: default; }
 .rating-text { font-weight: 800; font-size: 0.9rem; }
 
 /* Descripción / Cómo jugar: cajas violetas como Figma */
@@ -1185,7 +1198,7 @@ img.logo_footer { width: 5rem; height: auto; display: block; }
 }
 .victoria-linea { font-size: 0.9rem; color: #fff; margin: 0.3rem 0; }
 .victoria-linea span { font-weight: 800; }
-#vTiempo, #vNivel, #vRecord { color: var(--accent-cyan); }
+#vTiempo, #vNivel, #vDificultad, #vRecord { color: var(--accent-cyan); }
 .victoria-record { color: var(--neon-green); font-weight: 800; }
 .victoria-final { color: var(--neon-yellow); font-weight: 700; margin-top: 0.5rem; }
 #columnaVictoria #botonera2 {

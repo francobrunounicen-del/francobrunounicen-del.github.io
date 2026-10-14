@@ -74,8 +74,8 @@
           <label class="dificultad-label" for="dificultad">Dificultad</label>
           <select class="btn-retro" id="dificultad">
             <option value="4">Fácil (4 piezas)</option>
-            <option value="6">Media (6 piezas)</option>
-            <option value="8">Difícil (8 piezas)</option>
+            <option value="9">Media (9 piezas)</option>
+            <option value="16">Difícil (16 piezas)</option>
           </select>
         </div>
         <canvas id="canvas" width="755" height="472"></canvas>
@@ -90,6 +90,7 @@
               <h3 class="victoria-titulo">¡Nivel superado!</h3>
               <p class="victoria-linea">Tiempo: <span id="vTiempo">00:00</span></p>
               <p class="victoria-linea">Nivel: <span id="vNivel">1</span></p>
+            <p class="victoria-linea">Dificultad: <span id="vDificultad">4 piezas</span></p>
               <p class="victoria-linea">Récord del nivel: <span id="vRecord">--:--</span> <span class="victoria-record" id="vNuevoRecord">¡Nuevo récord! 🎉</span></p>
               <p class="victoria-linea victoria-final" id="vFinal">🏆 ¡Felicidades! Completaste todos los niveles.</p>
             </div>
@@ -114,6 +115,7 @@
             <button class="btn-icon" title="Favorito"><i class="fa-solid fa-heart"></i></button>
             <button class="btn-icon" title="Guardar"><i class="fa-solid fa-bookmark"></i></button>
             <button class="btn-icon" title="Pantalla Completa" id="fullscreenBtn"><i class="fa-solid fa-expand"></i></button>
+            <button class="btn-ayuda" id="btnAyuda" title="Acomoda una pieza (+5 segundos)" disabled>Ayudita +5s</button>
           </div>
           <div class="toolbar-right">
             <button class="btn-icon" title="Me gusta"><i class="fa-solid fa-thumbs-up"></i></button>
@@ -138,7 +140,7 @@
       <section class="info-card">
         <h3 class="info-title">¿Cómo jugar?</h3>
         <ul class="instructions-list">
-          <li>Cada partida tiene 3 niveles: elegí la dificultad en el menú (4, 6 u 8 piezas) y la imagen aparece dividida
+          <li>Cada partida tiene 3 niveles: elegí la dificultad en el menú (4, 9 o 16 piezas) y la imagen aparece dividida
             en partes rotadas al azar.
             El nivel 1 es normal, el nivel 2 aplica un filtro sorpresa (grises, brillo o negativo) y el nivel 3 un filtro
             distinto por pieza. Al ganar, los filtros se quitan y ves la imagen original.</li>
@@ -147,6 +149,8 @@
             en su orientación correcta.</li>
           <li>El cronómetro suma hacia arriba sin límite de tiempo: tu mejor tiempo de cada nivel queda guardado en el
             navegador como récord a superar. El nivel actual se muestra arriba a la izquierda del marco.</li>
+          <li>Si te trabás, el botón Ayudita (+5s) de la barra acomoda al azar una de las piezas y la deja fija con un
+            borde dorado, pero suma 5 segundos a tu tiempo.</li>
           <li>Al alinear la última pieza, el tablero detecta la victoria automáticamente y podés pasar al siguiente nivel
             (hasta el 3) o volver al menú principal, que reinicia la partida desde cero.</li>
         </ul>

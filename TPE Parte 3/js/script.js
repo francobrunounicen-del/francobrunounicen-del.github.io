@@ -180,7 +180,7 @@ function initPlayMenu() {
       estadoJuego.filtroActual = null;
       const selDificultad = document.getElementById('dificultad');
       const partes = selDificultad ? parseInt(selDificultad.value, 10) : 4;
-      estadoJuego.cantPartes = [4, 6, 8].includes(partes) ? partes : 4;
+      estadoJuego.cantPartes = [4, 9, 16].includes(partes) ? partes : 4;
       iniciarNivel();
       iniciarTemporizador();
     });
@@ -218,6 +218,7 @@ function initPlayMenu() {
 
       // Marcar juego como terminado para bloquear clics
       estadoJuego.juegoTerminado = true;
+      setAyudaEnabled(false);
     });
   }
   if(btnSiguienteNivel){
@@ -242,6 +243,15 @@ function initPlayMenu() {
       iniciarNivel();
       iniciarTemporizador();
     });
+  }
+
+  const btnAyuda = document.getElementById('btnAyuda');
+  if (btnAyuda) {
+    if (!canvas) {
+      btnAyuda.style.display = 'none';
+    } else {
+      btnAyuda.addEventListener('click', usarAyudita);
+    }
   }
 
 }
@@ -473,17 +483,27 @@ function renderizarCarruselAPI(track, juegos) {
 const canvas = document.getElementById("canvas");
 const ctx = canvas ? canvas.getContext("2d") : null;
 
-// Récords por nivel persistentes (sobreviven a recargas: hay contra qué comparar)
+// Récords por nivel y dificultad persistentes (hay contra qué comparar)
 const RECORD_KEY = 'blocka_records_v1';
+const DIFICULTADES = [4, 9, 16];
+function nivelVacio() { return { 1: null, 2: null, 3: null }; }
 function cargarRecords() {
-  const base = { 1: null, 2: null, 3: null };
+  const base = {};
+  DIFICULTADES.forEach((d) => { base[d] = nivelVacio(); });
   try {
     const raw = localStorage.getItem(RECORD_KEY);
     if (!raw) return base;
     const data = JSON.parse(raw);
-    [1, 2, 3].forEach((n) => {
-      if (typeof data[n] === 'number' && data[n] >= 0) base[n] = data[n];
-    });
+    if (data && typeof data === 'object') {
+      // Migración: formato anterior plano {1,2,3} -> dificultad 4
+      const fuente = (data[4] && typeof data[4] === 'object') ? data : { 4: data };
+      DIFICULTADES.forEach((d) => {
+        [1, 2, 3].forEach((n) => {
+          const v = fuente[d] ? fuente[d][n] : null;
+          if (typeof v === 'number' && v >= 0) base[d][n] = v;
+        });
+      });
+    }
   } catch (e) { /* dato corrupto: se usa base */ }
   return base;
 }
@@ -494,14 +514,14 @@ function guardarRecords(records) {
 // Estado global del nivel
 const estadoJuego = {
   nivelActual: 1,         // Nivel 1, 2 o 3
-  piezas: [],             // Arreglo con la información de las 4, 6 u 8 partes
+  piezas: [],             // Arreglo con la información de las 4, 9 o 16 partes
   bancoImagenes: [
     'img/galeria_BlockA/1.jpg', 'img/galeria_BlockA/2.jpg', 'img/galeria_BlockA/3.jpg',
     'img/galeria_BlockA/4.jpg', 'img/galeria_BlockA/5.jpg', 'img/galeria_BlockA/6.jpg'
   ],
   filtrosDisponibles: ['grises', 'brillo', 'negativo'],
   juegoTerminado: false,
-  cantPartes: 4,          // 4, 6 u 8 partes
+  cantPartes: 4,          // 4, 9 o 16 partes
   offsetLeft: 290,
   offsetTop: 41,
   tableroW: 0,
@@ -542,6 +562,7 @@ function aplicarFiltro(imageData, tipoFiltro) {
 function iniciarNivel() {
   if (!estadoJuego.bancoImagenes.length) return;
   showNivel(true);
+  setAyudaEnabled(true);
 
   if(estadoJuego.nivelActual===2){
     estadoJuego.filtroActual=estadoJuego.filtrosDisponibles[Math.floor(Math.random() * estadoJuego.filtrosDisponibles.length)];
@@ -559,10 +580,10 @@ function setupPiezas(imagen) {
   if (!canvas || canvas.style.display !== 'block') return; // se salió al menú durante la carga
   estadoJuego.piezas = [];
 
-  // Determinar filas y columnas según la cantidad de partes seleccionadas (4, 6 u 8)
+  // Determinar filas y columnas según la cantidad de partes seleccionadas (4, 9 o 16)
   let cols = 2, filas = 2;
-  if (estadoJuego.cantPartes === 6) { cols = 3; filas = 2; }
-  if (estadoJuego.cantPartes === 8) { cols = 4; filas = 2; }
+  if (estadoJuego.cantPartes === 9) { cols = 3; filas = 3; }
+  if (estadoJuego.cantPartes === 16) { cols = 4; filas = 4; }
 
   const subWidth = imagen.width / cols;
   const subHeight = imagen.height / filas;
@@ -703,12 +724,31 @@ canvas.addEventListener('mousedown', function (e) {
 });
 }
 
+function usarAyudita() {
+  if (!canvas || !ctx || estadoJuego.juegoTerminado) return;
+  const candidatas = estadoJuego.piezas.filter((p) => !p.fijada && p.rotacion !== 0);
+  if (!candidatas.length) return;
+  const elegida = candidatas[Math.floor(Math.random() * candidatas.length)];
+  elegida.rotacion = 0;
+  elegida.fijada = true;
+  estadoJuego.segundosTranscurridos += 5;
+  showTimer(true, 'Tiempo: ' + formatearTiempo(estadoJuego.segundosTranscurridos));
+  dibujarJuego();
+  comprobarVictoria();
+}
+
+function setAyudaEnabled(on) {
+  const b = document.getElementById('btnAyuda');
+  if (b) b.disabled = !on;
+}
+
 function comprobarVictoria() {
   // Si todas las piezas tienen rotación 0°
   const gano = estadoJuego.piezas.every(p => p.rotacion === 0);
 
   if (gano) {
     estadoJuego.juegoTerminado = true;
+    setAyudaEnabled(false);
     // Detener temporizador y obtener los tiempos
     const resultado = detenerTemporizador();
     const nivel = estadoJuego.nivelActual;
@@ -732,7 +772,7 @@ function comprobarVictoria() {
       const btnSiguiente = document.getElementById('siguiente_nivel');
       if (btnSiguiente) btnSiguiente.style.display = nivel >= 3 ? 'none' : '';
       setBotonera(document.getElementById('botonera2'), true);
-    }, 1500);
+    }, 2500);
   }
 }
 
@@ -741,6 +781,7 @@ function mostrarPanelVictoria(resultado, nivel) {
   if (!panel) return;
   document.getElementById('vTiempo').textContent = resultado.tiempoTexto;
   document.getElementById('vNivel').textContent = nivel;
+  document.getElementById('vDificultad').textContent = resultado.dificultad + ' piezas';
   document.getElementById('vRecord').textContent = resultado.recordTexto;
   document.getElementById('vNuevoRecord').style.display = resultado.esNuevoRecord ? '' : 'none';
   document.getElementById('vFinal').style.display = nivel >= 3 ? '' : 'none';
@@ -780,19 +821,22 @@ function detenerTemporizador() {
 
   const tiempoActual = estadoJuego.segundosTranscurridos;
   const nivel = estadoJuego.nivelActual;
-  const recordPrevio = estadoJuego.recordPorNivel[nivel] ?? null;
+  const dif = estadoJuego.cantPartes;
+  if (!estadoJuego.recordPorNivel[dif]) estadoJuego.recordPorNivel[dif] = nivelVacio();
+  const recordPrevio = estadoJuego.recordPorNivel[dif][nivel] ?? null;
   let esNuevoRecord = false;
 
   if (recordPrevio === null || tiempoActual < recordPrevio) {
-    estadoJuego.recordPorNivel[nivel] = tiempoActual;
+    estadoJuego.recordPorNivel[dif][nivel] = tiempoActual;
     esNuevoRecord = true;
     guardarRecords(estadoJuego.recordPorNivel);
   }
 
   return {
     tiempoTexto: formatearTiempo(tiempoActual),
-    recordTexto: formatearTiempo(estadoJuego.recordPorNivel[nivel]),
-    esNuevoRecord: esNuevoRecord
+    recordTexto: formatearTiempo(estadoJuego.recordPorNivel[dif][nivel]),
+    esNuevoRecord: esNuevoRecord,
+    dificultad: dif
   };
 }
 
