@@ -772,7 +772,7 @@ function comprobarVictoria() {
       const btnSiguiente = document.getElementById('siguiente_nivel');
       if (btnSiguiente) btnSiguiente.style.display = nivel >= 3 ? 'none' : '';
       setBotonera(document.getElementById('botonera2'), true);
-    }, 2500);
+    }, 2000);
   }
 }
 
