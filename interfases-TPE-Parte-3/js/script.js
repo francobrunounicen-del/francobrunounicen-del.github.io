@@ -89,15 +89,24 @@ function showVeil(show) {
   if (!v) return;
   v.style.display = show ? 'block' : 'none';
 }
+/* Posiciona el marco con coordenadas del canvas expresadas en porcentajes.
+   Lo usan tanto el tablero como la imagen original del final, para que el
+   marco siempre encuadre exactamente lo que se está mostrando. */
+function ubicarMarco(x, y, w, h) {
+  const f = document.getElementById('boardFrame');
+  if (!f || !canvas) return;
+  f.style.left = (x / canvas.width * 100) + '%';
+  f.style.top = (y / canvas.height * 100) + '%';
+  f.style.width = (w / canvas.width * 100) + '%';
+  f.style.height = (h / canvas.height * 100) + '%';
+  f.style.display = 'block';
+}
+
 function showMarco(show) {
   const f = document.getElementById('boardFrame');
   if (!f || !canvas) return;
   if (show) {
-    f.style.left = (estadoJuego.offsetLeft / canvas.width * 100) + '%';
-    f.style.top = (estadoJuego.offsetTop / canvas.height * 100) + '%';
-    f.style.width = (estadoJuego.tableroW / canvas.width * 100) + '%';
-    f.style.height = (estadoJuego.tableroH / canvas.height * 100) + '%';
-    f.style.display = 'block';
+    ubicarMarco(estadoJuego.offsetLeft, estadoJuego.offsetTop, estadoJuego.tableroW, estadoJuego.tableroH);
   } else {
     f.style.display = 'none';
   }
@@ -162,7 +171,7 @@ function initPlayMenu() {
       estadoJuego.filtroActual = null;
       const selDificultad = document.getElementById('dificultad');
       const partes = selDificultad ? parseInt(selDificultad.value, 10) : 4;
-      estadoJuego.cantPartes = [4, 9, 16].includes(partes) ? partes : 4;
+      estadoJuego.cantPartes = [4, 6, 8].includes(partes) ? partes : 4;
       iniciarNivel();
       iniciarTemporizador();
     });
@@ -197,6 +206,7 @@ function initPlayMenu() {
       estadoJuego.nivelActual = 1;
       estadoJuego.piezas = [];
       estadoJuego.filtroActual = null;
+      estadoJuego.imagenNivel = null;
 
       // Marcar juego como terminado para bloquear clics
       estadoJuego.juegoTerminado = true;
@@ -467,7 +477,7 @@ const ctx = canvas ? canvas.getContext("2d") : null;
 
 // Récords por nivel y dificultad persistentes (hay contra qué comparar)
 const RECORD_KEY = 'blocka_records_v1';
-const DIFICULTADES = [4, 9, 16];
+const DIFICULTADES = [4, 6, 8];
 function nivelVacio() { return { 1: null, 2: null, 3: null }; }
 function cargarRecords() {
   const base = {};
@@ -503,7 +513,9 @@ const estadoJuego = {
   ],
   filtrosDisponibles: ['grises', 'brillo', 'negativo'],
   juegoTerminado: false,
-  cantPartes: 4,          // 4, 9 o 16 partes
+  cantPartes: 4,          // 4, 6 u 8 partes
+  imagenNivel: null,      // Imagen original del nivel, para mostrarla completa al ganar
+  escalaFinal: 1,         // Escala del tablero, reutilizada por el reveal de victoria
   offsetLeft: 290,
   offsetTop: 41,
   tableroW: 0,
@@ -554,22 +566,17 @@ function iniciarNivel() {
   const img = new Image();
   img.src = rutaImagen;
   img.onload = function () {
+    // Se guarda para poder revelar la imagen completa (sin recorte) al ganar
+    estadoJuego.imagenNivel = img;
     setupPiezas(this);
   };
 }
 
-function setupPiezas(imagen) {
-  if (!canvas || canvas.style.display !== 'block') return; // se salió al menú durante la carga
-  estadoJuego.piezas = [];
-
-  // Determinar filas y columnas según la cantidad de partes seleccionadas (4, 9 o 16)
-  let cols = 2, filas = 2;
-  if (estadoJuego.cantPartes === 9) { cols = 3; filas = 3; }
-  if (estadoJuego.cantPartes === 16) { cols = 4; filas = 4; }
-
-  const subWidth = imagen.width / cols;
-  const subHeight = imagen.height / filas;
-  // Zona segura en px del canvas: reserva arriba (timer/nivel) y abajo (toolbar)
+/* Rectángulo (en px del canvas) donde se puede dibujar el juego sin chocar
+   con el timer/nivel de arriba ni con la toolbar de abajo.
+   Lo usan tanto el tablero como la imagen original del final, para que
+   ambos se dibujen siempre al mismo tamaño y en la misma posición. */
+function areaSeguraJuego() {
   const contRect = canvas.getBoundingClientRect();
   const ky = contRect.height > 0 ? canvas.height / contRect.height : 1;
   const screenEl = document.getElementById('gameScreen');
@@ -581,17 +588,46 @@ function setupPiezas(imagen) {
     return Math.max(0, el.getBoundingClientRect().bottom - screenRect.top);
   };
   const topCss = Math.max(bordeInf('timer-display'), bordeInf('level-display'), 50) + 10;
-  const topRes = topCss * ky;
-  const bottomRes = bottomCss * ky + 8 * ky;
+  const top = topCss * ky;
+  const bottom = bottomCss * ky + 8 * ky;
+  return { top: top, alto: Math.max(1, canvas.height - top - bottom) };
+}
+
+function setupPiezas(imagen) {
+  if (!canvas || canvas.style.display !== 'block') return; // se salió al menú durante la carga
+  estadoJuego.piezas = [];
+
+  // Determinar filas y columnas según la cantidad de partes seleccionadas (4, 6, 8 o 16)
+  let cols = 2, filas = 2;
+  if (estadoJuego.cantPartes === 6) { cols = 3; filas = 2; }
+  if (estadoJuego.cantPartes === 9) { cols = 3; filas = 3; }
+  if (estadoJuego.cantPartes === 8) { cols = 4; filas = 2; }
+  if (estadoJuego.cantPartes === 16) { cols = 4; filas = 4; }
+
+  /* Recorte de la fuente para que TODAS las piezas salgan cuadradas (1:1).
+     Sin esto, con cols != filas sobre una imagen cuadrada las piezas quedan
+     rectangulares y al rotar 90/270 se salen de su casilla.
+     Se conserva siempre el ancho completo y se recorta el alto necesario, centrado. */
+  const subWidth = Math.min(imagen.width / cols, imagen.height / filas);
+  const subHeight = subWidth;
+  const srcX = (imagen.width - cols * subWidth) / 2;
+  const srcY = (imagen.height - filas * subHeight) / 2;
+  // Zona segura en px del canvas: reserva arriba (timer/nivel) y abajo (toolbar)
+  const area = areaSeguraJuego();
+  const topRes = area.top;
+  const bottomRes = canvas.height - area.top - area.alto;
   // Escala para que el tablero entre en la zona segura (1 = sin cambios)
-  const esc = Math.min(1, canvas.width / (cols * subWidth), (canvas.height - topRes - bottomRes) / (filas * subHeight));
+  const esc = Math.min(1, canvas.width / (cols * subWidth), area.alto / (filas * subHeight));
+  // La imagen original del final se dibuja con esta misma escala, para que el
+  // reveal se vea del mismo tamaño que el rompecabezas que se acaba de armar.
+  estadoJuego.escalaFinal = esc;
   const wPieza = subWidth * esc;
   const hPieza = subHeight * esc;
   estadoJuego.tableroW = cols * wPieza;
   estadoJuego.tableroH = filas * hPieza;
   // Centrar el área de juego (y el marco) dentro de la zona segura
   estadoJuego.offsetLeft = Math.max(0, (canvas.width - estadoJuego.tableroW) / 2);
-  estadoJuego.offsetTop = Math.max(0, topRes + (canvas.height - topRes - bottomRes - estadoJuego.tableroH) / 2);
+  estadoJuego.offsetTop = Math.max(0, topRes + (area.alto - estadoJuego.tableroH) / 2);
   // Sin 0°: garantiza que ninguna pieza nazca ya resuelta, siempre hay algo que rotar
   const angulos = [90, 180, 270];
 
@@ -607,7 +643,7 @@ function setupPiezas(imagen) {
 
       // Recortar subimagen
       ctxAux.clearRect(0, 0, subWidth, subHeight);
-      ctxAux.drawImage(imagen, c * subWidth, r * subHeight, subWidth, subHeight, 0, 0, subWidth, subHeight);
+      ctxAux.drawImage(imagen, srcX + c * subWidth, srcY + r * subHeight, subWidth, subHeight, 0, 0, subWidth, subHeight);
 
       // Obtener ImageData original y con filtro
       const imgDataOrig = ctxAux.getImageData(0, 0, subWidth, subHeight);
@@ -725,6 +761,25 @@ function setAyudaEnabled(on) {
   if (b) b.disabled = !on;
 }
 
+/* Al ganar se revela la imagen ORIGINAL completa, sin el recorte que se usó
+   para armar las piezas cuadradas. Reutiliza la MISMA escala con la que se
+   armó el tablero (estadoJuego.escalaFinal), de modo que el reveal se ve
+   exactamente del mismo tamaño que el rompecabezas que se acaba de resolver. */
+function mostrarImagenCompleta() {
+  const img = estadoJuego.imagenNivel;
+  if (!canvas || !ctx || !img) return false;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const escala = Math.min(estadoJuego.escalaFinal, canvas.width / img.width);
+  const w = img.width * escala;
+  const h = img.height * escala;
+  const x = (canvas.width - w) / 2;
+  const y = (canvas.height - h) / 2;
+  ctx.drawImage(img, x, y, w, h);
+  // El marco pasa a encuadrar la imagen completa, no el tablero recortado anterior
+  ubicarMarco(x, y, w, h);
+  return true;
+}
+
 function comprobarVictoria() {
   // Si todas las piezas tienen rotación 0°
   const gano = estadoJuego.piezas.every(p => p.rotacion === 0);
@@ -736,14 +791,21 @@ function comprobarVictoria() {
     const resultado = detenerTemporizador();
     const nivel = estadoJuego.nivelActual;
 
-    // Fase 1: mostrar la imagen original armada, con el fondo de juego
+    // Fase 1: mostrar el rompecabezas armado (el recorte que se usó para jugar)
     estadoJuego.piezas.forEach(pieza => {
       const ctxPieza = pieza.canvasPropio.getContext('2d');
       ctxPieza.putImageData(pieza.imgDataOriginal, 0, 0);
     });
     dibujarJuego();
 
-    // Fase 2: fondo de victoria + panel de resultados + botonera
+    // Fase 2: revelar la imagen original completa (solo si hubo recorte)
+    // En 4 piezas la grilla 2x2 ya usa la imagen entera, así que no hay nada que revelar.
+    const huboRecorte = estadoJuego.cantPartes === 6 || estadoJuego.cantPartes === 8;
+    if (huboRecorte) {
+      setTimeout(mostrarImagenCompleta, 1500);
+    }
+
+    // Fase 3: fondo de victoria + panel de resultados + botonera
     setTimeout(() => {
       if (canvas) canvas.style.display = 'none';
       setCover("img/blockA_victoria.png");
@@ -755,7 +817,7 @@ function comprobarVictoria() {
       const btnSiguiente = document.getElementById('siguiente_nivel');
       if (btnSiguiente) btnSiguiente.style.display = nivel >= 3 ? 'none' : '';
       setBotonera(document.getElementById('botonera2'), true);
-    }, 2000);
+    }, huboRecorte ? 3000 : 1500);
   }
 }
 
