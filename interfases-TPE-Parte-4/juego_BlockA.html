@@ -1,0 +1,395 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Retro Player - Pegs On Neon</title>
+
+  <!-- Fuentes e Iconos -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" >
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Hoja de Estilos Principal -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- ENCABEZADO (HEADER) -->
+  <header class="header">
+    <div class="header-container">
+        
+      <!-- Izquierda: Menú Hamburguesa & Logo -->
+      <div class="header-left">
+        <button id="menu-btn" aria-label="Abrir menú" class="btn-icon" onclick="toggleDropdown('categoriesDropdown')">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <a href="index.html" class="brand-logo">
+          <div class="logo-icon">
+            <img class="logo_header" src="img/Logo Header.png" alt="Logo header">
+          </div>
+          <span class="brand-name">RETRO <span class="white-text">PLAYER</span></span>
+        </a>
+      </div>
+
+      <!-- Centro: Barra de Búsqueda -->
+      <div class="search-container">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input type="text" id="search-input" placeholder="¿Qué juego buscás?" class="search-input">
+      </div>
+
+      <!-- Derecha: Perfil de Usuario -->
+      <div class="header-right">
+        <button id="profile-btn" class="profile-dropdown-btn" onclick="toggleDropdown('userDropdown')">
+          <i class="fa-solid fa-chevron-down arrow-icon"></i>
+          <div>
+            <img class="logo_usuario" src="img/Logo Usuario.png" alt="Logo Usuario">
+          </div>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- BREADCRUMB -->
+  <nav class="breadcrumb-container">
+    <a href="index.html" class="breadcrumb-link">Home</a> 
+    <span class="breadcrumb-separator"><i class="fa-solid fa-play"></i></span> 
+    <span class="breadcrumb-current">BlockA</span>
+  </nav>
+
+  <!-- CONTENIDO PRINCIPAL (LAYOUT EN 2 COLUMNAS) -->
+  <div class="main-layout">
+    
+    <!-- COLUMNA IZQUIERDA: CONTENIDO DEL JUEGO -->
+    <main class="content-column">
+
+      <!-- REPRODUCTOR / MARCO DEL JUEGO -->
+      <section class="game-container">
+        <div class="botonera" id="botonera1">
+          <button class="btn-retro" id="iniciar_juego">
+            Iniciar Juego
+          </button>
+          <label class="dificultad-label" for="dificultad">Dificultad</label>
+          <select class="btn-retro" id="dificultad">
+            <option value="4">Fácil (4 piezas)</option>
+            <option value="6">Media (6 piezas)</option>
+            <option value="8">Difícil (8 piezas)</option>
+          </select>
+        </div>
+        <canvas id="canvas" width="755" height="472"></canvas>
+        <div class="board-frame" id="boardFrame"></div>
+        <div class="game-screen" id="gameScreen">
+          <div id="timer-display" class="timer-display">Tiempo: 00:00</div>
+          <div id="level-display" class="level-display">Nivel: 1</div>
+          <img src="img/Juego BlockA.jpg" alt="BlockA Gameplay" class="game-cover">
+          <div class="game-veil" id="gameVeil"></div>
+          <div class="victoria-col" id="columnaVictoria">
+            <div class="victoria-panel" id="panelVictoria">
+              <h3 class="victoria-titulo">¡Nivel superado!</h3>
+              <p class="victoria-linea">Tiempo: <span id="vTiempo">00:00</span></p>
+              <p class="victoria-linea">Nivel: <span id="vNivel">1</span></p>
+            <p class="victoria-linea">Dificultad: <span id="vDificultad">4 piezas</span></p>
+              <p class="victoria-linea">Récord del nivel: <span id="vRecord">--:--</span> <span class="victoria-record" id="vNuevoRecord">¡Nuevo récord! 🎉</span></p>
+              <p class="victoria-linea victoria-final" id="vFinal">🏆 ¡Felicidades! Completaste todos los niveles.</p>
+            </div>
+            <div class="botonera" id="botonera2">
+              <button class="btn-retro" id="siguiente_nivel">
+                Siguiente Nivel
+              </button>
+              <button class="btn-retro" id="menu_principal">
+                Menu Principal
+              </button>
+            </div>
+          </div>
+          <button class="btn-play-overlay" id="playBtn" aria-label="Iniciar Juego">
+            <i class="fa-solid fa-play"></i>
+          </button>
+        </div>
+
+        <!-- BARRA DE ACCIONES DEL JUEGO -->
+        <div class="game-toolbar">
+          <div class="toolbar-left">
+            <button class="btn-icon" title="Información"><i class="fa-solid fa-circle-info"></i></button>
+            <button class="btn-icon" title="Favorito"><i class="fa-solid fa-heart"></i></button>
+            <button class="btn-icon" title="Guardar"><i class="fa-solid fa-bookmark"></i></button>
+            <button class="btn-icon" title="Pantalla Completa" id="fullscreenBtn"><i class="fa-solid fa-expand"></i></button>
+            <button class="btn-ayuda" id="btnAyuda" title="Acomoda una pieza (+5 segundos)" disabled>Ayudita +5s</button>
+          </div>
+          <div class="toolbar-right">
+            <button class="btn-icon" title="Me gusta"><i class="fa-solid fa-thumbs-up"></i></button>
+            <span class="rating-text">86%</span>
+            <button class="btn-icon" title="No me gusta"><i class="fa-solid fa-thumbs-down"></i></button>
+          </div>
+        </div>
+      </section>
+
+      <!-- DESCRIPCIÓN DEL JUEGO -->
+      <section class="info-card">
+        <h3 class="info-title">Descripción:</h3>
+        <p class="info-text">
+          Es un juego de rompecabezas visual rápido, intuitivo y adictivo. En cada nivel te enfrentás a una imagen icónica
+          fragmentada en 4 piezas fuera de eje. Tu misión es alinear la perspectiva rotando cada cuadrante hasta encajar
+          la figura original en el menor tiempo posible para marcar tu récord.
+          ¡Entrená tu visión espacial y completá la galería!
+        </p>
+      </section>
+
+      <!-- CÓMO JUGAR -->
+      <section class="info-card">
+        <h3 class="info-title">¿Cómo jugar?</h3>
+        <ul class="instructions-list">
+          <li>Cada partida tiene 3 niveles: elegí la dificultad en el menú (4, 6 o 8 piezas) y la imagen aparece dividida
+            en partes rotadas al azar.
+            El nivel 1 es normal, el nivel 2 aplica un filtro sorpresa (grises, brillo o negativo) y el nivel 3 un filtro
+            distinto por pieza. Al ganar, los filtros se quitan y ves la imagen original.</li>
+          <li>Hacé clic izquierdo (o tocá en pantallas táctiles) sobre la pieza que quieras corregir para girarla 90° en
+            sentido antihorario, o clic derecho para girarla 90° en sentido horario. Repetí hasta que todas las piezas queden
+            en su orientación correcta.</li>
+          <li>El cronómetro suma hacia arriba sin límite de tiempo: tu mejor tiempo de cada nivel queda guardado en el
+            navegador como récord a superar. El nivel actual se muestra arriba a la izquierda del marco.</li>
+          <li>Si te trabás, el botón Ayudita (+5s) de la barra acomoda al azar una de las piezas y la deja fija con un
+            borde dorado, pero suma 5 segundos a tu tiempo.</li>
+          <li>Al alinear la última pieza, el tablero detecta la victoria automáticamente y podés pasar al siguiente nivel
+            (hasta el 3) o volver al menú principal, que reinicia la partida desde cero.</li>
+        </ul>
+      </section>
+
+      <!-- GALERÍA DE IMÁGENES -->
+      <section class="gallery-section">
+        <h3 class="info-title">Galería de Imágenes</h3>
+        <div class="gallery-grid gallery-grid--blocka">
+          <div class="gallery-item"><img src="img/Galeria BlockA menu.jpg" alt="Menú del juego BlockA"></div>
+          <div class="gallery-item"><img src="img/Galeria BlockA nivel.jpg" alt="Inicio de nivel en BlockA"></div>
+          <div class="gallery-item"><img src="img/Galeria BlockA ayudita.jpg" alt="Ayudita fijando una pieza"></div>
+          <div class="gallery-item"><img src="img/Galeria BlockA victoria.jpg" alt="Victoria en BlockA"></div>
+        </div>
+      </section>
+
+      <!-- SECCIÓN DE COMENTARIOS -->
+      <section class="comments-section">
+        <h3 class="info-title">Comentarios</h3>
+        
+        <!-- INPUT PARA UN NUEVO COMENTARIO -->
+        <div class="comment-input-box">
+          <input type="text" id="newComment" placeholder="💬 ¿Qué opinas del juego?">
+          <button id="sendCommentBtn" class="btn-send">Publicar</button>
+        </div>
+
+        <!-- LISTA DE COMENTARIOS EXISTENTES -->
+        <div class="comments-list" id="commentsList">
+          <div class="comment-card">
+            <div class="comment-avatar">👨‍💻</div>
+            <div class="comment-body">
+              <div class="comment-header">
+                <span class="comment-author">Lucia</span>
+                <span class="comment-time">1 día</span>
+              </div>
+              <p class="comment-text">¡Atrapante desde el primer nivel! La estética neón y la música retro me compraron al instante.
+                Es de esos juegos que decís 'juego 5 minutos y me voy', y terminás enganchado una hora tratando de romper tu propio récord.</p>
+            </div>
+          </div>
+
+          <div class="comment-card">
+            <div class="comment-avatar">🎮</div>
+            <div class="comment-body">
+              <div class="comment-header">
+                <span class="comment-author">Mateo</span>
+                <span class="comment-time">2 meses</span>
+              </div>
+              <p class="comment-text">Muy buen juego de lógica. Recomiendo jugarlo en modo contrarreloj si buscan un
+                verdadero desafío. ¡Esperando que agreguen más niveles pronto!</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- COLUMNA DERECHA: SIDEBAR DE PUBLICIDAD -->
+    <aside class="sidebar-column">
+      
+      <div class="ad-row">
+        <div class="ad-box">
+          <span class="ad-tag">Publicidad</span>
+          <div class="ad-content">
+            <img src="img/Pub2.jpg" alt="Publicidad Logitech G - Tu equipo pro" loading="lazy">
+          </div>
+        </div>
+        <div class="ad-box">
+          <span class="ad-tag">Publicidad</span>
+          <div class="ad-content">
+            <img src="img/Pub4.jpg" alt="Publicidad Logitech Trueforce G923 - Volante y pedales" loading="lazy">
+          </div>
+        </div>
+      </div>
+
+      <div class="tournament-card">
+        <img src="img/Pub1.jpg" alt="Torneo semanal de plataformas abierto" loading="lazy">
+        <button class="btn-tournament">INSCRIBETE AQUÍ</button>
+      </div>
+
+      <div class="ad-row">
+        <div class="ad-box">
+          <span class="ad-tag">Publicidad</span>
+          <div class="ad-content">
+            <img src="img/Pub5.jpg" alt="Publicidad Miyoo Mini - Consola retro portatil" loading="lazy">
+          </div>
+        </div>
+        <div class="ad-box">
+          <span class="ad-tag">Publicidad</span>
+          <div class="ad-content">
+            <img src="img/Pub3.jpg" alt="Publicidad 8BitDo - Mandos inalambricos" loading="lazy">
+          </div>
+        </div>
+      </div>
+
+    </aside>
+  </div>
+
+  <!-- PIE DE PÁGINA / FOOTER -->
+  <footer class="footer">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="logo">
+          <div ><img class="logo_footer" src="img/Logo RETRO PLAYER.png" alt="Logo Retro Player"></div>
+        </div>
+        <p>"Revive la época dorada de los videojuegos. Accede a un catálogo de títulos retro 100% gratuitos y financiados por la comunidad a través de anuncios."</p>
+      </div>
+
+      <div class="footer-links">
+        <div class="footer-col">
+          <h4>Explorar</h4>
+          <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="#">Todos los Juegos</a></li>
+            <li><a href="#">Más Populares</a></li>
+            <li><a href="#">Recién Agregados</a></li>
+            <li><a href="#">Categorías</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Consolas</h4>
+          <ul>
+            <li><a href="#">NES</a></li>
+            <li><a href="#">SNES</a></li>
+            <li><a href="#">Sega Génesis</a></li>
+            <li><a href="#">Game Boy</a></li>
+            <li><a href="#">PlayStation</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Comunidad</h4>
+          <ul>
+            <li><a href="#">Quiénes Somos</a></li>
+            <li><a href="#">Foro de Gamers</a></li>
+            <li><a href="#">Unirse a Discord</a></li>
+            <li><a href="#">Sugerir un Juego</a></li>
+            <li><a href="#">Blog & Noticias</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Soporte</h4>
+          <ul>
+            <li><a href="#">Preguntas Frecuentes</a></li>
+            <li><a href="#">Soporte Técnico</a></li>
+            <li><a href="#">Tutoriales</a></li>
+            <li><a href="#">Estado del Servidor</a></li>
+            <li><a href="#">Contacto</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>© 2026 Retro Player. Todos los derechos reservados.</p>
+            <div class="social-links">
+        <a href="#" aria-label="Instagram"><img src="img/Icon.png" alt="Instagram"></a>
+        <a href="#" aria-label="Facebook"><img src="img/Vector.png" alt="Facebook"></a>
+        <a href="#" aria-label="X"><img src="img/Icon (2).png" alt="X"></a>
+        <a href="#" aria-label="YouTube"><img src="img/Icon (1).png" alt="YouTube"></a>
+      </div>      <div class="footer-legal">
+        <a href="#">Términos y Condiciones</a>
+        <a href="#">Privacidad</a>
+        <a href="#">Cookies</a>
+      </div>
+    </div>
+  </footer>
+
+    <!-- MENÚ DESPLEGABLE DE CATEGORÍAS (Hamburguesa) -->
+  <div id="categoriesDropdown" class="dropdown-overlay hidden">
+    <div class="dropdown-card">
+      <button class="btn-close-dropdown" onclick="toggleDropdown('categoriesDropdown')">
+        <i class="fa-regular fa-circle-xmark"></i>
+      </button>
+      <nav class="dropdown-menu">
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-house"></i>
+          <span>Inicio</span>
+        </a>
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-rocket"></i>
+          <span>Nuevos</span>
+        </a>
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-trophy"></i>
+          <span>Populares</span>
+        </a>
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-star"></i>
+          <span>Destacados</span>
+        </a>
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-bomb"></i>
+          <span>Acción</span>
+        </a>
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-crosshairs"></i>
+          <span>RPG</span>
+        </a>
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-compass"></i>
+          <span>Aventura</span>
+        </a>
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-puzzle-piece"></i>
+          <span>Puzzle</span>
+        </a>
+      </nav>
+    </div>
+  </div>
+
+  <!-- MENÚ DESPLEGABLE DE USUARIO -->
+  <div id="userDropdown" class="dropdown-overlay hidden">
+    <div class="dropdown-card user-card">
+      <button class="btn-close-dropdown" onclick="toggleDropdown('userDropdown')">
+        <i class="fa-regular fa-circle-xmark"></i>
+      </button>
+      <h2 class="dropdown-title">Usuario</h2>
+      <nav class="dropdown-menu">
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-user"></i>
+          <span>Mi Perfil</span>
+        </a>
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-gamepad"></i>
+          <span>Mis Juegos</span>
+        </a>
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-gear"></i>
+          <span>Configuración</span>
+        </a>
+        <a href="#" class="dropdown-item">
+          <i class="fa-solid fa-circle-question"></i>
+          <span>Ayuda</span>
+        </a>
+      </nav>
+      <button class="btn-logout">Cerrar sesión</button>
+    </div>
+  </div>
+
+  <!-- SCRIPT UNIFICADO -->
+  <script src="js/script.js"></script>
+</body>
+</html>
