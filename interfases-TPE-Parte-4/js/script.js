@@ -884,4 +884,3 @@ function detenerTemporizador() {
     dificultad: dif
   };
 }
-
