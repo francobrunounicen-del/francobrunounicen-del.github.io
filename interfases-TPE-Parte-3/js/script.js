@@ -511,7 +511,7 @@ const estadoJuego = {
     'img/galeria_BlockA/1.jpg', 'img/galeria_BlockA/2.jpg', 'img/galeria_BlockA/3.jpg',
     'img/galeria_BlockA/4.jpg', 'img/galeria_BlockA/5.jpg', 'img/galeria_BlockA/6.jpg'
   ],
-  filtrosDisponibles: ['grises', 'brillo', 'negativo'],
+  filtrosDisponibles: ['grises', 'brillo', 'negativo', 'blur'],
   juegoTerminado: false,
   cantPartes: 4,          // 4, 6 u 8 partes
   imagenNivel: null,      // Imagen original del nivel, para mostrarla completa al ganar
@@ -529,6 +529,36 @@ const estadoJuego = {
 function aplicarFiltro(imageData, tipoFiltro) {
   if (!tipoFiltro) return; // Nivel 1
   const data = imageData.data;
+
+  if (tipoFiltro === 'blur') {
+  const K = 7;
+  const w = imageData.width;
+  const h = imageData.height;
+
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      let r = 0, g = 0, b = 0, n = 0;
+
+      for (let dy = -K; dy <= K; dy++) {
+        for (let dx = -K; dx <= K; dx++) {
+          const nx = x + dx, ny = y + dy;
+          // se ignoran píxeles fuera de la imagen
+          if (nx < 0 || nx >= w || ny < 0 || ny >= h) continue;
+          const j = (nx + ny * w) * 4;
+          r += data[j];
+          g += data[j + 1];
+          b += data[j + 2];
+          n++;  // contar cuántos vecinos existen de verdad
+        }
+      }
+      const i = (x + y * w) * 4;
+      data[i] = r / n;   // promedio R
+      data[i + 1] = g / n;   // promedio G
+      data[i + 2] = b / n;   // promedio B
+    }
+  }
+}
+
 
   for (let i = 0; i < data.length; i += 4) {
     if (tipoFiltro === 'grises') {
@@ -550,7 +580,7 @@ function aplicarFiltro(imageData, tipoFiltro) {
       data[i + 1] = 255 - data[i + 1];
       data[i + 2] = 255 - data[i + 2];
     }
-  }
+    }
 }
 
 function iniciarNivel() {
