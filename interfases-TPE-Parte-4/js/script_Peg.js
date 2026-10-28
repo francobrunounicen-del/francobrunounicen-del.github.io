@@ -1,4 +1,34 @@
-//funcionalidad del Peg Solitary
+document.addEventListener('DOMContentLoaded', () => {
+    /* --- INTERACCIÓN BOTÓN DE PLAY EN REPRODUCTOR --- */
+    const playBtn = document.getElementById('playBtn');
+    const gameCover = document.querySelector('.game-cover');
+    /* const gameBotonera1 = document.getElementById('botonera1');
+     const gameBotonera2 = document.getElementById('botonera2');
+     const btnIniciarJuego=document.getElementById("iniciar_juego");
+     const btnSiguienteNivel=document.getElementById("siguiente_nivel");
+     const btnMenuPrincipal=document.getElementById("menu_principal");
+     if (!playBtn && !btnIniciarJuego && !btnMenuPrincipal && !btnSiguienteNivel) return;*/
+
+// Al presionar el botón central PLAY de la portada
+    if (playBtn) {
+        playBtn.addEventListener('click', () => {
+            // Transición visual al iniciar el juego
+            playBtn.classList.add('is-playing');
+            if (gameBotonera1) {
+                setCover('img/blockA_fondo_menu.jpg');
+                setBotonera(gameBotonera1, true);
+                if (gameCover) gameCover.style.opacity = "1";
+            } else if (gameCover) {
+                // Flujo Peg (Parte 2): solo desaparece el botón, no se cambia la imagen
+                gameCover.style.transition = 'filter 0.3s ease';
+                gameCover.style.filter = 'brightness(1.1)';
+                gameCover.style.opacity = "1";
+            }
+        });
+    }
+})
+
+//Funcionalidad del Peg Solitary
 // 1. Configuración inicial del Canvas
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
