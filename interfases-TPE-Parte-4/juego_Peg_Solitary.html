@@ -19,8 +19,6 @@
   <!-- ENCABEZADO (HEADER) -->
   <header class="header">
     <div class="header-container">
-        
-      <!-- Izquierda: Menú Hamburguesa & Logo -->
       <div class="header-left">
         <button id="menu-btn" aria-label="Abrir menú" class="btn-icon" onclick="toggleDropdown('categoriesDropdown')">
           <i class="fa-solid fa-bars"></i>
@@ -67,6 +65,7 @@
       
       <!-- REPRODUCTOR / MARCO DEL JUEGO -->
       <section class="game-container">
+        <canvas id="canvas" width="755" height="472"></canvas>
         <div class="game-screen" id="gameScreen">
           <img src="img/Juego Peg Solitary.png" alt="Pegs On Neon Gameplay" class="game-cover">
           <button class="btn-play-overlay" id="playBtn" aria-label="Iniciar Juego">

@@ -527,8 +527,15 @@ const estadoJuego = {
 };
 
 function aplicarFiltro(imageData, tipoFiltro) {
-  if (!tipoFiltro) return; // Nivel 1
-  const data = imageData.data;
+  function aplicarFiltro(imageData, tipoFiltro) {
+    const data = imageData.data;
+    const width = imageData.width;
+    const height = imageData.height;
+
+    if (!tipoFiltro) {
+      const K = 2; // radio: ventana de 5 × 5
+      const destino = ctx.createImageData(width, height);
+      const dst = destino.data;
 
   if (tipoFiltro === 'blur') {
   const K = 7;
@@ -560,25 +567,38 @@ function aplicarFiltro(imageData, tipoFiltro) {
 }
 
 
-  for (let i = 0; i < data.length; i += 4) {
-    if (tipoFiltro === 'grises') {
-      // Grises
-      const gris = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
-      data[i] = gris;
-      data[i + 1] = gris;
-      data[i + 2] = gris;
-    }
-    else if (tipoFiltro === 'brillo') {
-      // Brillo +30%
-      data[i] *= 1.3;
-      data[i + 1] *= 1.3;
-      data[i + 2] *= 1.3;
-    }
-    else if (tipoFiltro === 'negativo') {
-      // Negativo
-      data[i] = 255 - data[i];
-      data[i + 1] = 255 - data[i + 1];
-      data[i + 2] = 255 - data[i + 2];
+      for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+          let r = 0, g = 0, b = 0, n = 0;
+
+          for (let dy = -K; dy <= K; dy++) {
+            for (let dx = -K; dx <= K; dx++) {
+              const nx = x + dx;
+              const ny = y + dy;
+              if (nx < 0 || ny < 0 || nx >= width || ny >= height) continue;
+
+              // CORREGIDO: Se usa '*' para multiplicar
+              const j = (ny * width + nx) * 4;
+
+              r += data[j];
+              g += data[j + 1];
+              b += data[j + 2];
+              n++; // cuántos vecinos existen de verdad
+            }
+          }
+
+          // CORREGIDO: Se usa '*' para multiplicar
+          const i = (y * width + x) * 4;
+
+          dst[i]     = r / n;
+          dst[i + 1] = g / n;
+          dst[i + 2] = b / n;
+          dst[i + 3] = data[i + 3]; // Mantenemos el canal Alpha original
+        }
+      }
+
+      // Faltaba cerrar el if y hacer el putImageData para volcarlo al canvas
+      ctx.putImageData(destino, 0, 0);
     }
     }
 }
