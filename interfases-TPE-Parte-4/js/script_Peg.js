@@ -129,15 +129,18 @@ class Circulo extends Figura {
     }
 }
 
-
-function dibujarJuego(){
-    const xTablero=210;
-    const yTablero=60;
-    for(let x=0;x<7; x++){
-        for(let y=0;y<7; y++) {
-            if(x>1 && x<5 || y>1 && y<5){
-            let circulo1 = new Circulo(x*55+xTablero, y*52+yTablero, '#2ecc71', 10);
-            circulo1.dibujar(ctx);}
+function dibujarJuego() {
+    const separacion = 50; // Distancia entre cada círculo
+    const margenX = 220;   // Desplazamiento desde el borde izquierdo
+    const margenY = 70;   // Desplazamiento desde el borde superior
+    for (let x = 0; x < 7; x++) {
+        for (let y = 0; y < 7; y++) {
+            if((x>1 && x<5 || y>1 && y<5) && (x!==3 || y!==3)){
+            let posX = margenX + (x * separacion);
+            let posY = margenY + (y * separacion);
+            let circulo = new Circulo(posX, posY, '#2ecc71', 15);
+            circulo.dibujar(ctx);
+            }
         }
     }
 }
