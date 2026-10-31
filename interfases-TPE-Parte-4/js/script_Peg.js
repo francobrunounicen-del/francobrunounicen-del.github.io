@@ -2,17 +2,16 @@ document.addEventListener('DOMContentLoaded', () => {
     /* --- INTERACCIÓN BOTÓN DE PLAY EN REPRODUCTOR --- */
     const playBtn = document.getElementById('playBtn');
     const gameCover = document.querySelector('.game-cover');
-
     // Al presionar el botón central PLAY de la portada
     playBtn.addEventListener('click', () => {
         // Transición visual al iniciar el juego
         playBtn.classList.add('is-playing');
         gameCover.src = 'img/Peg Tablero.jpg';
+        canvas.style.display='block'
+        dibujarJuego();
     });
 });
 
-//Funcionalidad del Peg Solitary
-// 1. Configuración inicial del Canvas
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
@@ -25,28 +24,24 @@ class Figura {
         this.y = y;         // Posición vertical
         this.color = color; // Color de relleno
     }
-    // Método que toda figura debe tener, pero cada una implementa a su modo
+
     dibujar(contexto) {
         console.warn("El método dibujar() debe ser implementado por la clase hija.");
     }
 }
 
-// ==========================================
-// CLASE HIJA: Circulo (Hereda de Figura)
-// ==========================================
 class Circulo extends Figura {
     constructor(x, y, color, radio) {
-        // super() invoca al constructor de Figura para asignar x, y, color
         super(x, y, color);
-        this.radio = radio;      // Propiedad exclusiva de un círculo
-        this.radioFicha = radio; // Añadido por compatibilidad con los métodos del tablero
-        this.ctx = ctx;          // Referencia global al contexto 2D
+        this.radio = radio;
+        this.radioFicha = radio;
+        this.ctx = ctx;
     }
 
-    // Sobreescribimos el método dibujar específico para un círculo
+    // Método dibujar
     dibujar(contexto) {
         contexto.beginPath();
-        contexto.arc(this.x, this.y, this.radio, 0, Math.PI * 2); // Corregido: se agregó el '*'
+        contexto.arc(this.x, this.y, this.radio, 0, Math.PI * 2); // Corregido el operador '*'
         contexto.fillStyle = this.color;
         contexto.fill();
         contexto.closePath();
@@ -134,14 +129,15 @@ class Circulo extends Figura {
     }
 }
 
-// ==========================================
-// USO Y CREACIÓN DE OBJETOS
-// ==========================================
 
-// Creamos dos círculos usando el molde de la clase hija
-const circulo1 = new Circulo(150, 200, 'emerald', 40);
-const circulo2 = new Circulo(350, 200, 'crimson', 75);
-
-// Los dibujamos en el canvas pasando el contexto (ctx)
-circulo1.dibujar(ctx);
-circulo2.dibujar(ctx);
+function dibujarJuego(){
+    const xTablero=210;
+    const yTablero=60;
+    for(let x=0;x<7; x++){
+        for(let y=0;y<7; y++) {
+            if(x>1 && x<5 || y>1 && y<5){
+            let circulo1 = new Circulo(x*55+xTablero, y*52+yTablero, '#2ecc71', 10);
+            circulo1.dibujar(ctx);}
+        }
+    }
+}

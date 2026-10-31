@@ -1087,13 +1087,7 @@ img.logo_footer { width: 5rem; height: auto; display: block; }
   right: 5%;
   transform: translateY(-50%);
 }
-@media (max-width: 640px) {
-  #botonera1 {
-    left: 50%;
-    right: auto;
-    transform: translate(-50%, -50%);
-  }
-}
+
 .btn-retro {
   width: min(25rem, 100%);
   padding: 1.1rem 4rem;
@@ -1217,16 +1211,3 @@ img.logo_footer { width: 5rem; height: auto; display: block; }
   width: 100%;
 }
 #columnaVictoria .btn-retro { pointer-events: auto; }
-@media (max-width: 640px) {
-  .victoria-col {
-    left: 0;
-    right: 0;
-    width: 100%;
-    padding: 0.8rem 4%;
-  }
-  .victoria-panel {
-    padding: 0.7rem 0.9rem;
-    max-height: 50%;
-  }
-  .victoria-titulo { font-size: 0.8rem; }
-}
