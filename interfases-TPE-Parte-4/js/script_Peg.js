@@ -129,7 +129,7 @@ class TableroJuego {
                 if (this.grid[r][c] === 1) {
                     let posX = this.margenX + c * this.tamCasilla + this.tamCasilla / 2;
                     let posY = this.margenY + r * this.tamCasilla + this.tamCasilla / 2;
-                    this.fichas.push(new Ficha(posX, posY, this.tamCasilla * 0.4, this.imgFicha, r, c));
+                    this.fichas.push(new Ficha(posX, posY, this.tamCasilla * 0.58, this.imgFicha, r, c));
                 }
             }
         }
@@ -324,6 +324,9 @@ class TableroJuego {
 // 4. INICIALIZACIÓN Y BUCLE PRINCIPAL
 // ==========================================
 let juego = null;
+// Id del requestAnimationFrame en curso. Si es null no hay bucle corriendo:
+// evita que cada llamada a iniciarJuego() arranque una segunda cadena de frames.
+let rafActivo = null;
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
@@ -341,7 +344,12 @@ function iniciarJuego() {
     // Instanciamos el tablero directamente sin esperar promesas bloqueantes
     juego = new TableroJuego(ctx, 195, 64, 50, imgFondo, imgFicha);
     canvas.style.touchAction = 'none'; // permite arrastrar con el dedo sin scrollear la página
-    requestAnimationFrame(gameLoop);
+
+    // Solo arranca el bucle si todavía no está corriendo (si no, cada llamada
+    // acumulaba una cadena nueva de frames y corrían varias en paralelo)
+    if (rafActivo === null) {
+        rafActivo = requestAnimationFrame(gameLoop);
+    }
 }
 
 function gameLoop(tiempo) {
@@ -349,7 +357,7 @@ function gameLoop(tiempo) {
     if (juego) {
         juego.dibujar(tiempo / 1000);
     }
-    requestAnimationFrame(gameLoop);
+    rafActivo = requestAnimationFrame(gameLoop);
 }
 
 // Convierte las coordenadas del mouse a pixels internos del canvas.
@@ -367,6 +375,10 @@ function obtenerPosicionCanvas(e) {
 
 canvas.addEventListener("pointerdown", (e) => {
     if (!juego) return;
+    // Captura el puntero: si se suelta FUERA del canvas, pointermove/pointerup
+    // llegan igual acá y la ficha vuelve a su casilla, en vez de quedar colgada
+    // siguiendo al cursor. (try/catch: con punteros sintéticos no hay captura)
+    try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* aplica el fallback de abajo */ }
     const pos = obtenerPosicionCanvas(e);
     juego.onMouseDown(pos.x, pos.y);
 });
@@ -383,8 +395,18 @@ canvas.addEventListener("pointerup", (e) => {
     juego.onMouseUp(pos.x, pos.y);
 });
 
+// Red de seguridad por si la captura no estuvo disponible: el pointerup que llega
+// a window (porque se soltó fuera) también finaliza el arrastre. onMouseUp es
+// idempotente: si ya no hay ficha seleccionada sale sin hacer nada, así que aunque
+// el evento llegue por los dos caminos no se produce ningún movimiento extra.
+window.addEventListener("pointerup", (e) => {
+    if (!juego || !juego.fichaSeleccionada) return;
+    const pos = obtenerPosicionCanvas(e);
+    juego.onMouseUp(pos.x, pos.y);
+});
+
 // Si el arrastre se interrumpe (se suelta fuera del canvas, cambia de ventana, etc.),
 // la ficha vuelve a su casilla en vez de quedar "pegada" al puntero
-canvas.addEventListener("pointercancel", () => {
-    if (juego) juego.cancelarArrastre();
-});
+const cancelarArrastreSeguro = () => { if (juego) juego.cancelarArrastre(); };
+canvas.addEventListener("pointercancel", cancelarArrastreSeguro);
+window.addEventListener("pointercancel", cancelarArrastreSeguro);
