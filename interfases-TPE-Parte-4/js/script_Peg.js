@@ -1,146 +1,347 @@
 document.addEventListener('DOMContentLoaded', () => {
-    /* --- INTERACCIÓN BOTÓN DE PLAY EN REPRODUCTOR --- */
     const playBtn = document.getElementById('playBtn');
-    const gameCover = document.querySelector('.game-cover');
-    // Al presionar el botón central PLAY de la portada
-    playBtn.addEventListener('click', () => {
-        // Transición visual al iniciar el juego
-        playBtn.classList.add('is-playing');
-        gameCover.src = 'img/Peg Tablero.jpg';
-        canvas.style.display='block'
-        dibujarJuego();
-    });
+    const canvas = document.getElementById('canvas');
+
+    if (playBtn) {
+        playBtn.addEventListener('click', () => {
+            playBtn.classList.add('is-playing');
+            // El fondo del tablero se dibuja UNA sola vez dentro del canvas,
+            // por eso ya no se reemplaza la imagen de portada (era la copia duplicada)
+            canvas.style.display = 'block';
+            iniciarJuego();
+        });
+    }
 });
 
-const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
-
 // ==========================================
-// CLASE PADRE: Figura
+// 1. CLASE PADRE: Figura
 // ==========================================
 class Figura {
-    constructor(x, y, color) {
-        this.x = x;         // Posición horizontal
-        this.y = y;         // Posición vertical
-        this.color = color; // Color de relleno
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
     }
 
-    dibujar(contexto) {
-        console.warn("El método dibujar() debe ser implementado por la clase hija.");
+    dibujar(contexto) {}
+
+    containsPoint(px, py) {
+        const dx = this.x - px;
+        const dy = this.y - py;
+        return (dx * dx + dy * dy) <= (this.radio * this.radio);
     }
 }
 
-class Circulo extends Figura {
-    constructor(x, y, color, radio) {
-        super(x, y, color);
+// ==========================================
+// 2. CLASE FICHA
+// ==========================================
+class Ficha extends Figura {
+    constructor(x, y, radio, imagen, fila, col) {
+        super(x, y);
         this.radio = radio;
-        this.radioFicha = radio;
-        this.ctx = ctx;
+        this.imagen = imagen;
+        this.fila = fila;
+        this.col = col;
+        this.isDragging = false;
     }
 
-    // Método dibujar
     dibujar(contexto) {
-        contexto.beginPath();
-        contexto.arc(this.x, this.y, this.radio, 0, Math.PI * 2); // Corregido el operador '*'
-        contexto.fillStyle = this.color;
-        contexto.fill();
-        contexto.closePath();
-    }
-
-    // Método para dibujar la ficha (extraído de las diapositivas)
-    dibujarficha(tipo, x, y, levantada = false) {
-        const ctx = this.ctx;
-        const r = this.radioFicha;
-        ctx.save();
-        if (levantada) {
-            ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-            ctx.shadowBlur = 10;
-            ctx.shadowOffsetY = 10;
+        contexto.save();
+        if (this.isDragging) {
+            contexto.shadowColor = 'rgba(0, 0, 0, 0.6)';
+            contexto.shadowBlur = 15;
+            contexto.shadowOffsetY = 8;
         }
-        ctx.beginPath();
-        ctx.arc(x, y, r, 0, 2 * Math.PI); // Corregido el operador '*'
-        if (this.imagenes) {
-            ctx.fillStyle = '#000';
-            ctx.fill();
-            ctx.shadowColor = 'transparent';
-            ctx.clip();
-            ctx.drawImage(this.imagenes[tipo], x - r, y - r, r * 2, r * 2); // Corregido '*'
+
+        // Si la imagen existe y cargó, la dibuja; sino, dibuja un círculo de color sólido temporal
+        if (this.imagen && this.imagen.complete && this.imagen.naturalWidth !== 0) {
+            contexto.drawImage(
+                this.imagen,
+                this.x - this.radio,
+                this.y - this.radio,
+                this.radio * 2,
+                this.radio * 2
+            );
         } else {
-            ctx.fillStyle = tipo === 'roja' ? '#e53935' : '#1e88e5';
-            ctx.fill();
+            contexto.beginPath();
+            contexto.arc(this.x, this.y, this.radio, 0, Math.PI * 2);
+            contexto.fillStyle = '#1e88e5'; // Color temporal de prueba
+            contexto.fill();
+            contexto.strokeStyle = '#0d47a1';
+            contexto.lineWidth = 3;
+            contexto.stroke();
+            contexto.closePath();
         }
-        ctx.restore();
+        contexto.restore();
     }
 
-    // Método para dibujar las pistas o hints
-    dibujarHints(destinos, tiempo) {
-        const ctx = this.ctx;
-        const pulso = (Math.sin(tiempo * 6) + 1) / 2;
-        for (const d of destinos) {
-            const { x, y } = this.aPixeles(d.fila, d.col);
-
-            ctx.strokeStyle = `rgba(255, 210, 63, ${1 - pulso * 0.6})`; // Corregidos los operadores
-            ctx.lineWidth = 4;
-            ctx.beginPath();
-            ctx.arc(x, y, this.radioFicha * (0.7 + pulso * 0.4), 0, 2 * Math.PI); // Corregido '*'
-            ctx.stroke();
-
-            const ya = y - this.radioFicha - 10 - pulso * 5; // Corregidos operadores de resta
-            ctx.fillStyle = '#ffd23f';
-            ctx.beginPath();
-            ctx.moveTo(x - 8, ya - 12); // Corregido operadores
-            ctx.lineTo(x + 8, ya - 12); // Corregido operadores
-            ctx.lineTo(x, ya);
-            ctx.fill();
-        }
-    }
-
-    // Manejador de eventos de mouse
-    onMouseDown(e) {
-        if (this.mensaje && typeof onDismiss === 'function') onDismiss();
-
-        // Nota: Asegúrate de que una clase padre tenga onMouseDown,
-        // de lo contrario super.onMouseDown(e) arrojará un error.
-        // super.onMouseDown(e);
-
-        if (this.arrastre) {
-            const ficha = this.arrastre.ficha;
-            this.arrastre.destinos = this.tablero.obtenerMovimientosPosibles(ficha);
-        }
-    }
-
-    // Bucle principal de animación / juego
-    loop(ahora) {
-        const transcurrido = (ahora - this.inicio) / 1000;
-        const restante = Math.max(0, this.tiempoLimite - transcurrido);
-        if (this.mensaje && restante === 0) {
-            this.mensaje = '';
-            this.arrastre = null;
-        }
-        this.vista.dibujar({
-            arrastre: this.arrastre,
-            tiempo: ahora / 1000,
-            restante: this.mensaje ? 0 : restante,
-            mensaje: this.mensaje
-        });
-
-        // Corregido: dentro de una clase, se debe llamar a la instancia con 'this.loop'
-        this.raf = requestAnimationFrame((t) => this.loop(t));
+    setPosition(x, y) {
+        this.x = x;
+        this.y = y;
     }
 }
 
-function dibujarJuego() {
-    const separacion = 50; // Distancia entre cada círculo
-    const margenX = 220;   // Desplazamiento desde el borde izquierdo
-    const margenY = 70;   // Desplazamiento desde el borde superior
-    for (let x = 0; x < 7; x++) {
-        for (let y = 0; y < 7; y++) {
-            if((x>1 && x<5 || y>1 && y<5) && (x!==3 || y!==3)){
-            let posX = margenX + (x * separacion);
-            let posY = margenY + (y * separacion);
-            let circulo = new Circulo(posX, posY, '#2ecc71', 15);
-            circulo.dibujar(ctx);
+// ==========================================
+// 3. CLASE TABLERO / JUEGO
+// ==========================================
+class TableroJuego {
+    constructor(ctx, margenX, margenY, tamCasilla, imgFondo, imgFicha) {
+        this.ctx = ctx;
+        this.margenX = margenX;
+        this.margenY = margenY;
+        this.tamCasilla = tamCasilla;
+        this.imgFondo = imgFondo;
+        this.imgFicha = imgFicha;
+
+        this.grid = [
+            [-1, -1,  1,  1,  1, -1, -1],
+            [-1, -1,  1,  1,  1, -1, -1],
+            [ 1,  1,  1,  1,  1,  1,  1],
+            [ 1,  1,  1,  0,  1,  1,  1], // Centro vacío
+            [ 1,  1,  1,  1,  1,  1,  1],
+            [-1, -1,  1,  1,  1, -1, -1],
+            [-1, -1,  1,  1,  1, -1, -1]
+        ];
+
+        this.fichas = [];
+        this.fichaSeleccionada = null;
+        this.movimientosValidos = [];
+        this.animOffset = 0;
+
+        this.inicializarFichas();
+    }
+
+    inicializarFichas() {
+        this.fichas = [];
+        for (let r = 0; r < 7; r++) {
+            for (let c = 0; c < 7; c++) {
+                if (this.grid[r][c] === 1) {
+                    let posX = this.margenX + c * this.tamCasilla + this.tamCasilla / 2;
+                    let posY = this.margenY + r * this.tamCasilla + this.tamCasilla / 2;
+                    this.fichas.push(new Ficha(posX, posY, this.tamCasilla * 0.4, this.imgFicha, r, c));
+                }
             }
         }
     }
+
+    getCoordsMatriz(x, y) {
+        let col = Math.floor((x - this.margenX) / this.tamCasilla);
+        let fila = Math.floor((y - this.margenY) / this.tamCasilla);
+        if (fila >= 0 && fila < 7 && col >= 0 && col < 7 && this.grid[fila][col] !== -1) {
+            return { fila, col };
+        }
+        return null;
+    }
+
+    getCoordsPixeles(fila, col) {
+        return {
+            x: this.margenX + col * this.tamCasilla + this.tamCasilla / 2,
+            y: this.margenY + fila * this.tamCasilla + this.tamCasilla / 2
+        };
+    }
+
+    obtenerMovimientosValidos(ficha) {
+        const direcciones = [
+            { df: -2, dc: 0, mf: -1, mc: 0 },
+            { df: 2,  dc: 0, mf: 1,  mc: 0 },
+            { df: 0, dc: -2, mf: 0, mc: -1 },
+            { df: 0, dc: 2,  mf: 0, mc: 1 }
+        ];
+
+        let validos = [];
+        let r = ficha.fila;
+        let c = ficha.col;
+
+        direcciones.forEach(d => {
+            let rf = r + d.df;
+            let cf = c + d.dc;
+            let rm = r + d.mf;
+            let cm = c + d.mc;
+
+            if (rf >= 0 && rf < 7 && cf >= 0 && cf < 7) {
+                if (this.grid[rm] && this.grid[rm][cm] === 1 && this.grid[rf][cf] === 0) {
+                    let pos = this.getCoordsPixeles(rf, cf);
+                    validos.push({ fila: rf, col: cf, x: pos.x, y: pos.y, medioFila: rm, medioCol: cm });
+                }
+            }
+        });
+        return validos;
+    }
+
+    // Fondo fijo: cubre TODO el canvas una sola vez, centrado y sin distorsión
+    // (mismo encuadre que hacía la portada con object-fit: cover)
+    dibujarFondo() {
+        const img = this.imgFondo;
+        const ancho = this.ctx.canvas.width;
+        const alto = this.ctx.canvas.height;
+
+        if (img && img.complete && img.naturalWidth !== 0) {
+            // Escala mínima que cubre todo el lienzo, manteniendo la proporción de la imagen
+            const escala = Math.max(ancho / img.naturalWidth, alto / img.naturalHeight);
+            const imgAncho = img.naturalWidth * escala;
+            const imgAlto = img.naturalHeight * escala;
+            this.ctx.drawImage(img, (ancho - imgAncho) / 2, (alto - imgAlto) / 2, imgAncho, imgAlto);
+        } else {
+            // Respaldo mientras carga la imagen (o si falta el archivo)
+            this.ctx.fillStyle = '#0b0e1a';
+            this.ctx.fillRect(0, 0, ancho, alto);
+        }
+    }
+
+    dibujar(tiempo) {
+        // 1. Fondo fijo del tablero (una sola imagen, ocupa todo el reproductor)
+        this.dibujarFondo();
+
+        // 2. Fichas normales
+        this.fichas.forEach(f => {
+            if (f !== this.fichaSeleccionada) f.dibujar(this.ctx);
+        });
+
+        // 3. Hints Animados
+        if (this.fichaSeleccionada && this.movimientosValidos.length > 0) {
+            this.animOffset += 0.08;
+            let pulso = Math.sin(this.animOffset) * 6;
+
+            this.movimientosValidos.forEach(m => {
+                this.ctx.fillStyle = '#ffd23f';
+                this.ctx.strokeStyle = '#d97706';
+                this.ctx.lineWidth = 2;
+
+                let x = m.x;
+                let y = m.y - this.tamCasilla * 0.4 + pulso;
+
+                this.ctx.beginPath();
+                this.ctx.moveTo(x, y + 10);
+                this.ctx.lineTo(x - 10, y - 5);
+                this.ctx.lineTo(x + 10, y - 5);
+                this.ctx.closePath();
+                this.ctx.fill();
+                this.ctx.stroke();
+            });
+        }
+
+        // 4. Ficha seleccionada (arriba de todo)
+        if (this.fichaSeleccionada) {
+            this.fichaSeleccionada.dibujar(this.ctx);
+        }
+    }
+
+    onMouseDown(x, y) {
+        for (let i = this.fichas.length - 1; i >= 0; i--) {
+            let f = this.fichas[i];
+            if (f.containsPoint(x, y)) {
+                this.fichaSeleccionada = f;
+                f.isDragging = true;
+                this.movimientosValidos = this.obtenerMovimientosValidos(f);
+                break;
+            }
+        }
+    }
+
+    onMouseMove(x, y) {
+        if (this.fichaSeleccionada) {
+            this.fichaSeleccionada.setPosition(x, y);
+        }
+    }
+
+    onMouseUp(x, y) {
+        if (!this.fichaSeleccionada) return;
+
+        let destinoMatriz = this.getCoordsMatriz(x, y);
+        let movimientoExitoso = false;
+
+        if (destinoMatriz) {
+            let movValido = this.movimientosValidos.find(
+                m => m.fila === destinoMatriz.fila && m.col === destinoMatriz.col
+            );
+
+            if (movValido) {
+                this.grid[this.fichaSeleccionada.fila][this.fichaSeleccionada.col] = 0;
+                this.grid[movValido.medioFila][movValido.medioCol] = 0;
+                this.grid[destinoMatriz.fila][destinoMatriz.col] = 1;
+
+                this.fichas = this.fichas.filter(
+                    f => !(f.fila === movValido.medioFila && f.col === movValido.medioCol)
+                );
+
+                this.fichaSeleccionada.fila = destinoMatriz.fila;
+                this.fichaSeleccionada.col = destinoMatriz.col;
+                let nuevaPos = this.getCoordsPixeles(destinoMatriz.fila, destinoMatriz.col);
+                this.fichaSeleccionada.setPosition(nuevaPos.x, nuevaPos.y);
+
+                movimientoExitoso = true;
+            }
+        }
+
+        if (!movimientoExitoso) {
+            let posOrig = this.getCoordsPixeles(this.fichaSeleccionada.fila, this.fichaSeleccionada.col);
+            this.fichaSeleccionada.setPosition(posOrig.x, posOrig.y);
+        }
+
+        this.fichaSeleccionada.isDragging = false;
+        this.fichaSeleccionada = null;
+        this.movimientosValidos = [];
+
+        if (movimientoExitoso && this.verificarFinJuego()) {
+            setTimeout(() => alert("¡Juego terminado! No hay más movimientos posibles."), 100);
+        }
+    }
+
+    verificarFinJuego() {
+        for (let f of this.fichas) {
+            let movs = this.obtenerMovimientosValidos(f);
+            if (movs.length > 0) return false;
+        }
+        return true;
+    }
 }
+
+// ==========================================
+// 4. INICIALIZACIÓN Y BUCLE PRINCIPAL
+// ==========================================
+let juego = null;
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+
+function iniciarJuego() {
+    const imgFondo = new Image();
+    imgFondo.src = 'img/Peg Tablero.jpg';
+
+    const imgFicha = new Image();
+    imgFicha.src = 'img/ficha.png';
+
+    // Usamos 'img.onerror' para que no rompa la ejecución si no encuentra los archivos
+    imgFondo.onerror = () => console.warn("Aviso: No se encontró la imagen de fondo. Se usará un fondo plano.");
+    imgFicha.onerror = () => console.warn("Aviso: No se encontró la imagen de ficha. Se usarán círculos.");
+
+    // Instanciamos el tablero directamente sin esperar promesas bloqueantes
+    juego = new TableroJuego(ctx, 195, 64, 50, imgFondo, imgFicha);
+    requestAnimationFrame(gameLoop);
+}
+
+function gameLoop(tiempo) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (juego) {
+        juego.dibujar(tiempo / 1000);
+    }
+
+    requestAnimationFrame(gameLoop);
+}
+
+canvas.addEventListener("pointerdown", (e) => {
+    if (!juego) return;
+    const rect = canvas.getBoundingClientRect();
+    juego.onMouseDown(e.clientX - rect.left, e.clientY - rect.top);
+});
+
+canvas.addEventListener("pointermove", (e) => {
+    if (!juego) return;
+    const rect = canvas.getBoundingClientRect();
+    juego.onMouseMove(e.clientX - rect.left, e.clientY - rect.top);
+});
+
+canvas.addEventListener("pointerup", (e) => {
+    if (!juego) return;
+    const rect = canvas.getBoundingClientRect();
+    juego.onMouseUp(e.clientX - rect.left, e.clientY - rect.top);
+});
