@@ -24,10 +24,12 @@ class Figura {
 
     dibujar(contexto) {}
 
-    containsPoint(px, py) {
+    // margen: tolerancia extra para facilitar el agarre (0 = solo el dibujo de la ficha)
+    containsPoint(px, py, margen = 0) {
         const dx = this.x - px;
         const dy = this.y - py;
-        return (dx * dx + dy * dy) <= (this.radio * this.radio);
+        const r = this.radio + margen;
+        return (dx * dx + dy * dy) <= (r * r);
     }
 }
 
@@ -226,9 +228,12 @@ class TableroJuego {
     }
 
     onMouseDown(x, y) {
+        // Zona de agarre más generosa que el dibujo de la ficha:
+        // subí/bajá este porcentaje si querés que se agarre más fácil o más difícil
+        const margenAgarre = this.tamCasilla * 0.08;
         for (let i = this.fichas.length - 1; i >= 0; i--) {
             let f = this.fichas[i];
-            if (f.containsPoint(x, y)) {
+            if (f.containsPoint(x, y, margenAgarre)) {
                 this.fichaSeleccionada = f;
                 f.isDragging = true;
                 this.movimientosValidos = this.obtenerMovimientosValidos(f);
@@ -286,6 +291,16 @@ class TableroJuego {
         }
     }
 
+    // Cancela el arrastre sin soltar: la ficha vuelve a su casilla
+    cancelarArrastre() {
+        if (!this.fichaSeleccionada) return;
+        const posOrig = this.getCoordsPixeles(this.fichaSeleccionada.fila, this.fichaSeleccionada.col);
+        this.fichaSeleccionada.setPosition(posOrig.x, posOrig.y);
+        this.fichaSeleccionada.isDragging = false;
+        this.fichaSeleccionada = null;
+        this.movimientosValidos = [];
+    }
+
     verificarFinJuego() {
         for (let f of this.fichas) {
             let movs = this.obtenerMovimientosValidos(f);
@@ -315,33 +330,51 @@ function iniciarJuego() {
 
     // Instanciamos el tablero directamente sin esperar promesas bloqueantes
     juego = new TableroJuego(ctx, 195, 64, 50, imgFondo, imgFicha);
+    canvas.style.touchAction = 'none'; // permite arrastrar con el dedo sin scrollear la página
     requestAnimationFrame(gameLoop);
 }
 
 function gameLoop(tiempo) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
     if (juego) {
         juego.dibujar(tiempo / 1000);
     }
-
     requestAnimationFrame(gameLoop);
+}
+
+// Convierte las coordenadas del mouse a pixels internos del canvas.
+// El lienzo se estira con CSS (755x472 -> tamaño del reproductor), así que sin
+// esta escala el clic se detectaba corrido: se agarraba solo el centro/arriba de la ficha.
+function obtenerPosicionCanvas(e) {
+    const rect = canvas.getBoundingClientRect();
+    const escalaX = canvas.width / (rect.width || canvas.width);
+    const escalaY = canvas.height / (rect.height || canvas.height);
+    return {
+        x: (e.clientX - rect.left) * escalaX,
+        y: (e.clientY - rect.top) * escalaY
+    };
 }
 
 canvas.addEventListener("pointerdown", (e) => {
     if (!juego) return;
-    const rect = canvas.getBoundingClientRect();
-    juego.onMouseDown(e.clientX - rect.left, e.clientY - rect.top);
+    const pos = obtenerPosicionCanvas(e);
+    juego.onMouseDown(pos.x, pos.y);
 });
 
 canvas.addEventListener("pointermove", (e) => {
     if (!juego) return;
-    const rect = canvas.getBoundingClientRect();
-    juego.onMouseMove(e.clientX - rect.left, e.clientY - rect.top);
+    const pos = obtenerPosicionCanvas(e);
+    juego.onMouseMove(pos.x, pos.y);
 });
 
 canvas.addEventListener("pointerup", (e) => {
     if (!juego) return;
-    const rect = canvas.getBoundingClientRect();
-    juego.onMouseUp(e.clientX - rect.left, e.clientY - rect.top);
+    const pos = obtenerPosicionCanvas(e);
+    juego.onMouseUp(pos.x, pos.y);
+});
+
+// Si el arrastre se interrumpe (se suelta fuera del canvas, cambia de ventana, etc.),
+// la ficha vuelve a su casilla en vez de quedar "pegada" al puntero
+canvas.addEventListener("pointercancel", () => {
+    if (juego) juego.cancelarArrastre();
 });
