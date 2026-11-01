@@ -129,7 +129,10 @@ class TableroJuego {
                 if (this.grid[r][c] === 1) {
                     let posX = this.margenX + c * this.tamCasilla + this.tamCasilla / 2;
                     let posY = this.margenY + r * this.tamCasilla + this.tamCasilla / 2;
-                    this.fichas.push(new Ficha(posX, posY, this.tamCasilla * 0.58, this.imgFicha, r, c));
+                    /* 0.55: el arte de ficha.png ocupa solo el 64.8% de la imagen, asi que
+                       con este factor la ficha visible mide ~37.5px y cubre el hueco (~30px)
+                       aunque el borde del tablero tenga unos px de desfase */
+                    this.fichas.push(new Ficha(posX, posY, this.tamCasilla * 0.55, this.imgFicha, r, c));
                 }
             }
         }
@@ -342,7 +345,12 @@ function iniciarJuego() {
     imgFicha.onerror = () => console.warn("Aviso: No se encontró la imagen de ficha. Se usarán círculos.");
 
     // Instanciamos el tablero directamente sin esperar promesas bloqueantes
-    juego = new TableroJuego(ctx, 195, 64, 50, imgFondo, imgFicha);
+    // Grilla calibrada contra los huecos reales de img/Peg Tablero.jpg (medidos con la
+    // imagen escalada en "cover" al canvas 755x472):
+    //   paso real de los huecos = 53.1px (horizontal) / 52.1px (vertical) -> promedio 52.6
+    //   centro del primer hueco = (211.9, 82.2)  ->  margen = centro - paso/2
+    // El 50 / 195 / 64 anteriores dejaban la ficha corrida hasta ~10px en los bordes.
+    juego = new TableroJuego(ctx, 185.6, 55.9, 52.6, imgFondo, imgFicha);
     canvas.style.touchAction = 'none'; // permite arrastrar con el dedo sin scrollear la página
 
     // Solo arranca el bucle si todavía no está corriendo (si no, cada llamada
