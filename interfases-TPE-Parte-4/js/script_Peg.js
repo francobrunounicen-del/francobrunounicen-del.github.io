@@ -54,8 +54,16 @@ class Ficha extends Figura {
             contexto.shadowOffsetY = 8;
         }
 
-        // Si la imagen existe y cargó, la dibuja; sino, dibuja un círculo de color sólido temporal
         if (this.imagen && this.imagen.complete && this.imagen.naturalWidth !== 0) {
+            // 1. Crear el camino del círculo de la ficha
+            contexto.beginPath();
+            contexto.arc(this.x, this.y, this.radio, 0, Math.PI * 2);
+            contexto.closePath();
+
+            // 2. Aplicar la máscara de recorte
+            contexto.clip();
+
+            // 3. Dibujar la imagen recortada en forma circular
             contexto.drawImage(
                 this.imagen,
                 this.x - this.radio,
@@ -63,7 +71,8 @@ class Ficha extends Figura {
                 this.radio * 2,
                 this.radio * 2
             );
-        } else {
+        }
+         else {
             contexto.beginPath();
             contexto.arc(this.x, this.y, this.radio, 0, Math.PI * 2);
             contexto.fillStyle = '#1e88e5'; // Color temporal de prueba
