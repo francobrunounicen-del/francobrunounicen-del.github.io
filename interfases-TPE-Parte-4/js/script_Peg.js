@@ -49,9 +49,10 @@ class Ficha extends Figura {
     dibujar(contexto) {
         contexto.save();
         if (this.isDragging) {
-            contexto.shadowColor = 'rgba(0, 0, 0, 0.6)';
-            contexto.shadowBlur = 15;
-            contexto.shadowOffsetY = 8;
+            contexto.shadowColor = '#00ffff'; // Brillo Neón Cyan
+            contexto.shadowBlur = 18;
+            contexto.shadowOffsetX = 0;
+            contexto.shadowOffsetY = 0;
         }
 
         if (this.imagen && this.imagen.complete && this.imagen.naturalWidth !== 0) {
