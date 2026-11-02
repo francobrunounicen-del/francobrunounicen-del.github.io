@@ -187,15 +187,13 @@ class TableroJuego {
 
     inicializarFichas() {
         this.fichas = [];
+        const RADIO_VISIBLE = 37.7 / 2;   // = 18.85 px
         for (let r = 0; r < 7; r++) {
             for (let c = 0; c < 7; c++) {
                 if (this.grid[r][c] === 1) {
                     let posX = this.margenX + c * this.tamCasilla + this.tamCasilla / 2;
                     let posY = this.margenY + r * this.tamCasilla + this.tamCasilla / 2;
-                    /* 0.55: el arte de ficha.png ocupa solo el 64.8% de la imagen, asi que
-                       con este factor la ficha visible mide ~37.5px y cubre el hueco (~30px)
-                       aunque el borde del tablero tenga unos px de desfase */
-                    this.fichas.push(new Ficha(posX, posY, this.tamCasilla * 0.55, this.imgFicha, r, c));
+                    this.fichas.push(new Ficha(posX, posY, RADIO_VISIBLE, this.imgFicha, r, c));
                 }
             }
         }
@@ -306,9 +304,9 @@ class TableroJuego {
     onMouseDown(x, y) {
         // La partida terminó (tiempo agotado o sin movimientos): no se aceptan más clics
         if (this.partidaTerminada) return;
-        // Zona de agarre más generosa que el dibujo de la ficha:
-        // subí/bajá este porcentaje si querés que se agarre más fácil o más difícil
-        const margenAgarre = this.tamCasilla * 0.08;
+        // Zona de agarre: subí/bajá este porcentaje si querés que se
+        // agarre más fácil o más difícil
+        const margenAgarre = this.tamCasilla * 0.27;
         for (let i = this.fichas.length - 1; i >= 0; i--) {
             let f = this.fichas[i];
             if (f.containsPoint(x, y, margenAgarre)) {
