@@ -1,3 +1,15 @@
+/* ===========================================================================
+   PEGS ON NEON
+
+   Figura        -> clase base: posición y detección de clics
+   Ficha         -> hereda de Figura; representa una esfera de neón
+   TableroJuego  -> estado de la partida (grilla, fichas) y reglas del juego
+   Temporizador  -> cuenta regresiva con límite de tiempo
+   Partida       -> coordina TODO: crea el tablero, arranca y reinicia la
+                    partida, corre el bucle de render, traduce los eventos
+                    del puntero y actualiza la interfaz (timer + panel de fin)
+   =========================================================================== */
+
 document.addEventListener('DOMContentLoaded', () => {
     const playBtn = document.getElementById('playBtn');
     const canvas = document.getElementById('canvas');
@@ -8,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // El fondo del tablero se dibuja UNA sola vez dentro del canvas,
             // por eso ya no se reemplaza la imagen de portada (era la copia duplicada)
             canvas.style.display = 'block';
-            iniciarJuego();
+            partida.iniciar();
         });
     }
 
@@ -16,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ambos reinician la partida en curso (o la arrancan si todavía no empezó)
     ['restartBtn', 'reiniciarPartidaBtn'].forEach(id => {
         const btn = document.getElementById(id);
-        if (btn) btn.addEventListener('click', reiniciarPartida);
+        if (btn) btn.addEventListener('click', () => partida.reiniciar());
     });
 });
 
@@ -97,6 +109,23 @@ class Ficha extends Figura {
         this.x = x;
         this.y = y;
     }
+
+    // --- Transiciones de estado (el tablero NO toca los atributos directamente) ---
+
+    seleccionar() {
+        this.isDragging = true;
+    }
+
+    soltar() {
+        this.isDragging = false;
+    }
+
+    // Ubica la ficha en una celda del tablero (coordenada de matriz + de píxel)
+    ubicarEn(fila, col, x, y) {
+        this.fila = fila;
+        this.col = col;
+        this.setPosition(x, y);
+    }
 }
 
 // ==========================================
@@ -119,7 +148,7 @@ class TableroJuego {
         this.animOffset = 0;
         // true = la partida terminó (tiempo agotado o sin movimientos): el tablero queda bloqueado
         this.partidaTerminada = false;
-        // Callback que avisa el motivo del fin: manejarFinPartida(motivo)
+        // Callback que avisa el fin de la partida. Lo asigna Partida.
         this.alFinalizar = null;
 
         this.inicializarFichas();
@@ -282,7 +311,7 @@ class TableroJuego {
             let f = this.fichas[i];
             if (f.containsPoint(x, y, margenAgarre)) {
                 this.fichaSeleccionada = f;
-                f.isDragging = true;
+                f.seleccionar();
                 this.movimientosValidos = this.obtenerMovimientosValidos(f);
                 break;
             }
@@ -315,10 +344,8 @@ class TableroJuego {
                     f => !(f.fila === movValido.medioFila && f.col === movValido.medioCol)
                 );
 
-                this.fichaSeleccionada.fila = destinoMatriz.fila;
-                this.fichaSeleccionada.col = destinoMatriz.col;
                 let nuevaPos = this.getCoordsPixeles(destinoMatriz.fila, destinoMatriz.col);
-                this.fichaSeleccionada.setPosition(nuevaPos.x, nuevaPos.y);
+                this.fichaSeleccionada.ubicarEn(destinoMatriz.fila, destinoMatriz.col, nuevaPos.x, nuevaPos.y);
 
                 movimientoExitoso = true;
             }
@@ -329,7 +356,7 @@ class TableroJuego {
             this.fichaSeleccionada.setPosition(posOrig.x, posOrig.y);
         }
 
-        this.fichaSeleccionada.isDragging = false;
+        this.fichaSeleccionada.soltar();
         this.fichaSeleccionada = null;
         this.movimientosValidos = [];
 
@@ -346,7 +373,7 @@ class TableroJuego {
         if (!this.fichaSeleccionada) return;
         const posOrig = this.getCoordsPixeles(this.fichaSeleccionada.fila, this.fichaSeleccionada.col);
         this.fichaSeleccionada.setPosition(posOrig.x, posOrig.y);
-        this.fichaSeleccionada.isDragging = false;
+        this.fichaSeleccionada.soltar();
         this.fichaSeleccionada = null;
         this.movimientosValidos = [];
     }
@@ -363,9 +390,9 @@ class TableroJuego {
 // ==========================================
 // 4. TEMPORIZADOR (límite de tiempo de la partida)
 // ==========================================
-/* Cuenta regresiva con límite. Se actualiza en cada frame del gameLoop usando el
-   timestamp de requestAnimationFrame, así que no necesita setInterval propio y
-   se pausa solo si la pestaña queda en segundo plano. */
+/* Cuenta regresiva con límite. Se actualiza en cada frame del bucle de render
+   usando el timestamp de requestAnimationFrame, así que no necesita setInterval
+   propio y se pausa solo si la pestaña queda en segundo plano. */
 class Temporizador {
     constructor(segundosLimite) {
         this.segundosLimite = segundosLimite;   // límite configurable (120 = 2 minutos)
@@ -431,173 +458,198 @@ class Temporizador {
 }
 
 // ==========================================
-// 5. INICIALIZACIÓN Y BUCLE PRINCIPAL
+// 5. CLASE PARTIDA (coordina todo el juego)
 // ==========================================
-let juego = null;
-// Id del requestAnimationFrame en curso. Si es null no hay bucle corriendo:
-// evita que cada llamada a iniciarJuego() arranque una segunda cadena de frames.
-let rafActivo = null;
-// Límite de tiempo de la partida en segundos (120 = 2 minutos). Cambiar acá el valor
-// cambia el límite del juego.
-const LIMITE_TIEMPO_SEGUNDOS = 120;
-const temporizador = new Temporizador(LIMITE_TIEMPO_SEGUNDOS);
-// Último texto pintado en el display: sirve para no tocar el DOM en cada frame
-let textoTiempoMostrado = null;
-const canvas = document.getElementById('canvas');
-const ctx = canvas.getContext('2d');
+/* Dueña del ciclo de vida del juego. Concentra lo que antes eran funciones
+   sueltas (iniciarJuego, gameLoop, reiniciarPartida, manejarFinPartida, ...) y
+   las globales (juego, rafActivo, temporizador, textoTiempoMostrado, ctx):
+   son ahora atributos y métodos de esta clase. */
+class Partida {
+    // segundosLimite: 120 = 2 minutos. Cambiar acá cambia el límite del juego.
+    constructor(canvas, segundosLimite = 120) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext('2d');
+        this.temporizador = new Temporizador(segundosLimite);
+        this.tablero = null;                 // se crea en iniciar()
 
-function iniciarJuego() {
-    const imgFondo = new Image();
-    imgFondo.src = 'img/Peg Tablero.jpg';
+        this.rafActivo = null;               // id del requestAnimationFrame en curso
+        this.textoTiempoMostrado = null;     // último texto pintado (evita tocar el DOM de más)
 
-    const imgFicha = new Image();
-    imgFicha.src = 'img/ficha.png';
+        // Imágenes del tablero: se cargan una sola vez para toda la partida
+        this.imgFondo = new Image();
+        this.imgFondo.src = 'img/Peg Tablero.jpg';
+        // Usamos 'onerror' para que no rompa la ejecución si no encuentra los archivos
+        this.imgFondo.onerror = () => console.warn("Aviso: No se encontró la imagen de fondo. Se usará un fondo plano.");
 
-    // Usamos 'img.onerror' para que no rompa la ejecución si no encuentra los archivos
-    imgFondo.onerror = () => console.warn("Aviso: No se encontró la imagen de fondo. Se usará un fondo plano.");
-    imgFicha.onerror = () => console.warn("Aviso: No se encontró la imagen de ficha. Se usarán círculos.");
+        this.imgFicha = new Image();
+        this.imgFicha.src = 'img/ficha.png';
+        this.imgFicha.onerror = () => console.warn("Aviso: No se encontró la imagen de ficha. Se usarán círculos.");
 
-    // Instanciamos el tablero directamente sin esperar promesas bloqueantes
-    // Grilla calibrada contra los huecos reales de img/Peg Tablero.jpg (medidos con la
-    // imagen escalada en "cover" al canvas 755x472):
-    //   paso real de los huecos = 53.1px (horizontal) / 52.1px (vertical) -> promedio 52.6
-    //   centro del primer hueco = (211.9, 82.2)  ->  margen = centro - paso/2
-    // El 50 / 195 / 64 anteriores dejaban la ficha corrida hasta ~10px en los bordes.
-    juego = new TableroJuego(ctx, 185.6, 55.9, 52.6, imgFondo, imgFicha);
-    // El tablero avisa cuando la partida termina por quedarse sin movimientos
-    juego.alFinalizar = manejarFinPartida;
-    canvas.style.touchAction = 'none'; // permite arrastrar con el dedo sin scrollear la página
+        // El bucle se ata a esta instancia: si no, perdería el "this" al ejecutarse
+        this.bucle = this.bucle.bind(this);
 
-    // Nueva partida: el temporizador vuelve al límite y empieza a correr
-    temporizador.reiniciar();
-    temporizador.iniciar();
-    ocultarPanelFin();
-    pintarTiempo(true);
-
-    // Solo arranca el bucle si todavía no está corriendo (si no, cada llamada
-    // acumulaba una cadena nueva de frames y corrían varias en paralelo)
-    if (rafActivo === null) {
-        rafActivo = requestAnimationFrame(gameLoop);
+        this.registrarEventos();
     }
-}
 
-function gameLoop(tiempo) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    if (juego) {
-        // La cuenta regresiva avanza con cada frame; al agotarse se termina la partida
-        if (temporizador.actualizar(tiempo)) {
-            juego.finalizarPartida();
-            manejarFinPartida('tiempo');
+    // ---------- Ciclo de vida de la partida ----------
+
+    // Arranca una partida: crea el tablero, prende el temporizador y enciende
+    // el bucle de render (con guardia: nunca dos cadenas de frames en paralelo)
+    iniciar() {
+        // Grilla calibrada contra los huecos reales de img/Peg Tablero.jpg (medidos con la
+        // imagen escalada en "cover" al canvas 755x472):
+        //   paso real de los huecos = 53.1px (horizontal) / 52.1px (vertical) -> promedio 52.6
+        //   centro del primer hueco = (211.9, 82.2)  ->  margen = centro - paso/2
+        // El 50 / 195 / 64 anteriores dejaban la ficha corrida hasta ~10px en los bordes.
+        this.tablero = new TableroJuego(this.ctx, 185.6, 55.9, 52.6, this.imgFondo, this.imgFicha);
+        // El tablero avisa cuando la partida termina por quedarse sin movimientos
+        this.tablero.alFinalizar = (motivo) => this.manejarFinPartida(motivo);
+        this.canvas.style.touchAction = 'none'; // permite arrastrar con el dedo sin scrollear la página
+
+        // Nueva partida: el temporizador vuelve al límite y empieza a correr
+        this.temporizador.reiniciar();
+        this.temporizador.iniciar();
+        this.ocultarPanelFin();
+        this.pintarTiempo(true);
+
+        // Solo arranca el bucle si todavía no está corriendo (si no, cada llamada
+        // acumulaba una cadena nueva de frames y corrían varias en paralelo)
+        if (this.rafActivo === null) {
+            this.rafActivo = requestAnimationFrame(this.bucle);
         }
-        pintarTiempo();
-        juego.dibujar(tiempo / 1000);
-    }
-    rafActivo = requestAnimationFrame(gameLoop);
-}
-
-// ---------------------------------------------------------------
-// UI: temporizador en pantalla y panel de fin de partida
-// ---------------------------------------------------------------
-
-// Escribe el tiempo restante en el display. Solo toca el DOM cuando cambia
-// el segundo visible (se llama en cada frame del gameLoop).
-function pintarTiempo(forzar = false) {
-    const texto = 'Tiempo: ' + temporizador.obtenerTexto();
-    if (!forzar && texto === textoTiempoMostrado) return;
-    textoTiempoMostrado = texto;
-
-    showTimer(true, texto); // helper compartido de script.js (muestra el display)
-    const el = document.getElementById('timer-display');
-    if (el) el.classList.toggle('timer-display--urgente', temporizador.enRiesgo());
-}
-
-// Fin de partida controlado: detiene el timer y muestra el panel con el botón
-// de reiniciar. Reemplaza al alert() bloqueante que había antes.
-function manejarFinPartida(motivo) {
-    temporizador.detener();
-    pintarTiempo(true);
-
-    const mensaje = motivo === 'tiempo'
-        ? '¡Tiempo agotado!'
-        : '¡Juego terminado! No quedan movimientos posibles.';
-    mostrarPanelFin(mensaje);
-}
-
-function mostrarPanelFin(mensaje) {
-    const panel = document.getElementById('finPartida');
-    const msg = document.getElementById('finPartidaMensaje');
-    if (msg) msg.textContent = mensaje;
-    if (panel) panel.classList.add('visible');
-}
-
-function ocultarPanelFin() {
-    const panel = document.getElementById('finPartida');
-    if (panel) panel.classList.remove('visible');
-}
-
-/* Reinicio de la partida: tablero nuevo, temporizador de vuelta al límite y
-   panel de fin oculto. Si todavía no se había empezado, arranca desde cero. */
-function reiniciarPartida() {
-    if (!juego) {
-        const playBtn = document.getElementById('playBtn');
-        if (playBtn) playBtn.click();
-        return;
     }
 
-    juego.reiniciar();
-    temporizador.reiniciar();
-    temporizador.iniciar();
-    ocultarPanelFin();
-    pintarTiempo(true);
+    /* Reinicio de la partida: tablero nuevo, temporizador de vuelta al límite y
+       panel de fin oculto. Si todavía no se había empezado, arranca desde cero. */
+    reiniciar() {
+        if (!this.tablero) {
+            const playBtn = document.getElementById('playBtn');
+            if (playBtn) playBtn.click();
+            return;
+        }
+
+        this.tablero.reiniciar();
+        this.temporizador.reiniciar();
+        this.temporizador.iniciar();
+        this.ocultarPanelFin();
+        this.pintarTiempo(true);
+    }
+
+    // ---------- Bucle de render ----------
+
+    bucle(tiempo) {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        if (this.tablero) {
+            // La cuenta regresiva avanza con cada frame; al agotarse se termina la partida
+            if (this.temporizador.actualizar(tiempo)) {
+                this.tablero.finalizarPartida();
+                this.manejarFinPartida('tiempo');
+            }
+            this.pintarTiempo();
+            this.tablero.dibujar(tiempo / 1000);
+        }
+        this.rafActivo = requestAnimationFrame(this.bucle);
+    }
+
+    // ---------- Interfaz (display del timer y panel de fin) ----------
+
+    // Escribe el tiempo restante en el display. Solo toca el DOM cuando cambia
+    // el segundo visible (se llama en cada frame del bucle).
+    pintarTiempo(forzar = false) {
+        const texto = 'Tiempo: ' + this.temporizador.obtenerTexto();
+        if (!forzar && texto === this.textoTiempoMostrado) return;
+        this.textoTiempoMostrado = texto;
+
+        showTimer(true, texto); // helper compartido de script.js (muestra el display)
+        const el = document.getElementById('timer-display');
+        if (el) el.classList.toggle('timer-display--urgente', this.temporizador.enRiesgo());
+    }
+
+    // Fin de partida controlado: detiene el timer y muestra el panel con el botón
+    // de reiniciar. Reemplaza al alert() bloqueante que había antes.
+    manejarFinPartida(motivo) {
+        this.temporizador.detener();
+        this.pintarTiempo(true);
+
+        const mensaje = motivo === 'tiempo'
+            ? '¡Tiempo agotado!'
+            : '¡Juego terminado! No quedan movimientos posibles.';
+        this.mostrarPanelFin(mensaje);
+    }
+
+    mostrarPanelFin(mensaje) {
+        const panel = document.getElementById('finPartida');
+        const msg = document.getElementById('finPartidaMensaje');
+        if (msg) msg.textContent = mensaje;
+        if (panel) panel.classList.add('visible');
+    }
+
+    ocultarPanelFin() {
+        const panel = document.getElementById('finPartida');
+        if (panel) panel.classList.remove('visible');
+    }
+
+    // ---------- Entrada: eventos del puntero ----------
+
+    registrarEventos() {
+        this.canvas.addEventListener('pointerdown', (e) => this.manejarPunteroAbajo(e));
+        this.canvas.addEventListener('pointermove', (e) => this.manejarPunteroMover(e));
+        this.canvas.addEventListener('pointerup', (e) => this.manejarPunteroSoltar(e));
+
+        // Red de seguridad por si la captura de puntero no estuvo disponible: el
+        // pointerup que llega a window (porque se soltó FUERA del canvas) también
+        // finaliza el arrastre. Soltar es idempotente: si ya no hay ficha
+        // seleccionada no hace nada, así que no se duplica ningún movimiento.
+        window.addEventListener('pointerup', (e) => {
+            if (!this.tablero || !this.tablero.fichaSeleccionada) return;
+            this.manejarPunteroSoltar(e);
+        });
+
+        // Si el arrastre se interrumpe (se suelta fuera del canvas, cambia de
+        // ventana, etc.), la ficha vuelve a su casilla en vez de quedar "pegada"
+        const cancelarSeguro = () => { if (this.tablero) this.tablero.cancelarArrastre(); };
+        this.canvas.addEventListener('pointercancel', cancelarSeguro);
+        window.addEventListener('pointercancel', cancelarSeguro);
+    }
+
+    // Convierte las coordenadas del puntero a pixels internos del canvas.
+    // El lienzo se estira con CSS (755x472 -> tamaño del reproductor), así que sin
+    // esta escala el clic se detectaba corrido: se agarraba solo el centro/arriba de la ficha.
+    obtenerPosicionCanvas(e) {
+        const rect = this.canvas.getBoundingClientRect();
+        const escalaX = this.canvas.width / (rect.width || this.canvas.width);
+        const escalaY = this.canvas.height / (rect.height || this.canvas.height);
+        return {
+            x: (e.clientX - rect.left) * escalaX,
+            y: (e.clientY - rect.top) * escalaY
+        };
+    }
+
+    manejarPunteroAbajo(e) {
+        if (!this.tablero) return;
+        // Captura el puntero: si se suelta FUERA del canvas, pointermove/pointerup
+        // llegan igual acá y la ficha vuelve a su casilla, en vez de quedar colgada
+        // siguiendo al cursor. (try/catch: con punteros sintéticos no hay captura)
+        try { this.canvas.setPointerCapture(e.pointerId); } catch (err) { /* aplica el fallback de window */ }
+        const pos = this.obtenerPosicionCanvas(e);
+        this.tablero.onMouseDown(pos.x, pos.y);
+    }
+
+    manejarPunteroMover(e) {
+        if (!this.tablero) return;
+        const pos = this.obtenerPosicionCanvas(e);
+        this.tablero.onMouseMove(pos.x, pos.y);
+    }
+
+    manejarPunteroSoltar(e) {
+        if (!this.tablero) return;
+        const pos = this.obtenerPosicionCanvas(e);
+        this.tablero.onMouseUp(pos.x, pos.y);
+    }
 }
 
-// Convierte las coordenadas del mouse a pixels internos del canvas.
-// El lienzo se estira con CSS (755x472 -> tamaño del reproductor), así que sin
-// esta escala el clic se detectaba corrido: se agarraba solo el centro/arriba de la ficha.
-function obtenerPosicionCanvas(e) {
-    const rect = canvas.getBoundingClientRect();
-    const escalaX = canvas.width / (rect.width || canvas.width);
-    const escalaY = canvas.height / (rect.height || canvas.height);
-    return {
-        x: (e.clientX - rect.left) * escalaX,
-        y: (e.clientY - rect.top) * escalaY
-    };
-}
-
-canvas.addEventListener("pointerdown", (e) => {
-    if (!juego) return;
-    // Captura el puntero: si se suelta FUERA del canvas, pointermove/pointerup
-    // llegan igual acá y la ficha vuelve a su casilla, en vez de quedar colgada
-    // siguiendo al cursor. (try/catch: con punteros sintéticos no hay captura)
-    try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* aplica el fallback de abajo */ }
-    const pos = obtenerPosicionCanvas(e);
-    juego.onMouseDown(pos.x, pos.y);
-});
-
-canvas.addEventListener("pointermove", (e) => {
-    if (!juego) return;
-    const pos = obtenerPosicionCanvas(e);
-    juego.onMouseMove(pos.x, pos.y);
-});
-
-canvas.addEventListener("pointerup", (e) => {
-    if (!juego) return;
-    const pos = obtenerPosicionCanvas(e);
-    juego.onMouseUp(pos.x, pos.y);
-});
-
-// Red de seguridad por si la captura no estuvo disponible: el pointerup que llega
-// a window (porque se soltó fuera) también finaliza el arrastre. onMouseUp es
-// idempotente: si ya no hay ficha seleccionada sale sin hacer nada, así que aunque
-// el evento llegue por los dos caminos no se produce ningún movimiento extra.
-window.addEventListener("pointerup", (e) => {
-    if (!juego || !juego.fichaSeleccionada) return;
-    const pos = obtenerPosicionCanvas(e);
-    juego.onMouseUp(pos.x, pos.y);
-});
-
-// Si el arrastre se interrumpe (se suelta fuera del canvas, cambia de ventana, etc.),
-// la ficha vuelve a su casilla en vez de quedar "pegada" al puntero
-const cancelarArrastreSeguro = () => { if (juego) juego.cancelarArrastre(); };
-canvas.addEventListener("pointercancel", cancelarArrastreSeguro);
-window.addEventListener("pointercancel", cancelarArrastreSeguro);
+// ==========================================
+// 6. PUNTO DE ENTRADA
+// ==========================================
+// Único objeto global del juego: toda la coordinación vive dentro de Partida
+const partida = new Partida(document.getElementById('canvas'), 120);
