@@ -69,6 +69,12 @@
           <!-- TEMPORIZADOR: cuenta regresiva con el límite de tiempo de la partida -->
           <div id="timer-display" class="timer-display" role="timer">Tiempo: 02:00</div>
 
+          <!-- PANEL DE ESTADO: fichas restantes y movimientos realizados de la partida -->
+          <div id="estado-display" class="estado-display" role="status">
+            <span>FICHAS: <b id="fichasRestantes">32</b></span>
+            <span>MOVIMIENTOS: <b id="movimientosRealizados">0</b></span>
+          </div>
+
           <img src="img/Juego Peg Solitary.png" alt="Pegs On Neon Gameplay" class="game-cover">
           <button class="btn-play-overlay" id="playBtn" aria-label="Iniciar Juego">
             <i class="fa-solid fa-play"></i>
@@ -77,6 +83,7 @@
           <!-- PANEL DE FIN DE PARTIDA: aparece al agotarse el tiempo o quedar sin movimientos -->
           <div class="fin-partida" id="finPartida">
             <p class="fin-partida-mensaje" id="finPartidaMensaje">¡Tiempo agotado!</p>
+            <p class="fin-partida-linea" id="finPartidaLinea"></p>
             <button class="btn-reiniciar" id="reiniciarPartidaBtn">Reiniciar partida</button>
           </div>
         </div>
@@ -106,7 +113,11 @@
           Debes saltar fichas sobre un tablero en forma de cruz para eliminarlas. Repleta de circuitos impresos, tubos de neón 
           y efectos de electricidad.
           El objetivo principal es planificar cada movimiento con precisión para ir despejando el circuito hasta dejar 
-          una sola esfera brillante en el centro del tablero.
+          <strong>una sola esfera brillante en el tablero, sin importar en qué casilla quede</strong>: eso significa victoria.
+          Cada partida cuenta con <strong>un límite de 2 minutos</strong>: si el tiempo se agota o quedan fichas sin movimientos 
+          posibles, la partida termina y puedes reiniciarla. Durante el juego, el <strong>panel de estado</strong> (arriba a la 
+          izquierda) muestra las fichas restantes y los movimientos realizados, y el temporizador (arriba a la derecha) avisa 
+          cuando quedan 10 segundos o menos.
         </p>
       </section>
 
@@ -114,9 +125,11 @@
       <section class="info-card">
         <h3 class="info-title">¿Cómo jugar?</h3>
         <ul class="instructions-list">
-          <li>Usa el clic del mouse o la pantalla táctil para seleccionar una esfera de neón y saltar sobre otra adyacente hacia un espacio vacío.</li>
+          <li>Usa el clic del mouse para seleccionar una esfera de neón: al tomarla aparecen <strong>flechas animadas sobre los lugares válidos</strong> donde puedes soltarla (hints).</li>
+          <li>Arrastra la esfera hasta una de esas flechas y suelta: saltará sobre la esfera adyacente y la eliminará. Si la soltás en un lugar inválido, la esfera vuelve a su casilla.</li>
           <li>Cada esfera superada desaparece del tablero de circuito, despejando el camino. Anticipa cada jugada para no quedarte sin saltos disponibles.</li>
-          <li>Intenta despejar la mayor cantidad de fichas y dejar solo una esfera en el tablero para dominar el circuito.</li>
+          <li>Ganás cuando queda <strong>una sola esfera en el tablero</strong>, en la casilla que sea. Si quedan varias sin movimientos posibles, o se <strong>agota el tiempo (2 minutos)</strong>, la partida termina.</li>
+          <li>Seguí el <strong>panel de estado</strong> (fichas restantes y movimientos realizados) y el temporizador. Para empezar de nuevo, usá el botón ↻ de la barra de acciones o el botón del panel de fin de partida.</li>
         </ul>
       </section>
 

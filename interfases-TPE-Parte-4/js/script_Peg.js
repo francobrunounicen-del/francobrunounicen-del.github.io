@@ -146,7 +146,9 @@ class TableroJuego {
         this.fichaSeleccionada = null;
         this.movimientosValidos = [];
         this.animOffset = 0;
-        // true = la partida terminó (tiempo agotado o sin movimientos): el tablero queda bloqueado
+        // Contador de saltos válidos realizados en la partida (se muestra en el panel de estado)
+        this.movimientos = 0;
+        // true = la partida terminó (victoria, tiempo agotado o sin movimientos): tablero bloqueado
         this.partidaTerminada = false;
         // Callback que avisa el fin de la partida. Lo asigna Partida.
         this.alFinalizar = null;
@@ -173,6 +175,7 @@ class TableroJuego {
         this.fichaSeleccionada = null;
         this.movimientosValidos = [];
         this.animOffset = 0;
+        this.movimientos = 0;      // nueva partida: el contador de movimientos vuelve a cero
         this.partidaTerminada = false;
         this.inicializarFichas();
     }
@@ -347,6 +350,7 @@ class TableroJuego {
                 let nuevaPos = this.getCoordsPixeles(destinoMatriz.fila, destinoMatriz.col);
                 this.fichaSeleccionada.ubicarEn(destinoMatriz.fila, destinoMatriz.col, nuevaPos.x, nuevaPos.y);
 
+                this.movimientos++; // un salto válido = un movimiento más para el panel de estado
                 movimientoExitoso = true;
             }
         }
@@ -361,10 +365,14 @@ class TableroJuego {
         this.movimientosValidos = [];
 
         if (movimientoExitoso && this.verificarFinJuego()) {
-            // Fin de partida controlado (sin alert bloqueante): bloquea el tablero
-            // y muestra el panel con el botón de reiniciar
+            /* Fin de partida controlado (sin alert bloqueante): bloquea el tablero
+               y muestra el panel con el botón de reiniciar.
+               Dos motivos distintos:
+                 - 'victoria'       -> quedó UNA sola ficha en el tablero (gana, sea donde sea)
+                 - 'sin-movimientos'-> quedaron varias fichas y ninguna tiene saltos posibles */
             this.finalizarPartida();
-            if (this.alFinalizar) this.alFinalizar('sin-movimientos');
+            const motivo = this.fichas.length === 1 ? 'victoria' : 'sin-movimientos';
+            if (this.alFinalizar) this.alFinalizar(motivo);
         }
     }
 
@@ -474,6 +482,8 @@ class Partida {
 
         this.rafActivo = null;               // id del requestAnimationFrame en curso
         this.textoTiempoMostrado = null;     // último texto pintado (evita tocar el DOM de más)
+        this.fichasMostradas = null;         // último contador de fichas pintado en el panel
+        this.movimientosMostrados = null;    // último contador de movimientos pintado
 
         // Imágenes del tablero: se cargan una sola vez para toda la partida
         this.imgFondo = new Image();
@@ -511,6 +521,7 @@ class Partida {
         this.temporizador.iniciar();
         this.ocultarPanelFin();
         this.pintarTiempo(true);
+        this.pintarEstado(true);   // panel de estado: 32 fichas / 0 movimientos
 
         // Solo arranca el bucle si todavía no está corriendo (si no, cada llamada
         // acumulaba una cadena nueva de frames y corrían varias en paralelo)
@@ -533,6 +544,7 @@ class Partida {
         this.temporizador.iniciar();
         this.ocultarPanelFin();
         this.pintarTiempo(true);
+        this.pintarEstado(true);   // vuelve a 32 fichas / 0 movimientos
     }
 
     // ---------- Bucle de render ----------
@@ -546,6 +558,7 @@ class Partida {
                 this.manejarFinPartida('tiempo');
             }
             this.pintarTiempo();
+            this.pintarEstado();
             this.tablero.dibujar(tiempo / 1000);
         }
         this.rafActivo = requestAnimationFrame(this.bucle);
@@ -565,28 +578,72 @@ class Partida {
         if (el) el.classList.toggle('timer-display--urgente', this.temporizador.enRiesgo());
     }
 
-    // Fin de partida controlado: detiene el timer y muestra el panel con el botón
-    // de reiniciar. Reemplaza al alert() bloqueante que había antes.
+    /* Panel de estado: fichas restantes y movimientos realizados de la partida.
+       Muestra en pantalla que la lógica del juego está viva (incisos 4 y 5) y le
+       indica al jugador cómo le va. Solo toca el DOM cuando un valor cambió. */
+    pintarEstado(forzar = false) {
+        if (!this.tablero) return;
+        const fichas = this.tablero.fichas.length;
+        const movimientos = this.tablero.movimientos;
+
+        if (forzar || fichas !== this.fichasMostradas) {
+            const el = document.getElementById('fichasRestantes');
+            if (el) el.textContent = fichas;
+            this.fichasMostradas = fichas;
+        }
+        if (forzar || movimientos !== this.movimientosMostrados) {
+            const el = document.getElementById('movimientosRealizados');
+            if (el) el.textContent = movimientos;
+            this.movimientosMostrados = movimientos;
+        }
+
+        // Mostrar el display solo mientras hay una partida en curso
+        const panel = document.getElementById('estado-display');
+        if (panel) panel.classList.add('visible');
+    }
+
+    // Fin de partida controlado: detiene el timer y muestra el panel con el
+    // resultado y el botón de reiniciar. Reemplaza al alert() bloqueante.
     manejarFinPartida(motivo) {
         this.temporizador.detener();
         this.pintarTiempo(true);
+        this.pintarEstado(true);   // el resumen del panel refleja el estado final
 
-        const mensaje = motivo === 'tiempo'
-            ? '¡Tiempo agotado!'
-            : '¡Juego terminado! No quedan movimientos posibles.';
-        this.mostrarPanelFin(mensaje);
+        /* Tres motivos de fin posibles:
+           - 'victoria'       -> quedó una sola ficha (gana, en cualquier casilla)
+           - 'sin-movimientos'-> quedaron fichas pero ningún salto posible
+           - 'tiempo'         -> se agotó el límite de tiempo               */
+        const mensajes = {
+            'victoria': '¡Victoria! 🏆 ¡Ganaste!',
+            'sin-movimientos': '¡Juego terminado! No quedan movimientos posibles.',
+            'tiempo': '¡Tiempo agotado!'
+        };
+        this.mostrarPanelFin(mensajes[motivo] || mensajes['sin-movimientos'], motivo);
     }
 
-    mostrarPanelFin(mensaje) {
+    /* Muestra el panel de fin con el mensaje, la línea de resumen
+       (fichas restantes | movimientos) y, si ganó, el estilo de victoria. */
+    mostrarPanelFin(motivoTexto, motivo = 'sin-movimientos') {
         const panel = document.getElementById('finPartida');
         const msg = document.getElementById('finPartidaMensaje');
-        if (msg) msg.textContent = mensaje;
-        if (panel) panel.classList.add('visible');
+        const linea = document.getElementById('finPartidaLinea');
+        if (msg) msg.textContent = motivoTexto;
+        if (linea && this.tablero) {
+            linea.textContent = 'Fichas restantes: ' + this.tablero.fichas.length +
+                                ' | Movimientos: ' + this.tablero.movimientos;
+        }
+        if (panel) {
+            panel.classList.toggle('fin-partida--victoria', motivo === 'victoria');
+            panel.classList.add('visible');
+        }
     }
 
     ocultarPanelFin() {
         const panel = document.getElementById('finPartida');
-        if (panel) panel.classList.remove('visible');
+        if (panel) {
+            panel.classList.remove('visible');
+            panel.classList.remove('fin-partida--victoria');
+        }
     }
 
     // ---------- Entrada: eventos del puntero ----------
@@ -645,6 +702,7 @@ class Partida {
         if (!this.tablero) return;
         const pos = this.obtenerPosicionCanvas(e);
         this.tablero.onMouseUp(pos.x, pos.y);
+        this.pintarEstado(); // actualiza fichas/movimientos apenas se concreta el salto
     }
 }
 
