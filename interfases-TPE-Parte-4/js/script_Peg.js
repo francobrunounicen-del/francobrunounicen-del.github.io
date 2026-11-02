@@ -24,12 +24,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Botón de reinicio de la barra de acciones y botón del panel de fin de partida:
-    // ambos reinician la partida en curso (o la arrancan si todavía no empezó)
-    ['restartBtn', 'reiniciarPartidaBtn'].forEach(id => {
-        const btn = document.getElementById(id);
-        if (btn) btn.addEventListener('click', () => partida.reiniciar());
-    });
+    // Solo el panel de fin de partida ofrece reiniciar: NO hay reinicio "en cualquier
+    // momento" (el botón de la barra de acciones fue eliminado). Se reinicia únicamente
+    // cuando la partida termina (victoria, sin movimientos o tiempo agotado).
+    const btnReiniciar = document.getElementById('reiniciarPartidaBtn');
+    if (btnReiniciar) btnReiniciar.addEventListener('click', () => partida.reiniciar());
 });
 
 // ==========================================
@@ -367,11 +366,16 @@ class TableroJuego {
         if (movimientoExitoso && this.verificarFinJuego()) {
             /* Fin de partida controlado (sin alert bloqueante): bloquea el tablero
                y muestra el panel con el botón de reiniciar.
-               Dos motivos distintos:
-                 - 'victoria'       -> quedó UNA sola ficha en el tablero (gana, sea donde sea)
-                 - 'sin-movimientos'-> quedaron varias fichas y ninguna tiene saltos posibles */
+               Tres motivos distintos:
+                 - 'victoria-perfecta' -> quedó UNA sola ficha, exactamente en el centro (3,3)
+                 - 'victoria'          -> quedó UNA sola ficha en cualquier otra casilla
+                 - 'sin-movimientos'   -> quedaron varias fichas y ninguna tiene saltos posibles */
             this.finalizarPartida();
-            const motivo = this.fichas.length === 1 ? 'victoria' : 'sin-movimientos';
+            let motivo = 'sin-movimientos';
+            if (this.fichas.length === 1) {
+                const ultima = this.fichas[0];
+                motivo = (ultima.fila === 3 && ultima.col === 3) ? 'victoria-perfecta' : 'victoria';
+            }
             if (this.alFinalizar) this.alFinalizar(motivo);
         }
     }
@@ -610,10 +614,12 @@ class Partida {
         this.pintarEstado(true);   // el resumen del panel refleja el estado final
 
         /* Tres motivos de fin posibles:
-           - 'victoria'       -> quedó una sola ficha (gana, en cualquier casilla)
-           - 'sin-movimientos'-> quedaron fichas pero ningún salto posible
-           - 'tiempo'         -> se agotó el límite de tiempo               */
+           - 'victoria-perfecta' -> una sola ficha, exactamente en el centro del tablero
+           - 'victoria'          -> una sola ficha, en cualquier casilla
+           - 'sin-movimientos'   -> quedaron fichas pero ningún salto posible
+           - 'tiempo'            -> se agotó el límite de tiempo               */
         const mensajes = {
+            'victoria-perfecta': '¡Victoria Perfecta! ✨',
             'victoria': '¡Victoria! 🏆 ¡Ganaste!',
             'sin-movimientos': '¡Juego terminado! No quedan movimientos posibles.',
             'tiempo': '¡Tiempo agotado!'
@@ -633,7 +639,9 @@ class Partida {
                                 ' | Movimientos: ' + this.tablero.movimientos;
         }
         if (panel) {
-            panel.classList.toggle('fin-partida--victoria', motivo === 'victoria');
+            // Cualquier victoria usa el estilo verde; la perfecta suma su propio brillo
+            panel.classList.toggle('fin-partida--victoria', motivo.startsWith('victoria'));
+            panel.classList.toggle('fin-partida--perfecta', motivo === 'victoria-perfecta');
             panel.classList.add('visible');
         }
     }
@@ -643,6 +651,7 @@ class Partida {
         if (panel) {
             panel.classList.remove('visible');
             panel.classList.remove('fin-partida--victoria');
+            panel.classList.remove('fin-partida--perfecta');
         }
     }
 
