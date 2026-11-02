@@ -11,6 +11,13 @@ document.addEventListener('DOMContentLoaded', () => {
             iniciarJuego();
         });
     }
+
+    // Botón de reinicio de la barra de acciones y botón del panel de fin de partida:
+    // ambos reinician la partida en curso (o la arrancan si todavía no empezó)
+    ['restartBtn', 'reiniciarPartidaBtn'].forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) btn.addEventListener('click', reiniciarPartida);
+    });
 });
 
 // ==========================================
@@ -104,7 +111,23 @@ class TableroJuego {
         this.imgFondo = imgFondo;
         this.imgFicha = imgFicha;
 
-        this.grid = [
+        this.grid = TableroJuego.grillaInicial();
+
+        this.fichas = [];
+        this.fichaSeleccionada = null;
+        this.movimientosValidos = [];
+        this.animOffset = 0;
+        // true = la partida terminó (tiempo agotado o sin movimientos): el tablero queda bloqueado
+        this.partidaTerminada = false;
+        // Callback que avisa el motivo del fin: manejarFinPartida(motivo)
+        this.alFinalizar = null;
+
+        this.inicializarFichas();
+    }
+
+    // Grilla inicial de la partida: tablero en cruz con el centro vacío
+    static grillaInicial() {
+        return [
             [-1, -1,  1,  1,  1, -1, -1],
             [-1, -1,  1,  1,  1, -1, -1],
             [ 1,  1,  1,  1,  1,  1,  1],
@@ -113,13 +136,22 @@ class TableroJuego {
             [-1, -1,  1,  1,  1, -1, -1],
             [-1, -1,  1,  1,  1, -1, -1]
         ];
+    }
 
-        this.fichas = [];
+    // Devuelve el tablero al estado inicial de una nueva partida
+    reiniciar() {
+        this.grid = TableroJuego.grillaInicial();
         this.fichaSeleccionada = null;
         this.movimientosValidos = [];
         this.animOffset = 0;
-
+        this.partidaTerminada = false;
         this.inicializarFichas();
+    }
+
+    // Bloquea el tablero al terminar la partida (y suelta cualquier arrastre en curso)
+    finalizarPartida() {
+        this.partidaTerminada = true;
+        this.cancelarArrastre();
     }
 
     inicializarFichas() {
@@ -241,6 +273,8 @@ class TableroJuego {
     }
 
     onMouseDown(x, y) {
+        // La partida terminó (tiempo agotado o sin movimientos): no se aceptan más clics
+        if (this.partidaTerminada) return;
         // Zona de agarre más generosa que el dibujo de la ficha:
         // subí/bajá este porcentaje si querés que se agarre más fácil o más difícil
         const margenAgarre = this.tamCasilla * 0.08;
@@ -300,7 +334,10 @@ class TableroJuego {
         this.movimientosValidos = [];
 
         if (movimientoExitoso && this.verificarFinJuego()) {
-            setTimeout(() => alert("¡Juego terminado! No hay más movimientos posibles."), 100);
+            // Fin de partida controlado (sin alert bloqueante): bloquea el tablero
+            // y muestra el panel con el botón de reiniciar
+            this.finalizarPartida();
+            if (this.alFinalizar) this.alFinalizar('sin-movimientos');
         }
     }
 
@@ -324,12 +361,88 @@ class TableroJuego {
 }
 
 // ==========================================
-// 4. INICIALIZACIÓN Y BUCLE PRINCIPAL
+// 4. TEMPORIZADOR (límite de tiempo de la partida)
+// ==========================================
+/* Cuenta regresiva con límite. Se actualiza en cada frame del gameLoop usando el
+   timestamp de requestAnimationFrame, así que no necesita setInterval propio y
+   se pausa solo si la pestaña queda en segundo plano. */
+class Temporizador {
+    constructor(segundosLimite) {
+        this.segundosLimite = segundosLimite;   // límite configurable (120 = 2 minutos)
+        this.segundosRestantes = segundosLimite;
+        this.activo = false;                   // está corriendo la cuenta regresiva
+        this.agotado = false;                  // llegó a cero
+        this.ultimoTs = null;                  // timestamp del frame anterior
+    }
+
+    // Arranca (o reanuda) la cuenta desde donde esté
+    iniciar() {
+        this.activo = true;
+        this.ultimoTs = null; // evita un salto de tiempo enorme en el primer frame
+    }
+
+    detener() {
+        this.activo = false;
+    }
+
+    // Vuelve al límite completo y apaga los estados (para reiniciar la partida)
+    reiniciar() {
+        this.segundosRestantes = this.segundosLimite;
+        this.agotado = false;
+        this.activo = false;
+        this.ultimoTs = null;
+    }
+
+    /* Se ejecuta en cada frame. Devuelve true SOLO en el frame en que se agota,
+       para que el juego reaccione una única vez. */
+    actualizar(ts) {
+        if (!this.activo || this.agotado) return false;
+
+        if (this.ultimoTs === null) {
+            this.ultimoTs = ts;
+            return false;
+        }
+
+        const deltaSegundos = (ts - this.ultimoTs) / 1000;
+        this.ultimoTs = ts;
+        this.segundosRestantes = Math.max(0, this.segundosRestantes - deltaSegundos);
+
+        if (this.segundosRestantes <= 0) {
+            this.segundosRestantes = 0;
+            this.agotado = true;
+            this.activo = false;
+            return true;
+        }
+        return false;
+    }
+
+    // ¿Faltan 10 segundos o menos? (para el aviso visual del display)
+    enRiesgo(umbralSegundos = 10) {
+        return this.activo && this.segundosRestantes <= umbralSegundos;
+    }
+
+    // Texto "01:59" (redondea hacia arriba para que muestre 02:00 al inicio)
+    obtenerTexto() {
+        const total = Math.ceil(this.segundosRestantes);
+        const minutos = Math.floor(total / 60);
+        const segundos = total % 60;
+        return String(minutos).padStart(2, '0') + ':' + String(segundos).padStart(2, '0');
+    }
+}
+
+// ==========================================
+// 5. INICIALIZACIÓN Y BUCLE PRINCIPAL
 // ==========================================
 let juego = null;
 // Id del requestAnimationFrame en curso. Si es null no hay bucle corriendo:
 // evita que cada llamada a iniciarJuego() arranque una segunda cadena de frames.
 let rafActivo = null;
+// Límite de tiempo de la partida en segundos (120 = 2 minutos). Cambiar acá el valor
+// cambia el límite del juego.
+const LIMITE_TIEMPO_SEGUNDOS = 120;
+const temporizador = new Temporizador(LIMITE_TIEMPO_SEGUNDOS);
+// Último texto pintado en el display: sirve para no tocar el DOM en cada frame
+let textoTiempoMostrado = null;
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
@@ -351,7 +464,15 @@ function iniciarJuego() {
     //   centro del primer hueco = (211.9, 82.2)  ->  margen = centro - paso/2
     // El 50 / 195 / 64 anteriores dejaban la ficha corrida hasta ~10px en los bordes.
     juego = new TableroJuego(ctx, 185.6, 55.9, 52.6, imgFondo, imgFicha);
+    // El tablero avisa cuando la partida termina por quedarse sin movimientos
+    juego.alFinalizar = manejarFinPartida;
     canvas.style.touchAction = 'none'; // permite arrastrar con el dedo sin scrollear la página
+
+    // Nueva partida: el temporizador vuelve al límite y empieza a correr
+    temporizador.reiniciar();
+    temporizador.iniciar();
+    ocultarPanelFin();
+    pintarTiempo(true);
 
     // Solo arranca el bucle si todavía no está corriendo (si no, cada llamada
     // acumulaba una cadena nueva de frames y corrían varias en paralelo)
@@ -363,9 +484,71 @@ function iniciarJuego() {
 function gameLoop(tiempo) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     if (juego) {
+        // La cuenta regresiva avanza con cada frame; al agotarse se termina la partida
+        if (temporizador.actualizar(tiempo)) {
+            juego.finalizarPartida();
+            manejarFinPartida('tiempo');
+        }
+        pintarTiempo();
         juego.dibujar(tiempo / 1000);
     }
     rafActivo = requestAnimationFrame(gameLoop);
+}
+
+// ---------------------------------------------------------------
+// UI: temporizador en pantalla y panel de fin de partida
+// ---------------------------------------------------------------
+
+// Escribe el tiempo restante en el display. Solo toca el DOM cuando cambia
+// el segundo visible (se llama en cada frame del gameLoop).
+function pintarTiempo(forzar = false) {
+    const texto = 'Tiempo: ' + temporizador.obtenerTexto();
+    if (!forzar && texto === textoTiempoMostrado) return;
+    textoTiempoMostrado = texto;
+
+    showTimer(true, texto); // helper compartido de script.js (muestra el display)
+    const el = document.getElementById('timer-display');
+    if (el) el.classList.toggle('timer-display--urgente', temporizador.enRiesgo());
+}
+
+// Fin de partida controlado: detiene el timer y muestra el panel con el botón
+// de reiniciar. Reemplaza al alert() bloqueante que había antes.
+function manejarFinPartida(motivo) {
+    temporizador.detener();
+    pintarTiempo(true);
+
+    const mensaje = motivo === 'tiempo'
+        ? '¡Tiempo agotado!'
+        : '¡Juego terminado! No quedan movimientos posibles.';
+    mostrarPanelFin(mensaje);
+}
+
+function mostrarPanelFin(mensaje) {
+    const panel = document.getElementById('finPartida');
+    const msg = document.getElementById('finPartidaMensaje');
+    if (msg) msg.textContent = mensaje;
+    if (panel) panel.classList.add('visible');
+}
+
+function ocultarPanelFin() {
+    const panel = document.getElementById('finPartida');
+    if (panel) panel.classList.remove('visible');
+}
+
+/* Reinicio de la partida: tablero nuevo, temporizador de vuelta al límite y
+   panel de fin oculto. Si todavía no se había empezado, arranca desde cero. */
+function reiniciarPartida() {
+    if (!juego) {
+        const playBtn = document.getElementById('playBtn');
+        if (playBtn) playBtn.click();
+        return;
+    }
+
+    juego.reiniciar();
+    temporizador.reiniciar();
+    temporizador.iniciar();
+    ocultarPanelFin();
+    pintarTiempo(true);
 }
 
 // Convierte las coordenadas del mouse a pixels internos del canvas.

@@ -1145,6 +1145,66 @@ img.logo_footer { width: 5rem; height: auto; display: block; }
   display: none; /* Se muestra al iniciar la partida */
 }
 
+/* Temporizador en los últimos segundos: aviso rojo con parpadeo */
+.timer-display--urgente {
+  border-color: var(--neon-pink);
+  color: var(--neon-pink);
+  box-shadow: 0 0 10px rgba(255, 47, 214, 0.55);
+  animation: timerUrgente 1s steps(2, jump-none) infinite;
+}
+@keyframes timerUrgente {
+  50% { opacity: 0.5; }
+}
+
+/* PANEL DE FIN DE PARTIDA (tiempo agotado o sin movimientos posibles)
+   Cubre el área de juego (no la barra de acciones), por lo que el botón de
+   reinicio de la barra sigue disponible siempre. */
+.fin-partida {
+  position: absolute;
+  inset: 0;
+  z-index: 4; /* sobre el canvas (2), debajo del temporizador (5) */
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.2rem;
+  padding: 1rem;
+  text-align: center;
+  background-color: rgba(11, 14, 26, 0.9);
+}
+.fin-partida.visible { display: flex; }
+
+.fin-partida-mensaje {
+  margin: 0;
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(0.8rem, 2.2vw, 1.15rem);
+  line-height: 1.7;
+  color: var(--neon-yellow);
+  text-shadow: 0 0 12px rgba(250, 204, 21, 0.6);
+}
+
+/* Botón del panel de fin de partida: reinicia la partida */
+.btn-reiniciar {
+  padding: 0.8rem 1.6rem;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.8rem;
+  color: #0b0e1a;
+  background-color: var(--accent-orange);
+  border: 2px solid var(--neon-yellow);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  box-shadow: 0 0 14px rgba(255, 107, 0, 0.5);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.btn-reiniciar:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 22px rgba(255, 107, 0, 0.8);
+}
+.btn-reiniciar:focus-visible {
+  outline: 3px solid var(--accent-cyan);
+  outline-offset: 4px;
+}
+
 /* Velo oscuro: apaga el fondo solo durante la partida (debajo del canvas) */
 .game-veil {
   position: absolute;

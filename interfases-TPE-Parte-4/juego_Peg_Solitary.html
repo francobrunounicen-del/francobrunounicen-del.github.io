@@ -66,10 +66,19 @@
       <section class="game-container">
         <canvas id="canvas" width="755" height="472"></canvas>
         <div class="game-screen" id="gameScreen">
+          <!-- TEMPORIZADOR: cuenta regresiva con el límite de tiempo de la partida -->
+          <div id="timer-display" class="timer-display" role="timer">Tiempo: 02:00</div>
+
           <img src="img/Juego Peg Solitary.png" alt="Pegs On Neon Gameplay" class="game-cover">
           <button class="btn-play-overlay" id="playBtn" aria-label="Iniciar Juego">
             <i class="fa-solid fa-play"></i>
           </button>
+
+          <!-- PANEL DE FIN DE PARTIDA: aparece al agotarse el tiempo o quedar sin movimientos -->
+          <div class="fin-partida" id="finPartida">
+            <p class="fin-partida-mensaje" id="finPartidaMensaje">¡Tiempo agotado!</p>
+            <button class="btn-reiniciar" id="reiniciarPartidaBtn">Reiniciar partida</button>
+          </div>
         </div>
 
         <!-- BARRA DE ACCIONES DEL JUEGO -->
@@ -78,6 +87,7 @@
             <button class="btn-icon" title="Información"><i class="fa-solid fa-circle-info"></i></button>
             <button class="btn-icon" title="Favorito"><i class="fa-solid fa-heart"></i></button>
             <button class="btn-icon" title="Guardar"><i class="fa-solid fa-bookmark"></i></button>
+            <button class="btn-icon" title="Reiniciar partida" id="restartBtn" aria-label="Reiniciar partida"><i class="fa-solid fa-rotate-right"></i></button>
             <button class="btn-icon" title="Pantalla Completa" id="fullscreenBtn"><i class="fa-solid fa-expand"></i></button>
           </div>
           <div class="toolbar-right">
