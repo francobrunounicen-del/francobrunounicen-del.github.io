@@ -7,7 +7,8 @@
    Temporizador  -> cuenta regresiva con límite de tiempo
    Partida       -> coordina TODO: crea el tablero, arranca y reinicia la
                     partida, corre el bucle de render, traduce los eventos
-                    del puntero y actualiza la interfaz (timer + panel de fin)
+                    del mouse (mousedown / mousemove / mouseup) y actualiza
+                    la interfaz (timer + panel de estado/fin)
    =========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -331,8 +332,11 @@ class TableroJuego {
         }
     }
 
-    // Al presionar el mouse: si hay una ficha bajo el cursor la selecciona,
-    // calcula sus saltos válidos y deja todo listo para el arrastre
+    /* MOUSEDOWN (TP4, inciso 6): "encontrar la figura". Recorre las fichas de
+       arriba hacia abajo (la última dibujada es la que se ve encima) y busca cuál
+       contiene el punto del cursor. Si la encuentra la selecciona → feedback
+       visual (highlight cyan) y calcula sus saltos válidos → dibuja las flechas.
+       Una ficha se puede agarrar apenas un poco más allá de su borde (margenAgarre) */
     onMouseDown(x, y) {
         // La partida terminó (tiempo agotado o sin movimientos): no se aceptan más clics
         if (this.partidaTerminada) return;
@@ -350,18 +354,20 @@ class TableroJuego {
         }
     }
 
-    // Al mover el mouse: arrastra la ficha seleccionada siguiendo el cursor
+    /* MOUSEMOVE (TP4, inciso 6): "colocarle a la figura la posición del mouse".
+       Sólo mueve la ficha si hay una arrastrándose: si no hay ficha seleccionada
+       el movimiento del mouse no hace nada */
     onMouseMove(x, y) {
         if (this.fichaSeleccionada) {
             this.fichaSeleccionada.setPosition(x, y);
         }
     }
 
-    /* Al soltar el mouse: valida el destino contra los saltos calculados.
-       Si coincide, actualiza la grilla (origen vacío, destino ocupado), elimina
-       la ficha capturada, ubica la que saltó y suma el movimiento; si no
-       coincide, la ficha vuelve sola a su casilla. Al final verifica si la
-       partida terminó (inciso 5) */
+    /* MOUSEUP (TP4, inciso 6): "soltar la figura". Valida el destino contra los
+       saltos calculados. Si coincide, actualiza la grilla (origen vacío, destino
+       ocupado), elimina la ficha capturada, ubica la que saltó y suma el
+       movimiento; si no coincide, la ficha vuelve sola a su casilla. Al final
+       verifica si la partida terminó (inciso 5) */
     onMouseUp(x, y) {
         if (!this.fichaSeleccionada) return;
 
@@ -416,7 +422,8 @@ class TableroJuego {
         }
     }
 
-    // Cancela el arrastre sin soltar: la ficha vuelve a su casilla
+    // Red de seguridad: si el arrastre se interrumpe sin un mouseup (el cursor sale
+    // del canvas o la ventana pierde el foco), la ficha vuelve a su casilla
     cancelarArrastre() {
         if (!this.fichaSeleccionada) return;
         const posOrig = this.getCoordsPixeles(this.fichaSeleccionada.fila, this.fichaSeleccionada.col);
@@ -558,7 +565,7 @@ class Partida {
         this.tablero = new TableroJuego(this.ctx, 185.6, 55.9, 52.6, this.imgFondo, this.imgFicha);
         // El tablero avisa cuando la partida termina por quedarse sin movimientos
         this.tablero.alFinalizar = (motivo) => this.manejarFinPartida(motivo);
-        this.canvas.style.touchAction = 'none'; // permite arrastrar con el dedo sin scrollear la página
+        this.canvas.style.touchAction = 'none'; // sin scroll accidental al arrastrar sobre el tablero
 
         // Nueva partida: el temporizador vuelve al límite y empieza a correr
         this.temporizador.reiniciar();
@@ -700,32 +707,36 @@ class Partida {
         }
     }
 
-    // ---------- Entrada: eventos del puntero ----------
+    // ---------- Entrada: eventos del mouse ----------
 
-    // Vincula los eventos del puntero (más sus red de seguridad en window) con
-    // los manejadores que traducen las coordenadas y actualizan el tablero
+    // TP4 (Tema 4 - Parte B): MouseDown -> encontrar la figura bajo el cursor y
+    // darle feedback (highlight); MouseMove -> moverla SÓLO si se está arrastrando;
+    // MouseUp -> resolver el salto. Se registran los tres eventos del mouse y,
+    // como red de seguridad, su versión en window / salida del canvas.
     registrarEventos() {
-        this.canvas.addEventListener('pointerdown', (e) => this.manejarPunteroAbajo(e));
-        this.canvas.addEventListener('pointermove', (e) => this.manejarPunteroMover(e));
-        this.canvas.addEventListener('pointerup', (e) => this.manejarPunteroSoltar(e));
+        this.canvas.addEventListener('mousedown', (e) => this.manejarMouseAbajo(e));
+        this.canvas.addEventListener('mousemove', (e) => this.manejarMouseMover(e));
+        this.canvas.addEventListener('mouseup', (e) => this.manejarMouseSoltar(e));
 
-        // Red de seguridad por si la captura de puntero no estuvo disponible: el
-        // pointerup que llega a window (porque se soltó FUERA del canvas) también
-        // finaliza el arrastre. Soltar es idempotente: si ya no hay ficha
-        // seleccionada no hace nada, así que no se duplica ningún movimiento.
-        window.addEventListener('pointerup', (e) => {
+        // Red de seguridad: el mouseup que llega a window (porque se soltó FUERA
+        // del canvas) también finaliza el arrastre. Soltar es idempotente: si ya
+        // no hay ficha seleccionada no hace nada, así que no se duplica ningún movimiento.
+        window.addEventListener('mouseup', (e) => {
             if (!this.tablero || !this.tablero.fichaSeleccionada) return;
-            this.manejarPunteroSoltar(e);
+            this.manejarMouseSoltar(e);
         });
 
-        // Si el arrastre se interrumpe (se suelta fuera del canvas, cambia de
-        // ventana, etc.), la ficha vuelve a su casilla en vez de quedar "pegada"
+        // Si el arrastre se interrumpe (el cursor abandona el canvas o la ventana),
+        // la ficha vuelve a su casilla en vez de quedar "pegada" al mouse
         const cancelarSeguro = () => { if (this.tablero) this.tablero.cancelarArrastre(); };
-        this.canvas.addEventListener('pointercancel', cancelarSeguro);
-        window.addEventListener('pointercancel', cancelarSeguro);
+        this.canvas.addEventListener('mouseleave', cancelarSeguro);
+        window.addEventListener('blur', cancelarSeguro);
     }
 
-    // Convierte las coordenadas del puntero a pixels internos del canvas.
+    // Convierte las coordenadas del mouse a pixels internos del canvas.
+    // Usa clientX/clientY (relativas a la pantalla) llevadas al rectángulo del canvas
+    // con getBoundingClientRect(), en lugar de offsetX/offsetY, que quedan deprecated
+    // (como se aclaró en clase: "ojo con compatibilidad, Chrome, etc").
     // El lienzo se estira con CSS (755x472 -> tamaño del reproductor), así que sin
     // esta escala el clic se detectaba corrido: se agarraba solo el centro/arriba de la ficha.
     obtenerPosicionCanvas(e) {
@@ -738,28 +749,28 @@ class Partida {
         };
     }
 
-    // pointerdown: captura el puntero, escala las coordenadas al lienzo y
-    // avisa al tablero para que seleccione la ficha bajo el cursor
-    manejarPunteroAbajo(e) {
+    // MOUSEDOWN (TP4): escala las coordenadas al lienzo y avisa al tablero, que
+    // busca la figura bajo el cursor. Si la encuentra la marca como seleccionada
+    // (feedback: brillo cyan) y calcula sus destinos válidos (flechas animadas).
+    manejarMouseAbajo(e) {
         if (!this.tablero) return;
-        // Captura el puntero: si se suelta FUERA del canvas, pointermove/pointerup
-        // llegan igual acá y la ficha vuelve a su casilla, en vez de quedar colgada
-        // siguiendo al cursor. (try/catch: con punteros sintéticos no hay captura)
-        try { this.canvas.setPointerCapture(e.pointerId); } catch (err) { /* aplica el fallback de window */ }
+        this.canvas.focus(); // para poder jugar también con el teclado
         const pos = this.obtenerPosicionCanvas(e);
         this.tablero.onMouseDown(pos.x, pos.y);
     }
 
-    // pointermove: escala las coordenadas y arrastra la ficha siguiendo el cursor
-    manejarPunteroMover(e) {
+    // MOUSEMOVE (TP4): escala las coordenadas y le pasa la posición del mouse a
+    // la figura que se está arrastrando (si no hay ninguna, el tablero no hace nada)
+    manejarMouseMover(e) {
         if (!this.tablero) return;
         const pos = this.obtenerPosicionCanvas(e);
         this.tablero.onMouseMove(pos.x, pos.y);
     }
 
-    // pointerup: resuelve el movimiento en el tablero (o el retorno a la casilla)
-    // y refresca el panel de estado apenas se concreta el salto
-    manejarPunteroSoltar(e) {
+    // MOUSEUP (TP4): suelta la figura y resuelve el movimiento: si el destino es
+    // un salto válido lo concreta (captura la ficha del medio), si no vuelve a su
+    // casilla. Además refresca el panel de estado apenas se concreta el salto
+    manejarMouseSoltar(e) {
         if (!this.tablero) return;
         const pos = this.obtenerPosicionCanvas(e);
         this.tablero.onMouseUp(pos.x, pos.y);
