@@ -55,7 +55,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // momento" (el botón de la barra de acciones fue eliminado). Se reinicia únicamente
     // cuando la partida termina (victoria, sin movimientos o tiempo agotado).
     const btnReiniciar = document.getElementById('reiniciarPartidaBtn');
-    if (btnReiniciar) btnReiniciar.addEventListener('click', () => partida.reiniciar());
+    if (btnReiniciar) btnReiniciar.addEventListener('click', () => {
+        // Inciso 9: al terminar/reiniciar, se vuelve a abrir el selector para elegir
+        // la nueva variante de ficha de la próxima partida
+        if (selectorFichas) selectorFichas.classList.add('visible');
+    });
 });
 
 // ==========================================
