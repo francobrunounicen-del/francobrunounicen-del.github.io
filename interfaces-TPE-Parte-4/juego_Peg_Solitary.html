@@ -80,6 +80,26 @@
             <i class="fa-solid fa-play"></i>
           </button>
 
+          <!-- SELECTOR DE FICHAS (inciso 9): al apretar Jugar, el jugador elige con qué tipo de ficha jugar -->
+          <div class="selector-fichas" id="selectorFichas" role="group" aria-label="Elegir tipo de ficha">
+            <p class="selector-titulo">Elegí tu ficha</p>
+            <div class="selector-opciones">
+              <button class="selector-opcion is-elegida" data-tipo="violeta" aria-pressed="true">
+                <img src="img/ficha.png" alt="">
+                <span>Violeta</span>
+              </button>
+              <button class="selector-opcion" data-tipo="rosa" aria-pressed="false">
+                <img src="img/ficha-rosa.png" alt="">
+                <span>Rosa</span>
+              </button>
+              <button class="selector-opcion" data-tipo="verde" aria-pressed="false">
+                <img src="img/ficha-verde.png" alt="">
+                <span>Verde</span>
+              </button>
+            </div>
+            <button class="btn-comenzar" id="comenzarBtn">Comenzar</button>
+          </div>
+
           <!-- PANEL DE FIN DE PARTIDA: aparece al agotarse el tiempo o quedar sin movimientos -->
           <div class="fin-partida" id="finPartida">
             <p class="fin-partida-mensaje" id="finPartidaMensaje">¡Tiempo agotado!</p>

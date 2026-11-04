@@ -14,6 +14,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     const playBtn = document.getElementById('playBtn');
     const canvas = document.getElementById('canvas');
+    const selectorFichas = document.getElementById('selectorFichas');
+    const btnComenzar = document.getElementById('comenzarBtn');
 
     if (playBtn) {
         playBtn.addEventListener('click', () => {
@@ -21,7 +23,31 @@ document.addEventListener('DOMContentLoaded', () => {
             // El fondo del tablero se dibuja UNA sola vez dentro del canvas,
             // por eso ya no se reemplaza la imagen de portada (era la copia duplicada)
             canvas.style.display = 'block';
-            partida.iniciar();
+            // Inciso 9: en vez de arrancar directo, se elige el tipo de ficha
+            if (selectorFichas) selectorFichas.classList.add('visible');
+        });
+    }
+
+    // Cada opción marca la ficha elegida y quita la marca de las demás
+    if (selectorFichas) {
+        selectorFichas.querySelectorAll('.selector-opcion').forEach((opcion) => {
+            opcion.addEventListener('click', () => {
+                selectorFichas.querySelectorAll('.selector-opcion').forEach((otra) => {
+                    otra.classList.remove('is-elegida');
+                    otra.setAttribute('aria-pressed', 'false');
+                });
+                opcion.classList.add('is-elegida');
+                opcion.setAttribute('aria-pressed', 'true');
+            });
+        });
+    }
+
+    // Comenzar: cierra el selector y arranca la partida con la ficha elegida
+    if (btnComenzar) {
+        btnComenzar.addEventListener('click', () => {
+            const elegida = selectorFichas && selectorFichas.querySelector('.selector-opcion.is-elegida');
+            if (selectorFichas) selectorFichas.classList.remove('visible');
+            partida.iniciar(elegida ? elegida.dataset.tipo : 'violeta');
         });
     }
 
@@ -536,9 +562,20 @@ class Partida {
         // Usamos 'onerror' para que no rompa la ejecución si no encuentra los archivos
         this.imgFondo.onerror = () => console.warn("Aviso: No se encontró la imagen de fondo. Se usará un fondo plano.");
 
-        this.imgFicha = new Image();
-        this.imgFicha.src = 'img/ficha.png';
-        this.imgFicha.onerror = () => console.warn("Aviso: No se encontró la imagen de ficha. Se usarán círculos.");
+        // Variantes de ficha (inciso 9): se cargan las 3 una sola vez
+        this.imgFichas = {
+            violeta: new Image(),
+            rosa: new Image(),
+            verde: new Image()
+        };
+        this.imgFichas.violeta.src = 'img/ficha.png';
+        this.imgFichas.rosa.src = 'img/ficha-rosa.png';
+        this.imgFichas.verde.src = 'img/ficha-verde.png';
+        // Usamos 'onerror' para que no rompa la ejecución si no encuentra los archivos
+        this.imgFichas.violeta.onerror = () => console.warn("Aviso: No se encontró la imagen de ficha. Se usarán círculos.");
+        this.imgFichas.rosa.onerror = () => console.warn("Aviso: No se encontró la imagen de ficha rosa. Se usará un círculo.");
+        this.imgFichas.verde.onerror = () => console.warn("Aviso: No se encontró la imagen de ficha verde. Se usará un círculo.");
+        this.imgFicha = this.imgFichas.violeta;   // la que usa el tablero (la elige el jugador)
 
         // El bucle se ata a esta instancia: si no, perdería el "this" al ejecutarse
         this.bucle = this.bucle.bind(this);
@@ -548,9 +585,12 @@ class Partida {
 
     // ---------- Ciclo de vida de la partida ----------
 
-    // Arranca una partida: crea el tablero, prende el temporizador y enciende
-    // el bucle de render (con guardia: nunca dos cadenas de frames en paralelo)
-    iniciar() {
+    // Arranca una partida con la ficha elegida en el selector: crea el tablero,
+    // prende el temporizador y enciende el bucle de render (con guardia: nunca
+    // dos cadenas de frames en paralelo)
+    iniciar(tipoFicha = 'violeta') {
+        // Inciso 9: el tablero se dibuja con el tipo de ficha que eligió el jugador
+        this.imgFicha = this.imgFichas[tipoFicha] || this.imgFichas.violeta;
         this.tablero = new TableroJuego(this.ctx, 185, 56, 53, this.imgFondo, this.imgFicha);
         // El tablero avisa cuando la partida termina por quedarse sin movimientos
         this.tablero.alFinalizar = (motivo) => this.manejarFinPartida(motivo);

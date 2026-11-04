@@ -1255,6 +1255,93 @@ img.logo_footer { width: 5rem; height: auto; display: block; }
   outline-offset: 4px;
 }
 
+/* SELECTOR DE FICHAS (inciso 9): aparece al apretar Jugar, antes de arrancar
+   la partida. Cubre el área de juego, por encima del botón play. */
+.selector-fichas {
+  position: absolute;
+  inset: 0;
+  z-index: 12; /* sobre el canvas (2) y el botón play (10) */
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9rem;
+  padding: 1rem;
+  text-align: center;
+  background-color: rgba(11, 14, 26, 0.94);
+}
+.selector-fichas.visible { display: flex; }
+
+.selector-titulo {
+  margin: 0;
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(0.6rem, 1.7vw, 0.85rem);
+  color: var(--accent-cyan);
+  text-shadow: 0 0 12px rgba(0, 229, 255, 0.6);
+}
+
+.selector-opciones {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.selector-opcion {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 0.8rem;
+  background-color: rgba(22, 27, 46, 0.85);
+  border: 2px solid var(--purple);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.55rem;
+  color: #e6e1ff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+}
+.selector-opcion img {
+  width: 56px;
+  height: 56px;
+  display: block;
+}
+.selector-opcion:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent-cyan);
+}
+.selector-opcion.is-elegida {
+  border-color: var(--neon-yellow);
+  box-shadow: 0 0 16px rgba(250, 204, 21, 0.6), inset 0 0 8px rgba(250, 204, 21, 0.25);
+}
+.selector-opcion:focus-visible {
+  outline: 3px solid var(--accent-cyan);
+  outline-offset: 3px;
+}
+
+/* Botón Comenzar: arranca la partida con la ficha elegida */
+.btn-comenzar {
+  padding: 0.8rem 1.6rem;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.8rem;
+  color: #0b0e1a;
+  background-color: var(--accent-cyan);
+  border: 2px solid var(--neon-yellow);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  box-shadow: 0 0 14px rgba(0, 229, 255, 0.5);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.btn-comenzar:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 22px rgba(0, 229, 255, 0.8);
+}
+.btn-comenzar:focus-visible {
+  outline: 3px solid var(--accent-orange);
+  outline-offset: 4px;
+}
+
 /* Velo oscuro: apaga el fondo solo durante la partida (debajo del canvas) */
 .game-veil {
   position: absolute;
