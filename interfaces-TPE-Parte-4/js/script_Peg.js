@@ -20,8 +20,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (playBtn) {
         playBtn.addEventListener('click', () => {
             playBtn.classList.add('is-playing');
-            // El fondo del tablero se dibuja UNA sola vez dentro del canvas,
-            // por eso ya no se reemplaza la imagen de portada (era la copia duplicada)
             canvas.style.display = 'block';
             // Inciso 9: en vez de arrancar directo, se elige el tipo de ficha
             if (selectorFichas) selectorFichas.classList.add('visible');
