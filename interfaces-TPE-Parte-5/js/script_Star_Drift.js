@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function empezar() {
         juego.estado = 'jugando';
-        juego.vidas = 3;
+        juego.vidas = 5;
         juego.puntos = 0;
         tubos = [];
         pajaro.y = 300;
