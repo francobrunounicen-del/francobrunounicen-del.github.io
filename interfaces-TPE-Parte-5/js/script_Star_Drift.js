@@ -3,6 +3,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // -------------------------------------------------------------------------
     // 1. CONSTANTES Y CONFIGURACIÓN GLOBAL
     // -------------------------------------------------------------------------
+    // ADAPTACION: el contenedor de juego usa aspect-ratio 16/10 (igual que BlockA y Peg).
+    // Se leen las dimensiones reales del contenedor para no hardcodear 800x600.
+    const _gc = document.getElementById('game-container');
+    const ANCHO_JUEGO = (_gc && _gc.clientWidth) ? _gc.clientWidth : 800;
+    const ALTO_JUEGO = (_gc && _gc.clientHeight) ? _gc.clientHeight : 500;
     const GRAVEDAD = 1400; // px/s²
     const IMPULSO = 500;   // px/s
     const HUECO_MIN = 120;
@@ -144,11 +149,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // -------------------------------------------------------------------------
     function crearTubo() {
         const hueco = Math.max(HUECO_MIN, HUECO_INICIAL - tiempo * 5) + azar(-20, 20);
-        const centro = azar(100, 500 - hueco / 2);
+        const centro = azar(100, ALTO_JUEGO - hueco / 2);
         const el = crearDivs(centro, hueco);
 
         tubos.push({
-            x: 800, // Empieza al borde derecho del contenedor
+            x: ANCHO_JUEGO, // Empieza al borde derecho del contenedor
             centro,
             hueco,
             el,
@@ -156,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return { x: this.x, y: 0, w: ANCHO_TUBO, h: this.centro - this.hueco / 2 };
             },
             abajo() {
-                return { x: this.x, y: this.centro + this.hueco / 2, w: ANCHO_TUBO, h: 600 - (this.centro + this.hueco / 2) };
+                return { x: this.x, y: this.centro + this.hueco / 2, w: ANCHO_TUBO, h: ALTO_JUEGO - (this.centro + this.hueco / 2) };
             }
         });
         distancia = azar(200, 500); // Distancia hasta el siguiente obstáculo
@@ -179,7 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Limitar límites de pantalla superior e inferior
         if (pajaro.y < 0) { pajaro.y = 0; pajaro.vy = 0; }
-        if (pajaro.y > 560) { pajaro.chocar(); }
+        if (pajaro.y > ALTO_JUEGO - 40) { pajaro.chocar(); }
 
         // Movimiento de obstáculos
         distancia -= vel * dt;
@@ -220,7 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Parallax Scrolling (movimiento de las 4 capas de fondo)
         capas.forEach((c, i) => {
-            c.x = (c.x + vel * FACTORES[i] * dt) % 800;
+            c.x = (c.x + vel * FACTORES[i] * dt) % ANCHO_JUEGO;
         });
     }
 

@@ -1,0 +1,155 @@
+/* ===== Star Drift - Area de juego ===== */
+#gameScreen {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  margin: 0 auto;
+  overflow: hidden;
+  background: #000;
+  border: 2px solid #333;
+}
+
+#game-container {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  overflow: hidden;
+}
+
+/* ===== Parallax 4 capas ===== */
+.parallax-layer {
+  position: absolute;
+  top: 0; left: 0;
+  width: 200%; height: 100%;
+  background-repeat: repeat-x;
+  background-size: auto 100%;
+  will-change: transform;
+}
+.parallax-layer.l1 { background-image: url('../img/layer1.png'); animation: scroll1 8s linear infinite; }
+.parallax-layer.l2 { background-image: url('../img/layer2.png'); animation: scroll2 6s linear infinite; }
+.parallax-layer.l3 { background-image: url('../img/layer3.png'); animation: scroll3 4s linear infinite; }
+.parallax-layer.l4 { background-image: url('../img/layer4.png'); animation: scroll4 2s linear infinite; }
+
+@keyframes scroll1 { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@keyframes scroll2 { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@keyframes scroll3 { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@keyframes scroll4 { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* ===== Nave / Pajaro ===== */
+#ship {
+  position: absolute;
+  width: 40px; height: 30px;
+  background: url('../img/ship.png') no-repeat center / contain;
+  z-index: 10;
+  transition: transform 0.05s linear;
+}
+#ship.vuela { animation: aletear 0.4s steps(2) infinite; }
+#ship.impulso { animation: impulso 0.3s ease-out; }
+#ship.choca { animation: explosion 0.5s ease-out; }
+
+@keyframes aletear {
+  0% { background-position: 0 0; }
+  50% { background-position: -40px 0; }
+  100% { background-position: 0 0; }
+}
+@keyframes impulso {
+  0% { transform: scale(1) rotate(-15deg); }
+  50% { transform: scale(1.2) rotate(-25deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+@keyframes explosion {
+  0% { transform: scale(1); opacity: 1; filter: brightness(2); }
+  50% { transform: scale(1.5); opacity: 0.6; filter: brightness(3) hue-rotate(90deg); }
+  100% { transform: scale(0.5); opacity: 0; }
+}
+
+/* ===== Tuberias (obstaculos) ===== */
+.tubo-obstaculo {
+  position: absolute;
+  width: 60px;
+  background: linear-gradient(to right, #2e7d32, #43a047, #2e7d32);
+  border: 2px solid #1b5e20;
+  z-index: 5;
+}
+
+/* ===== Items (spritesheet) ===== */
+.item {
+  position: absolute;
+  width: 32px; height: 32px;
+  background-repeat: no-repeat;
+  background-size: 64px 32px;
+  z-index: 6;
+  animation: spriteAnim 0.6s steps(2) infinite;
+}
+.item.moneda {
+  background-image: url('../img/moneda.png');
+}
+.item.murcielago {
+  background-image: url('../img/murcielago.png');
+  animation: spriteAnim 0.4s steps(2) infinite;
+}
+@keyframes spriteAnim {
+  0% { background-position: 0 0; }
+  100% { background-position: -64px 0; }
+}
+.item.tomado {
+  animation: recoger 0.4s ease-out forwards;
+}
+@keyframes recoger {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(2); opacity: 0; }
+}
+
+/* ===== HUD ===== */
+#hud {
+  position: absolute;
+  top: 10px; left: 10px;
+  color: #fff;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 12px;
+  z-index: 20;
+  background: rgba(0,0,0,0.5);
+  padding: 6px 10px;
+  border-radius: 4px;
+}
+
+/* ===== Game Over ===== */
+#game-over-screen, .game-over {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0,0,0,0.85);
+  color: #fff;
+  padding: 30px;
+  border-radius: 8px;
+  text-align: center;
+  z-index: 30;
+  font-family: 'Press Start 2P', monospace;
+}
+#game-over-screen.hidden, .game-over.hidden { display: none; }
+#comenzarBtn {
+  margin-top: 15px;
+  padding: 8px 16px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  cursor: pointer;
+  background: #ff5722;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+}
+
+/* ===== Portada ===== */
+.game-cover { position: absolute; top:0; left:0; width:100%; height:100%; object-fit: cover; z-index: 15; }
+.btn-play-overlay {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 70px; height: 70px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255,255,255,0.9);
+  font-size: 28px;
+  cursor: pointer;
+  z-index: 16;
+}
