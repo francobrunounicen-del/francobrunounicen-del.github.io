@@ -14,6 +14,7 @@
   top: 0; left: 0;
   width: 100%; height: 100%;
   overflow: hidden;
+  background: #0b0e1a;
 }
 
 /* ===== Parallax 4 capas ===== */
@@ -24,11 +25,26 @@
   background-repeat: repeat-x;
   background-size: auto 100%;
   will-change: transform;
+  opacity: 0.25;
+  animation: scrollParallax 4s linear infinite;
 }
-.parallax-layer.l1 { background-image: url('../img/layer1.png'); animation: scroll1 8s linear infinite; }
-.parallax-layer.l2 { background-image: url('../img/layer2.png'); animation: scroll2 6s linear infinite; }
-.parallax-layer.l3 { background-image: url('../img/layer3.png'); animation: scroll3 4s linear infinite; }
-.parallax-layer.l4 { background-image: url('../img/layer4.png'); animation: scroll4 2s linear infinite; }
+.parallax-layer.l1 { animation-duration: 8s; background-color: rgba(255,255,255,0.05); }
+.parallax-layer.l2 { animation-duration: 6s; background-color: rgba(100,149,237,0.15); }
+.parallax-layer.l3 { animation-duration: 4s; background-color: rgba(255,215,0,0.1); }
+.parallax-layer.l4 { animation-duration: 2s; background-color: rgba(255,255,255,0.2); }
+
+@keyframes scrollParallax {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.parallax-layer.l1 { background-color: rgba(255,255,255,0.05); }
+.parallax-layer.l2 { background-color: rgba(100,149,237,0.15); }
+.parallax-layer.l3 { background-color: rgba(255,215,0,0.1); }
+.parallax-layer.l4 { background-color: rgba(255,255,255,0.2); }
+.parallax-layer.l1 { background-color: rgba(255,255,255,0.05); }
+.parallax-layer.l2 { background-color: rgba(100,149,237,0.15); }
+.parallax-layer.l3 { background-color: rgba(255,215,0,0.1); }
+.parallax-layer.l4 { background-color: rgba(255,255,255,0.2); }
 
 @keyframes scroll1 { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 @keyframes scroll2 { from { transform: translateX(0); } to { transform: translateX(-50%); } }
@@ -38,30 +54,38 @@
 /* ===== Nave / Pajaro ===== */
 #ship {
   position: absolute;
-  width: 40px; height: 30px;
-  background: url('../img/ship.png') no-repeat center / contain;
+  width: 64px; height: 64px;
+  background: url('../img/nave.png') no-repeat;
+  background-size: 704px 256px;
+  border: 1px solid #fff;
   z-index: 10;
-  transition: transform 0.05s linear;
 }
-#ship.vuela { animation: aletear 0.4s steps(2) infinite; }
-#ship.impulso { animation: impulso 0.3s ease-out; }
-#ship.choca { animation: explosion 0.5s ease-out; }
+#ship.vuela { animation: vuelo 0.5s steps(8) infinite; }
+#ship.cae { animation: planeo 0.6s steps(4) infinite; }
+#ship.impulso { animation: impulso 0.4s steps(6); }
+#ship.choca { animation: explosion 0.8s steps(11); }
 
-@keyframes aletear {
-  0% { background-position: 0 0; }
-  50% { background-position: -40px 0; }
-  100% { background-position: 0 0; }
+/* Fila 3 (vuelo): 8 frames de 64px */
+@keyframes vuelo {
+  from { background-position: 0 -128px; }
+  to { background-position: -512px -128px; }
 }
+/* Fila 4 (planeo): 4 frames */
+@keyframes planeo {
+  from { background-position: 0 -192px; }
+  to { background-position: -256px -192px; }
+}
+/* Fila 2 (impulso): 6 frames */
 @keyframes impulso {
-  0% { transform: scale(1) rotate(-15deg); }
-  50% { transform: scale(1.2) rotate(-25deg); }
-  100% { transform: scale(1) rotate(0deg); }
+  from { background-position: 0 -64px; }
+  to { background-position: -384px -64px; }
 }
+/* Fila 1 (explosion): 11 frames */
 @keyframes explosion {
-  0% { transform: scale(1); opacity: 1; filter: brightness(2); }
-  50% { transform: scale(1.5); opacity: 0.6; filter: brightness(3) hue-rotate(90deg); }
-  100% { transform: scale(0.5); opacity: 0; }
+  from { background-position: 0 0; }
+  to { background-position: -704px 0; }
 }
+
 
 /* ===== Tuberias (obstaculos) ===== */
 .tubo-obstaculo {

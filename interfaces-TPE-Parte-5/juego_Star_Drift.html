@@ -365,32 +365,15 @@
   <script src="js/script.js"></script>
   <script src="js/script_Star_Drift.js"></script>
   <script>
-    // Crear capas de parallax y items animados (sin tocar script_Star_Drift.js)
+    // Crear capas de parallax (sin tocar script_Star_Drift.js)
     (function () {
       var gc = document.getElementById('game-container');
       if (!gc) return;
-      // Parallax 4 capas
       for (var i = 1; i <= 4; i++) {
         var l = document.createElement('div');
         l.className = 'parallax-layer l' + i;
         gc.appendChild(l);
       }
-      // Items: moneda (suma puntos) y murcielago (resta vida) que aparecen periodicamente
-      function crearItem(tipo) {
-        var it = document.createElement('div');
-        it.className = 'item ' + tipo;
-        it.style.left = '800px';
-        it.style.top = (100 + Math.random() * 400) + 'px';
-        gc.appendChild(it);
-        var x = 800;
-        var anim = setInterval(function () {
-          x -= 3;
-          it.style.left = x + 'px';
-          if (x < -40) { clearInterval(anim); it.remove(); }
-        }, 16);
-      }
-      setInterval(function () { crearItem('moneda'); }, 4000);
-      setInterval(function () { crearItem('murcielago'); }, 7000);
     })();
 
     // Ocultar la portada y mostrar el HUD solo al jugar (sin tocar script_Star_Drift.js)
