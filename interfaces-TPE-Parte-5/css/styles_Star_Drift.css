@@ -7,7 +7,6 @@
   background: #0b0e1a;
 }
 
-/* ===== Parallax - 4 capas de fondo ===== */
 /* ===== Parallax 4 capas ===== */
 .parallax-layer {
   position: absolute;
@@ -50,7 +49,7 @@
   to   { transform: translateX(-512px); }
 }
 
-/* ===== Nave (spritesheet nave.png: 704×256px, frames de 64×64px) ===== */
+/* ===== Nave (spritesheet nave.png: 888×168px, frames de 74×42px) ===== */
 #ship {
   position: absolute;
   width: 74px; height: 42px;
@@ -84,16 +83,6 @@
   to   { background-position: -385px 0; }
 }
 
-/* ===== Par de tubos (contenedor posicionado) ===== */
-.par-tubos {
-  position: absolute;
-  top: 0;
-  width: 60px;
-  height: 100%;
-  pointer-events: none;
-  z-index: 5;
-}
-
 /* ===== Obstáculos (tubo superior e inferior) ===== */
 .tubo-obstaculo {
   position: absolute;
@@ -105,12 +94,12 @@
   z-index: 5;
 }
 
-/* ===== Items animados (spritesheet 64×32px) =====
+/* ===== Items animados ===== */
 .item {
   position: absolute;
   width: 32px; height: 32px;
   background-repeat: no-repeat;
-  background-size: 64px 32px;
+  background-size: 32px 32px;
   z-index: 6;
   pointer-events: none;
   animation: spriteAnim 0.6s steps(2) infinite;
@@ -122,14 +111,13 @@
 }
 @keyframes spriteAnim {
   from { background-position: 0 0; }
-  to   { background-position: -64px 0; }
+  to   { background-position: -32px 0; }
 }
 .item.tomado { animation: recoger 0.4s ease-out forwards; }
 @keyframes recoger {
   from { transform: scale(1); opacity: 1; }
   to   { transform: scale(2); opacity: 0; }
 }
-*/
 /* ===== HUD (puntos y vidas en pantalla) ===== */
 #hud {
   position: absolute;

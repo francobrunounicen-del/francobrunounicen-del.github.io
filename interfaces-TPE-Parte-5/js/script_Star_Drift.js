@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const GRAVEDAD = 600;       // px/s² (reducida para que sea jugable)
     const IMPULSO = 500;        // px/s (moderado)
     const HUECO_MIN = 125;      // Hueco mínimo entre tubos
+    const MARGEN_Y = 18;        // Margen vertical para los límites de pantalla
     const HUECO_INICIAL = 190;  // Hueco inicial más amplio
     const ANCHO_TUBO = 60;
     const PUNTOS_OBJETIVO = 50; // Meta de puntaje para ganar (Requisito 6)
@@ -19,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Estado general del juego
     const juego = {
         estado: 'menu', // 'menu', 'jugando', 'fin'
-        vidas: 30,
+        vidas: 10,
         puntos: 0,
         velBase: 220
     };
@@ -53,8 +54,8 @@ document.addEventListener('DOMContentLoaded', () => {
         x: 100,
         y: ALTO_JUEGO / 2,
         vy: 0,
-        w: 64, // Coincide con el ancho del frame de nave.png
-        h: 64, // Coincide con el alto del frame de nave.png
+        w: 74, // Coincide con el ancho del frame de nave.png
+        h: 42, // Coincide con el alto del frame de nave.png
         invulnerable: 0,
         el: document.getElementById('ship'),
 
@@ -89,12 +90,12 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         hitbox() {
-            // Hitbox ajustada al cuerpo central de la nave
+            // Hitbox ajustada al cuerpo central de la nave (74x42)
             return {
-                x: this.x + 14,
-                y: this.y + 18,
-                w: this.w - 28,
-                h: this.h - 36
+                x: this.x + 10,
+                y: this.y + 8,
+                w: this.w - 20,
+                h: this.h - 16
             };
         }
     };
@@ -290,8 +291,6 @@ document.addEventListener('DOMContentLoaded', () => {
         nave.vy += GRAVEDAD * dt;
         nave.y += nave.vy * dt;
         nave.actualizarEstadoVuelo();
-
-        const MARGEN_Y = 18; // el mismo que usa hitbox()
 
         if (nave.y < -MARGEN_Y) {
             nave.y = -MARGEN_Y;
