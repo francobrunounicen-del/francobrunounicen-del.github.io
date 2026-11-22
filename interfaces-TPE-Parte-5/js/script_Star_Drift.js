@@ -164,6 +164,8 @@ document.addEventListener('DOMContentLoaded', () => {
         nave.vy = 0;
         nave.invulnerable = 0;
         nave.ponerEstado('vuela');
+        // Mostrar nave al iniciar el juego
+        if (nave.el) nave.el.style.display = 'block';
 
         if (gameOverScreen) gameOverScreen.classList.add('hidden');
         pausarParallax(false);

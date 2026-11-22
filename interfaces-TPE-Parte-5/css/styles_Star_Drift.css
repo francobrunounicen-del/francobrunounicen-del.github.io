@@ -1,14 +1,11 @@
-/* ===== Star Drift - Area de juego ===== */
-#gameScreen {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 16 / 10;
-  margin: 0 auto;
-  overflow: hidden;
-  background: #000;
-  border: 2px solid #333;
-}
+/* ===================================================================
+   styles_Star_Drift.css
+   Estilos específicos del juego Star Drift.
+   Los estilos compartidos (.game-container, .game-screen, .game-cover,
+   .btn-play-overlay, .game-toolbar, etc.) ya están en styles.css.
+   =================================================================== */
 
+/* ===== Contenedor interno del área jugable ===== */
 #game-container {
   position: absolute;
   top: 0; left: 0;
@@ -17,7 +14,7 @@
   background: #0b0e1a;
 }
 
-/* ===== Parallax 4 capas ===== */
+/* ===== Parallax - 4 capas de fondo ===== */
 .parallax-layer {
   position: absolute;
   top: 0; left: 0;
@@ -28,103 +25,106 @@
   opacity: 0.25;
   animation: scrollParallax 4s linear infinite;
 }
-.parallax-layer.l1 { animation-duration: 8s; background-color: rgba(255,255,255,0.05); }
-.parallax-layer.l2 { animation-duration: 6s; background-color: rgba(100,149,237,0.15); }
-.parallax-layer.l3 { animation-duration: 4s; background-color: rgba(255,215,0,0.1); }
-.parallax-layer.l4 { animation-duration: 2s; background-color: rgba(255,255,255,0.2); }
+.parallax-layer.l1 { animation-duration: 8s;  background-color: rgba(255, 255, 255, 0.05); }
+.parallax-layer.l2 { animation-duration: 6s;  background-color: rgba(100, 149, 237, 0.15); }
+.parallax-layer.l3 { animation-duration: 4s;  background-color: rgba(255, 215,   0, 0.10); }
+.parallax-layer.l4 { animation-duration: 2s;  background-color: rgba(255, 255, 255, 0.20); }
 
 @keyframes scrollParallax {
   from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+  to   { transform: translateX(-50%); }
 }
-.parallax-layer.l1 { background-color: rgba(255,255,255,0.05); }
-.parallax-layer.l2 { background-color: rgba(100,149,237,0.15); }
-.parallax-layer.l3 { background-color: rgba(255,215,0,0.1); }
-.parallax-layer.l4 { background-color: rgba(255,255,255,0.2); }
-.parallax-layer.l1 { background-color: rgba(255,255,255,0.05); }
-.parallax-layer.l2 { background-color: rgba(100,149,237,0.15); }
-.parallax-layer.l3 { background-color: rgba(255,215,0,0.1); }
-.parallax-layer.l4 { background-color: rgba(255,255,255,0.2); }
 
-@keyframes scroll1 { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-@keyframes scroll2 { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-@keyframes scroll3 { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-@keyframes scroll4 { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-
-/* ===== Nave / Pajaro ===== */
+/* ===== Nave (spritesheet nave.png: 704×256px, frames de 64×64px) ===== */
 #ship {
   position: absolute;
   width: 64px; height: 64px;
   background: url('../img/nave.png') no-repeat;
   background-size: 704px 256px;
-  border: 1px solid #fff;
   z-index: 10;
+  pointer-events: none;
 }
-#ship.vuela { animation: vuelo 0.5s steps(8) infinite; }
-#ship.cae { animation: planeo 0.6s steps(4) infinite; }
+/* Fila 3 (vuelo normal): 8 frames */
+#ship.vuela  { animation: vuelo    0.5s steps(8)  infinite; }
+/* Fila 4 (planeo/caída): 4 frames */
+#ship.cae    { animation: planeo   0.6s steps(4)  infinite; }
+/* Fila 2 (impulso/propulsión): 6 frames */
 #ship.impulso { animation: impulso 0.4s steps(6); }
-#ship.choca { animation: explosion 0.8s steps(11); }
+/* Fila 1 (explosión): 11 frames */
+#ship.choca  { animation: explosion 0.8s steps(11); }
 
-/* Fila 3 (vuelo): 8 frames de 64px */
 @keyframes vuelo {
   from { background-position: 0 -128px; }
-  to { background-position: -512px -128px; }
+  to   { background-position: -512px -128px; }
 }
-/* Fila 4 (planeo): 4 frames */
 @keyframes planeo {
   from { background-position: 0 -192px; }
-  to { background-position: -256px -192px; }
+  to   { background-position: -256px -192px; }
 }
-/* Fila 2 (impulso): 6 frames */
 @keyframes impulso {
   from { background-position: 0 -64px; }
-  to { background-position: -384px -64px; }
+  to   { background-position: -384px -64px; }
 }
-/* Fila 1 (explosion): 11 frames */
 @keyframes explosion {
   from { background-position: 0 0; }
-  to { background-position: -704px 0; }
+  to   { background-position: -704px 0; }
 }
 
-
-/* ===== Tuberias (obstaculos) ===== */
-.tubo-obstaculo {
+/* ===== Par de tubos (contenedor posicionado) ===== */
+.par-tubos {
   position: absolute;
+  top: 0;
   width: 60px;
-  background: linear-gradient(to right, #2e7d32, #43a047, #2e7d32);
-  border: 2px solid #1b5e20;
+  height: 100%;
+  pointer-events: none;
   z-index: 5;
 }
 
-/* ===== Items (spritesheet) ===== */
+/* ===== Obstáculos (tubo superior e inferior) ===== */
+.tubo-obstaculo {
+  position: absolute;
+  width: 60px;
+  left: 0;
+  background: linear-gradient(to right, #2e7d32, #43a047, #2e7d32);
+  border: 2px solid #1b5e20;
+  box-sizing: border-box;
+  z-index: 5;
+}
+.tubo-obstaculo.tubo-arriba {
+  border-radius: 0 0 6px 6px;
+  border-bottom: 4px solid #a5d6a7;
+}
+.tubo-obstaculo.tubo-abajo {
+  border-radius: 6px 6px 0 0;
+  border-top: 4px solid #a5d6a7;
+}
+
+/* ===== Items animados (spritesheet 64×32px) ===== */
 .item {
   position: absolute;
   width: 32px; height: 32px;
   background-repeat: no-repeat;
   background-size: 64px 32px;
   z-index: 6;
+  pointer-events: none;
   animation: spriteAnim 0.6s steps(2) infinite;
 }
-.item.moneda {
-  background-image: url('../img/moneda.png');
-}
+.item.moneda    { background-image: url('../img/moneda.png'); }
 .item.murcielago {
   background-image: url('../img/murcielago.png');
-  animation: spriteAnim 0.4s steps(2) infinite;
+  animation-duration: 0.4s;
 }
 @keyframes spriteAnim {
-  0% { background-position: 0 0; }
-  100% { background-position: -64px 0; }
+  from { background-position: 0 0; }
+  to   { background-position: -64px 0; }
 }
-.item.tomado {
-  animation: recoger 0.4s ease-out forwards;
-}
+.item.tomado { animation: recoger 0.4s ease-out forwards; }
 @keyframes recoger {
-  0% { transform: scale(1); opacity: 1; }
-  100% { transform: scale(2); opacity: 0; }
+  from { transform: scale(1); opacity: 1; }
+  to   { transform: scale(2); opacity: 0; }
 }
 
-/* ===== HUD ===== */
+/* ===== HUD (puntos y vidas en pantalla) ===== */
 #hud {
   position: absolute;
   top: 10px; left: 10px;
@@ -132,48 +132,49 @@
   font-family: 'Press Start 2P', monospace;
   font-size: 12px;
   z-index: 20;
-  background: rgba(0,0,0,0.5);
-  padding: 6px 10px;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 8px 12px;
   border-radius: 4px;
+  pointer-events: none;
 }
 
-/* ===== Game Over ===== */
-#game-over-screen, .game-over {
+/* ===== Pantalla de Game Over ===== */
+#game-over-screen {
   position: absolute;
   top: 50%; left: 50%;
   transform: translate(-50%, -50%);
-  background: rgba(0,0,0,0.85);
+  background: rgba(10, 10, 20, 0.92);
   color: #fff;
-  padding: 30px;
+  padding: 30px 40px;
   border-radius: 8px;
+  border: 2px solid #ff5722;
+  box-shadow: 0 0 25px rgba(255, 87, 34, 0.5);
   text-align: center;
   z-index: 30;
   font-family: 'Press Start 2P', monospace;
 }
-#game-over-screen.hidden, .game-over.hidden { display: none; }
+#game-over-screen.hidden { display: none; }
+#game-over-screen h2 {
+  color: #ff5252;
+  font-size: 18px;
+  margin-bottom: 15px;
+}
+
+/* Botón Reiniciar */
 #comenzarBtn {
   margin-top: 15px;
-  padding: 8px 16px;
+  padding: 10px 20px;
   font-family: 'Press Start 2P', monospace;
-  font-size: 10px;
+  font-size: 11px;
   cursor: pointer;
   background: #ff5722;
   color: #fff;
   border: none;
   border-radius: 4px;
+  transition: transform 0.15s, background-color 0.15s;
 }
-
-/* ===== Portada ===== */
-.game-cover { position: absolute; top:0; left:0; width:100%; height:100%; object-fit: cover; z-index: 15; }
-.btn-play-overlay {
-  position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  width: 70px; height: 70px;
-  border-radius: 50%;
-  border: none;
-  background: rgba(255,255,255,0.9);
-  font-size: 28px;
-  cursor: pointer;
-  z-index: 16;
+#comenzarBtn:hover {
+  background: #ff7043;
+  transform: scale(1.05);
 }
