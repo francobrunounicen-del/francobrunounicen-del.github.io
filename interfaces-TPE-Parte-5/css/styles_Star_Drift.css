@@ -8,24 +8,46 @@
 }
 
 /* ===== Parallax - 4 capas de fondo ===== */
+/* ===== Parallax 4 capas ===== */
 .parallax-layer {
   position: absolute;
   top: 0; left: 0;
-  width: 200%; height: 100%;
+  width: 200%;
+  height: 100%;
   background-repeat: repeat-x;
-  background-size: auto 100%;
+  background-size: 512px 100%;
   will-change: transform;
-  opacity: 0.25;
   animation: scrollParallax 4s linear infinite;
 }
-.parallax-layer.l1 { animation-duration: 8s;  background-color: rgba(255, 255, 255, 0.05); }
-.parallax-layer.l2 { animation-duration: 6s;  background-color: rgba(100, 149, 237, 0.15); }
-.parallax-layer.l3 { animation-duration: 4s;  background-color: rgba(255, 215,   0, 0.10); }
-.parallax-layer.l4 { animation-duration: 2s;  background-color: rgba(255, 255, 255, 0.20); }
+
+.parallax-layer.l1 {
+  background-image: url('../img/layer1.png');
+  animation-duration: 20s;
+  z-index: 1;
+}
+.parallax-layer.l2 {
+  background-image: url('../img/layer2.png');
+  mix-blend-mode: screen;
+  animation-duration: 14s;
+  opacity: 0.8;
+  z-index: 2;
+}
+.parallax-layer.l3 {
+  background-image: url('../img/layer3.png');
+  mix-blend-mode: screen;
+  animation-duration: 8s;
+  z-index: 3;
+}
+.parallax-layer.l4 {
+  background-image: url('../img/layer4.png');
+  mix-blend-mode: screen;
+  animation-duration: 3.5s;
+  z-index: 4;
+}
 
 @keyframes scrollParallax {
   from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
+  to   { transform: translateX(-512px); }
 }
 
 /* ===== Nave (spritesheet nave.png: 704×256px, frames de 64×64px) ===== */
