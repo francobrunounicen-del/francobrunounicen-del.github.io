@@ -184,14 +184,14 @@
 
 /* Asteroide: spritesheet 768×96px, 8 frames de 96×96px.
    Se escala al 50% → background-size 384×48px, cada frame ocupa 48px.
-   Los primeros 3 frames (asteroide volando) se animan en loop.
+   Los primeros 2 frames (asteroide volando) se animan en loop.
    Al ser tomado, explota con los 8 frames completos. */
 .item.murcielago {
   background-image: url('../img/asteroide.png');
-  background-size: 384px 48px;  /* 768×0.5 = 384, 96×0.5 = 48 → un frame = 48×48px */
-  width:  48px;
-  height: 48px;
-  animation: asteroideVuela 0.5s steps(3) infinite;
+  background-size: 512px 64px;  /* 768×(2/3) = 512, 96×(2/3) = 64 → un frame = 64×64px */
+  width:  64px;
+  height: 64px;
+  animation: asteroideVuela 0.5s steps(2) infinite;
 }
 
 @keyframes spriteAnim {
@@ -199,19 +199,19 @@
   to   { background-position: -32px 0; }
 }
 
-/* Loop de vuelo: 3 frames × 48px = 144px */
+/* Loop de vuelo: 2 frames × 64px = 128px */
 @keyframes asteroideVuela {
   from { background-position: 0 0; }
-  to   { background-position: -144px 0; }
+  to   { background-position: -128px 0; }
 }
 
-/* Al ser tocado: explosión completa 8 frames × 48px = 384px */
+/* Al ser tocado: explosión completa 8 frames × 64px = 512px */
 .item.tomado {
   animation: asteroideExplota 0.5s steps(8) forwards;
 }
 @keyframes asteroideExplota {
   from { background-position: 0 0; }
-  to   { background-position: -384px 0; }
+  to   { background-position: -512px 0; }
 }
 /* ===== HUD (puntos y vidas en pantalla) ===== */
 #hud {

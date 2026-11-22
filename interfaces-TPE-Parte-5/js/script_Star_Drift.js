@@ -259,7 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (container) container.appendChild(el);
 
         // El asteroide (murcielago) se renderiza a 48×48; la moneda sigue siendo 32×32
-        const tamano = tipo === 'murcielago' ? 48 : 32;
+        const tamano = tipo === 'murcielago' ? 64 : 32;
 
         items.push({
             tipo,
