@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const HUECO_MIN = 125;      // Hueco mínimo entre tubos
     const MARGEN_Y = 18;        // Margen vertical para los límites de pantalla
     const HUECO_INICIAL = 190;  // Hueco inicial más amplio
-    const ANCHO_TUBO = 60;
+    const ANCHO_TUBO = 18;
     const PUNTOS_OBJETIVO = 50; // Meta de puntaje para ganar (Requisito 6)
 
     // Estado general del juego
@@ -258,12 +258,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (container) container.appendChild(el);
 
+        // El asteroide (murcielago) se renderiza a 48×48; la moneda sigue siendo 32×32
+        const tamano = tipo === 'murcielago' ? 48 : 32;
+
         items.push({
             tipo,
             x: ANCHO_JUEGO,
             y: posY,
-            w: 32,
-            h: 32,
+            w: tamano,
+            h: tamano,
             tomado: false,
             el,
             caja() {

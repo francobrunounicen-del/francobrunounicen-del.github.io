@@ -74,7 +74,7 @@
 /* Fila 4 (planeo/caída): 4 frames */
 #ship.cae    { animation: planeo   0.6s steps(4)  infinite; }
 /* Fila 3 (impulso/propulsión): 8 frames */
-#ship.impulso { animation: impulso 0.4s steps(8); }
+#ship.impulso { animation: impulso 0.4s steps(8) forwards; }
 /* Fila 1 (explosión): 5 frames */
 #ship.choca  { animation: explosion 0.5s steps(5); }
 
@@ -95,15 +95,79 @@
   to   { background-position: -385px 0; }
 }
 
-/* ===== Obstáculos (tubo superior e inferior) ===== */
+/* ===== Obstáculos: láseres de barrera energética ===== */
 .tubo-obstaculo {
   position: absolute;
-  width: 60px;
+  width: 18px;
   left: 0;
-  background: linear-gradient(to right, #2e7d32, #43a047, #2e7d32);
-  border: 2px solid #1b5e20;
+  background: linear-gradient(
+    to right,
+    transparent        0%,
+    rgba(0,229,255,.1) 15%,
+    rgba(0,229,255,.6) 35%,
+    #ffffff            50%,
+    rgba(0,229,255,.6) 65%,
+    rgba(0,229,255,.1) 85%,
+    transparent        100%
+  );
+  box-shadow:
+    0 0 6px  2px rgba(0, 229, 255, 1),
+    0 0 20px 6px rgba(0, 229, 255, 0.6),
+    0 0 40px 10px rgba(0, 229, 255, 0.2);
   box-sizing: border-box;
   z-index: 5;
+  animation: parpadeoLaser 1.8s ease-in-out infinite;
+}
+
+/* Zona de advertencia alrededor del láser */
+.tubo-obstaculo::before {
+  content: '';
+  position: absolute;
+  left: -20px;
+  width: 58px;
+  height: 100vh;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(255, 69, 0, 0.04),
+    transparent
+  );
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Nodo de energía en el extremo del láser */
+.tubo-obstaculo::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffffff 0%, #ff4500 35%, #ff0000 60%, transparent 75%);
+  box-shadow:
+    0 0 8px  4px rgba(255, 69, 0, 1),
+    0 0 20px 8px rgba(255, 69, 0, 0.6);
+  animation: pulsoNodo 0.9s ease-in-out infinite alternate;
+}
+
+.tubo-arriba::after { bottom: -14px; }
+.tubo-abajo::after  { top: -14px; }
+
+@keyframes parpadeoLaser {
+  0%   { opacity: 1;    filter: brightness(1); }
+  15%  { opacity: 0.6;  filter: brightness(0.7); }
+  17%  { opacity: 1;    filter: brightness(1.4); }
+  50%  { opacity: 0.85; filter: brightness(0.9); }
+  80%  { opacity: 0.5;  filter: brightness(0.6); }
+  82%  { opacity: 1;    filter: brightness(1.5); }
+  100% { opacity: 1;    filter: brightness(1); }
+}
+
+@keyframes pulsoNodo {
+  from { transform: translateX(-50%) scale(1);    box-shadow: 0 0 8px 4px rgba(255,69,0,1), 0 0 20px 8px rgba(255,69,0,0.6); }
+  to   { transform: translateX(-50%) scale(1.25); box-shadow: 0 0 20px 10px rgba(255,69,0,.4), 0 0 35px 14px rgba(255,69,0,.2); }
 }
 
 /* ===== Items animados ===== */
@@ -116,19 +180,38 @@
   pointer-events: none;
   animation: spriteAnim 0.6s steps(2) infinite;
 }
-.item.moneda    { background-image: url('../img/moneda.png'); }
+.item.moneda { background-image: url('../img/moneda.png'); }
+
+/* Asteroide: spritesheet 768×96px, 8 frames de 96×96px.
+   Se escala al 50% → background-size 384×48px, cada frame ocupa 48px.
+   Los primeros 3 frames (asteroide volando) se animan en loop.
+   Al ser tomado, explota con los 8 frames completos. */
 .item.murcielago {
-  background-image: url('../img/murcielago.png');
-  animation-duration: 0.4s;
+  background-image: url('../img/asteroide.png');
+  background-size: 384px 48px;  /* 768×0.5 = 384, 96×0.5 = 48 → un frame = 48×48px */
+  width:  48px;
+  height: 48px;
+  animation: asteroideVuela 0.5s steps(3) infinite;
 }
+
 @keyframes spriteAnim {
   from { background-position: 0 0; }
   to   { background-position: -32px 0; }
 }
-.item.tomado { animation: recoger 0.4s ease-out forwards; }
-@keyframes recoger {
-  from { transform: scale(1); opacity: 1; }
-  to   { transform: scale(2); opacity: 0; }
+
+/* Loop de vuelo: 3 frames × 48px = 144px */
+@keyframes asteroideVuela {
+  from { background-position: 0 0; }
+  to   { background-position: -144px 0; }
+}
+
+/* Al ser tocado: explosión completa 8 frames × 48px = 384px */
+.item.tomado {
+  animation: asteroideExplota 0.5s steps(8) forwards;
+}
+@keyframes asteroideExplota {
+  from { background-position: 0 0; }
+  to   { background-position: -384px 0; }
 }
 /* ===== HUD (puntos y vidas en pantalla) ===== */
 #hud {
