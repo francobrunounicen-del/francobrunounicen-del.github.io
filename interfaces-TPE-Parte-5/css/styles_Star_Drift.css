@@ -24,11 +24,15 @@
   animation-duration: 20s;
   z-index: 1;
 }
+/* Capa 2: Agujero negro neón cruzando lentamente */
 .parallax-layer.l2 {
+  width: 100%;
   background-image: url('../img/layer2.png');
-  mix-blend-mode: screen;
-  animation-duration: 14s;
-  opacity: 0.8;
+  background-repeat: no-repeat;
+  background-size: 160px 160px;
+  background-position: right 25%;
+  image-rendering: pixelated;
+  animation: pasarPlaneta 25s linear infinite;
   z-index: 2;
 }
 .parallax-layer.l3 {
@@ -47,6 +51,14 @@
 @keyframes scrollParallax {
   from { transform: translateX(0); }
   to   { transform: translateX(-512px); }
+}
+@keyframes scrollParallax2 {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-320px); }
+}
+@keyframes pasarPlaneta {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(-100%); }
 }
 
 /* ===== Nave (spritesheet nave.png: 888×168px, frames de 74×42px) ===== */
