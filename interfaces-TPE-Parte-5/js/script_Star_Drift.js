@@ -163,7 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function empezar() {
         limpiarEscena();
         juego.estado = 'jugando';
-        juego.vidas = 3;
+        juego.vidas = 10;
         juego.puntos = 0;
         tiempo = 0;
         vel = juego.velBase;

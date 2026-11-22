@@ -57,7 +57,6 @@
   background: url('../img/nave.png') no-repeat;
   background-size: 888px 168px;
   z-index: 10;
-  pointer-events: none;
 }
 /* Fila 2 (vuelo normal): 6 frames */
 #ship.vuela  { animation: vuelo    0.5s steps(6)  infinite; }

@@ -66,10 +66,10 @@
       <!-- REPRODUCTOR / MARCO DEL JUEGO -->
       <section class="game-container">
         <div class="game-screen" id="gameScreen">
-          <div id="game-container" class="game-container-area">
+          <div id="game-container" class="playfield">
             <div id="ship" class="ship vuela" style="display:none;"></div>
           </div>
-          <div id="hud" class="hud" style="display:none;">Puntos: <span id="score">0</span> | Vidas: <span id="vidas">3</span></div>
+          <div id="hud" class="hud" style="display:none;">Puntos: <span id="score">0</span> | Vidas: <span id="vidas">10</span></div>
           <div id="game-over-screen" class="game-over hidden">
             <h2>Game Over</h2>
             <p>Puntos: <span id="final-score">0</span></p>
@@ -364,5 +364,29 @@
   <!-- SCRIPT UNIFICADO -->
   <script src="js/script.js"></script>
   <script src="js/script_Star_Drift.js"></script>
+  <script>
+    // Ocultar portada y mostrar HUD al iniciar (sin tocar script_Star_Drift.js)
+    (function () {
+      var playBtn = document.getElementById('playBtn');
+      var cover = document.getElementById('coverImg');
+      var hud = document.getElementById('hud');
+      var ship = document.getElementById('ship');
+      if (playBtn) {
+        playBtn.addEventListener('click', function () {
+          if (cover) cover.style.display = 'none';
+          playBtn.style.display = 'none';
+          if (hud) hud.style.display = 'block';
+          if (ship) ship.style.display = 'block';
+        });
+      }
+      var comenzarBtn = document.getElementById('comenzarBtn');
+      if (comenzarBtn) {
+        comenzarBtn.addEventListener('click', function () {
+          if (cover) cover.style.display = 'none';
+          if (hud) hud.style.display = 'block';
+        });
+      }
+    })();
+  </script>
 </body>
 </html>
