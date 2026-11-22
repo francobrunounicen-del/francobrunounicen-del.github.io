@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const MARGEN_Y = 18;        // Margen vertical para los límites de pantalla
     const HUECO_INICIAL = 190;  // Hueco inicial más amplio
     const ANCHO_TUBO = 18;
-    const PUNTOS_OBJETIVO = 50; // Meta de puntaje para ganar (Requisito 6)
+    const PUNTOS_OBJETIVO = 100; // Meta de puntaje para ganar (Requisito 6)
 
     // Estado general del juego
     const juego = {
@@ -283,7 +283,10 @@ document.addEventListener('DOMContentLoaded', () => {
         vel = juego.velBase; // Velocidad constante (Requisito 1)
 
         if (nave.invulnerable > 0) {
-            nave.invulnerable -= dt;
+            nave.invulnerable = Math.max(0, nave.invulnerable - dt);
+            if (nave.invulnerable === 0 && nave.el) {
+                nave.el.classList.remove('invulnerable');
+            }
         }
 
         if (entrada.impulso) {
@@ -334,7 +337,7 @@ document.addEventListener('DOMContentLoaded', () => {
         timerMoneda -= dt;
         if (timerMoneda <= 0) {
             crearItem('moneda');
-            timerMoneda = azar(2.5, 4.5);
+            timerMoneda = azar(5.5, 10.5);
         }
 
         timerEnemigo -= dt;
@@ -354,6 +357,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (it.tipo === 'moneda') {
                     juego.puntos += 5;
+                    nave.invulnerable = 4; // 4 segundos de invulnerabilidad
+                    if (nave.el) nave.el.classList.add('invulnerable');
                 } else if (it.tipo === 'murcielago') {
                     // Elemento 2: resta puntos y frena la nave (NO termina el juego)
                     juego.puntos = Math.max(0, juego.puntos - 3);

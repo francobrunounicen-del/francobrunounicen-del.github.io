@@ -77,6 +77,10 @@
 #ship.impulso { animation: impulso 0.4s steps(8) forwards; }
 /* Fila 1 (explosión): 5 frames */
 #ship.choca  { animation: explosion 0.5s steps(5); }
+#ship.invulnerable {
+  opacity: 0.65;
+  filter: drop-shadow(0 0 8px #00e5ff);
+}
 
 @keyframes vuelo {
   from { background-position: -14px -42px; }
@@ -173,25 +177,46 @@
 /* ===== Items animados ===== */
 .item {
   position: absolute;
-  width: 32px; height: 32px;
+  width: 32px;
+  height: 32px;
   background-repeat: no-repeat;
   background-size: 32px 32px;
   z-index: 6;
   pointer-events: none;
   animation: spriteAnim 0.6s steps(2) infinite;
 }
-.item.moneda { background-image: url('../img/moneda.png'); }
 
-/* Asteroide: spritesheet 768×96px, 8 frames de 96×96px.
-   Se escala al 50% → background-size 384×48px, cada frame ocupa 48px.
-   Los primeros 2 frames (asteroide volando) se animan en loop.
-   Al ser tomado, explota con los 8 frames completos. */
+.item.moneda {
+  width: 40px;
+  height: 40px;
+  background-image: url('../img/moneda.png');
+  background-size: 120px 40px;
+  animation:
+          escudoFrames 1.45s steps(3) infinite
+}
+
 .item.murcielago {
   background-image: url('../img/asteroide.png');
   background-size: 512px 64px;  /* 768×(2/3) = 512, 96×(2/3) = 64 → un frame = 64×64px */
   width:  64px;
   height: 64px;
   animation: asteroideVuela 0.5s steps(2) infinite;
+}
+
+
+.item.tomado {
+  animation: recoger 0.4s ease-out forwards;
+}
+
+/* ===== Keyframes de ítems ===== */
+@keyframes escudoFrames {
+  from { background-position: 0 0; }
+  to   { background-position: -120px 0; }
+}
+
+@keyframes girarEscudo {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }
 
 @keyframes spriteAnim {
