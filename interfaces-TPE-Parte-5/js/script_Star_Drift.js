@@ -1,5 +1,43 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+    (function () {
+        var gc = document.getElementById('game-container');
+        if (!gc) return;
+        for (var i = 1; i <= 4; i++) {
+            var l = document.createElement('div');
+            l.className = 'parallax-layer l' + i;
+            gc.appendChild(l);
+        }
+    })();
+
+    (function () {
+        var playBtn = document.getElementById('playBtn');
+        var cover = document.getElementById('coverImg');
+        var hud = document.getElementById('hud');
+        var gameOver = document.getElementById('game-over-screen');
+        if (hud) hud.style.display = 'none';
+
+        function mostrarJuego() {
+            if (cover) cover.style.display = 'none';
+            if (playBtn) playBtn.style.display = 'none';
+            if (hud) hud.style.display = 'block';
+        }
+        if (playBtn) playBtn.addEventListener('click', mostrarJuego);
+        var comenzarBtn = document.getElementById('comenzarBtn');
+        if (comenzarBtn) comenzarBtn.addEventListener('click', mostrarJuego);
+
+        // Ocultar HUD cuando aparece Game Over
+        if (gameOver && hud) {
+            var obs = new MutationObserver(function () {
+                if (!gameOver.classList.contains('hidden')) {
+                    hud.style.display = 'none';
+                } else {
+                    hud.style.display = 'block';
+                }
+            });
+            obs.observe(gameOver, { attributes: true, attributeFilter: ['class'] });
+        }
+    })();
     // -------------------------------------------------------------------------
     // 1. CONSTANTES Y CONFIGURACIÓN GLOBAL
     // -------------------------------------------------------------------------
@@ -19,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Estado general del juego
     const juego = {
         estado: 'menu', // 'menu', 'jugando', 'fin'
-        vidas: 3,
+        vidas: 30,
         puntos: 0,
         velBase: 220
     };

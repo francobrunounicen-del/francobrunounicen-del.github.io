@@ -1,10 +1,3 @@
-/* ===================================================================
-   styles_Star_Drift.css
-   Estilos específicos del juego Star Drift.
-   Los estilos compartidos (.game-container, .game-screen, .game-cover,
-   .btn-play-overlay, .game-toolbar, etc.) ya están en styles.css.
-   =================================================================== */
-
 /* ===== Contenedor interno del área jugable ===== */
 #game-container {
   position: absolute;
@@ -90,16 +83,8 @@
   box-sizing: border-box;
   z-index: 5;
 }
-.tubo-obstaculo.tubo-arriba {
-  border-radius: 0 0 6px 6px;
-  border-bottom: 4px solid #a5d6a7;
-}
-.tubo-obstaculo.tubo-abajo {
-  border-radius: 6px 6px 0 0;
-  border-top: 4px solid #a5d6a7;
-}
 
-/* ===== Items animados (spritesheet 64×32px) ===== */
+/* ===== Items animados (spritesheet 64×32px) =====
 .item {
   position: absolute;
   width: 32px; height: 32px;
@@ -123,7 +108,7 @@
   from { transform: scale(1); opacity: 1; }
   to   { transform: scale(2); opacity: 0; }
 }
-
+*/
 /* ===== HUD (puntos y vidas en pantalla) ===== */
 #hud {
   position: absolute;
