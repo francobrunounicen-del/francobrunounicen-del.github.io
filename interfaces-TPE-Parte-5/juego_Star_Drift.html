@@ -364,29 +364,5 @@
   <!-- SCRIPT UNIFICADO -->
   <script src="js/script.js"></script>
   <script src="js/script_Star_Drift.js"></script>
-  <script>
-    // Ocultar portada y mostrar HUD al iniciar (sin tocar script_Star_Drift.js)
-    (function () {
-      var playBtn = document.getElementById('playBtn');
-      var cover = document.getElementById('coverImg');
-      var hud = document.getElementById('hud');
-      var ship = document.getElementById('ship');
-      if (playBtn) {
-        playBtn.addEventListener('click', function () {
-          if (cover) cover.style.display = 'none';
-          playBtn.style.display = 'none';
-          if (hud) hud.style.display = 'block';
-          if (ship) ship.style.display = 'block';
-        });
-      }
-      var comenzarBtn = document.getElementById('comenzarBtn');
-      if (comenzarBtn) {
-        comenzarBtn.addEventListener('click', function () {
-          if (cover) cover.style.display = 'none';
-          if (hud) hud.style.display = 'block';
-        });
-      }
-    })();
-  </script>
 </body>
 </html>

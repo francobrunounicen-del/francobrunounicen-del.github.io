@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const ALTO_JUEGO = (container && container.clientHeight) ? container.clientHeight : 500;
 
     const GRAVEDAD = 600;       // px/s² (reducida para que sea jugable)
-    const IMPULSO = 500;        // px/s (moderado)
+    const IMPULSO = 250;        // px/s (moderado)
     const HUECO_MIN = 125;      // Hueco mínimo entre tubos
     const MARGEN_Y = 18;        // Margen vertical para los límites de pantalla
     const HUECO_INICIAL = 190;  // Hueco inicial más amplio
