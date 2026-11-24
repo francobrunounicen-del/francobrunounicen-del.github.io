@@ -90,12 +90,13 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         hitbox() {
-            // Hitbox ajustada al cuerpo central de la nave (74x42)
+            // Hitbox ajustada al dibujo real de la nave dentro del frame de 74x42.
+            // El sprite tiene margenes transparentes: la nave se ve aprox. en x=14..56, y=11..34.
             return {
-                x: this.x + 10,
-                y: this.y + 8,
-                w: this.w - 20,
-                h: this.h - 16
+                x: this.x + 13,
+                y: this.y + 11,
+                w: 44,
+                h: 24
             };
         }
     };
@@ -273,8 +274,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (container) container.appendChild(el);
 
         // Tamaños reales de cada sprite (deben coincidir con el CSS)
-        const ancho = tipo === 'murcielago' ? 64 : 40;
-        const alto  = tipo === 'murcielago' ? 64 : 51;
+        const esAsteroide = tipo === 'murcielago';
+        const ancho = esAsteroide ? 64 : 40;
+        const alto  = esAsteroide ? 64 : 51;
+
+        // El asteroide tiene mucho margen transparente en su frame:
+        // la roca visible ocupa aprox. x=19..44, y=21..43 dentro del frame de 64x64.
+        const hitX = esAsteroide ? 18 : 0;
+        const hitY = esAsteroide ? 20 : 0;
+        const hitW = esAsteroide ? 28 : ancho;
+        const hitH = esAsteroide ? 24 : alto;
 
         items.push({
             tipo,
@@ -282,10 +291,19 @@ document.addEventListener('DOMContentLoaded', () => {
             y: posY,
             w: ancho,
             h: alto,
+            hitX,
+            hitY,
+            hitW,
+            hitH,
             tomado: false,
             el,
             caja() {
-                return { x: this.x, y: this.y, w: this.w, h: this.h };
+                return {
+                    x: this.x + this.hitX,
+                    y: this.y + this.hitY,
+                    w: this.hitW,
+                    h: this.hitH
+                };
             }
         });
     }
