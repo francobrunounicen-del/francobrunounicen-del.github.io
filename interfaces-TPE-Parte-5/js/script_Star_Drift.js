@@ -80,6 +80,9 @@ document.addEventListener('DOMContentLoaded', () => {
             juego.vidas--;
             this.invulnerable = 1.5; // 1.5 segundos de inmunidad tras golpe
             this.ponerEstado('choca');
+            // Feedback visual: la misma aura que usa el escudo, para que se entienda
+            // que la nave sigue protegida mientras dura la invulnerabilidad.
+            if (this.el) this.el.classList.add('invulnerable');
         },
 
         ponerEstado(nombre) {
@@ -189,6 +192,8 @@ document.addEventListener('DOMContentLoaded', () => {
         nave.y = ALTO_JUEGO / 2 - 32;
         nave.vy = 0;
         nave.invulnerable = 0;
+        // Limpiar el aura por si la partida anterior terminó durante la invulnerabilidad.
+        if (nave.el) nave.el.classList.remove('invulnerable');
         nave.ponerEstado('vuela');
         // Mostrar nave al iniciar el juego
         if (nave.el) nave.el.style.display = 'block';

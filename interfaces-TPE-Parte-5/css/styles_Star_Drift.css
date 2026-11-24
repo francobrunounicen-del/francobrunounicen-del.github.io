@@ -78,8 +78,10 @@
 /* Fila 1 (explosión): 5 frames */
 #ship.choca  { animation: explosion 0.5s steps(5); }
 #ship.invulnerable {
-  opacity: 0.65;
-  filter: drop-shadow(0 0 8px #00e5ff);
+  opacity: 0.85;
+  filter:
+    drop-shadow(0 0 2px #ffffff)
+    drop-shadow(0 0 8px #00e5ff);
 }
 
 @keyframes vuelo {
