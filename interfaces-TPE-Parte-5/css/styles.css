@@ -494,6 +494,8 @@ img.logo_footer { width: 5rem; height: auto; display: block; }
   background-color: var(--purple); color: white; border-radius: 0.6rem;
   padding: 0.85rem 1rem; font-size: 0.82rem; line-height: 1.5; font-weight: 500;
 }
+.info-text p { margin: 0; }
+.info-text p + p { margin-top: 0.6rem; }
 .instructions-list { list-style: none; display: flex; flex-direction: column; gap: 0.4rem; }
 .instructions-list li::before { content: "• "; font-weight: 900; }
 
