@@ -44,8 +44,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let tiempo = 0;
     let vel = juego.velBase;
     let distanciaTubo = 0;
-    let timerMoneda = 2.5;
-    let timerEnemigo = 4.5;
+    let timerEscudo = 2.5;
+    let timerAsteroide = 4.5;
 
     // -------------------------------------------------------------------------
     // 2. OBJETO NAVE / JUGADOR
@@ -186,8 +186,8 @@ document.addEventListener('DOMContentLoaded', () => {
         tiempo = 0;
         vel = juego.velBase;
         distanciaTubo = 150;
-        timerMoneda = 2.0;
-        timerEnemigo = 3.5;
+        timerEscudo = 2.0;
+        timerAsteroide = 3.5;
 
         nave.y = ALTO_JUEGO / 2 - 32;
         nave.vy = 0;
@@ -279,7 +279,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (container) container.appendChild(el);
 
         // Tamaños reales de cada sprite (deben coincidir con el CSS)
-        const esAsteroide = tipo === 'murcielago';
+        const esAsteroide = tipo === 'asteroide';
         const ancho = esAsteroide ? 64 : 40;
         const alto  = esAsteroide ? 64 : 51;
 
@@ -372,16 +372,16 @@ document.addEventListener('DOMContentLoaded', () => {
             t.elAbajo.remove();
         }
 
-        timerMoneda -= dt;
-        if (timerMoneda <= 0) {
-            crearItem('moneda');
-            timerMoneda = azar(5.5, 10.5);
+        timerEscudo -= dt;
+        if (timerEscudo <= 0) {
+            crearItem('escudo');
+            timerEscudo = azar(5.5, 10.5);
         }
 
-        timerEnemigo -= dt;
-        if (timerEnemigo <= 0) {
-            crearItem('murcielago');
-            timerEnemigo = azar(3.5, 6.0);
+        timerAsteroide -= dt;
+        if (timerAsteroide <= 0) {
+            crearItem('asteroide');
+            timerAsteroide = azar(3.5, 6.0);
         }
 
         for (let i = items.length - 1; i >= 0; i--) {
@@ -393,11 +393,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 it.tomado = true;
                 it.el.classList.add('tomado');
 
-                if (it.tipo === 'moneda') {
+                if (it.tipo === 'escudo') {
                     juego.puntos += 5;
                     nave.invulnerable = 4; // 4 segundos de invulnerabilidad
                     if (nave.el) nave.el.classList.add('invulnerable');
-                } else if (it.tipo === 'murcielago') {
+                } else if (it.tipo === 'asteroide') {
                     // Elemento 2: resta puntos y frena la nave (NO termina el juego)
                     juego.puntos = Math.max(0, juego.puntos - 3);
                     nave.vy = Math.max(nave.vy, 0);
