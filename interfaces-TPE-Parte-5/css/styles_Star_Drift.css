@@ -238,10 +238,20 @@
   to   { color: #ffffff; text-shadow: none; }
 }
 
+/* Al sumar puntos con un escudo, el marcador parpadea en verde */
+#score.sube {
+  animation: mostrarSubida 0.5s ease-out;
+}
+@keyframes mostrarSubida {
+  from { color: #4ade80; text-shadow: 0 0 10px #4ade80; }
+  to   { color: #ffffff; text-shadow: none; }
+}
+
 /* ===== HUD (puntos y vidas en pantalla) ===== */
 #hud {
   position: absolute;
-  top: 10px; left: 10px;
+  /* A la derecha: la nave siempre está en x=100 y no queda tapada. */
+  top: 10px; right: 10px;
   color: #fff;
   font-family: 'Press Start 2P', monospace;
   font-size: 12px;

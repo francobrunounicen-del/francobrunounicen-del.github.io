@@ -51,6 +51,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const gameOverTitle = gameOverScreen ? gameOverScreen.querySelector('h2') : null;
     const finalScoreSpan = document.getElementById('final-score');
     const scoreSpan = document.getElementById('score');
+    const metaSpan = document.getElementById('meta');
+    if (metaSpan) metaSpan.textContent = PUNTOS_OBJETIVO; // la meta se define una sola vez, en el JS
     const vidasSpan = document.getElementById('vidas');
     const hud = document.getElementById('hud');
     const cover = document.getElementById('coverImg');
@@ -252,6 +254,15 @@ document.addEventListener('DOMContentLoaded', () => {
         return Math.random() * (max - min) + min;
     }
 
+    // Hace parpadear el marcador. Se quitan las dos clases para que no se
+    // mezclen animaciones si el jugador suma y resta puntos seguidos.
+    function destacarMarcador(clase) {
+        if (!scoreSpan) return;
+        scoreSpan.classList.remove('baja', 'sube');
+        void scoreSpan.offsetWidth; // reinicia la animación CSS
+        scoreSpan.classList.add(clase);
+    }
+
     function choca(a, b) {
         return a.x < b.x + b.w &&
                a.x + a.w > b.x &&
@@ -423,20 +434,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     juego.puntos += 5;
                     nave.invulnerable = 4; // 4 segundos de invulnerabilidad
                     if (nave.el) nave.el.classList.add('invulnerable');
+                    destacarMarcador('sube'); // el marcador se pone verde
                 } else if (it.tipo === 'asteroide') {
                     // Elemento 2: resta puntos y frena la nave (NO termina el juego)
                     juego.puntos = Math.max(0, juego.puntos - 3);
                     nave.vy = Math.max(nave.vy, 0); // corta el impulso hacia arriba
                     factorFreno = FRENO_ASTEREOIDE; // y frena el avance ~0,6s
 
-                    // Feedback: el marcador se pone rojo un instante para que se
-                    // note la bajada de puntos. Se reinicia la animación por si
-                    // el jugador toca otro asteroide poco después.
-                    if (scoreSpan) {
-                        scoreSpan.classList.remove('baja');
-                        void scoreSpan.offsetWidth;
-                        scoreSpan.classList.add('baja');
-                    }
+                    destacarMarcador('baja'); // el marcador se pone rojo
                 }
 
                 // La duración se define una sola vez y se aplica al elemento.
