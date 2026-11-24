@@ -144,8 +144,10 @@
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  width: 28px;
-  height: 28px;
+  /* Tamaño intermedio: más grande que la barra (18px) pero sobresale solo
+     6px al hueco, en vez de los 14px del nodo original. */
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   background: radial-gradient(circle, #ffffff 0%, #ff4500 35%, #ff0000 60%, transparent 75%);
   box-shadow:
@@ -154,8 +156,8 @@
   animation: pulsoNodo 0.9s ease-in-out infinite alternate;
 }
 
-.tubo-arriba::after { bottom: -14px; }
-.tubo-abajo::after  { top: -14px; }
+.tubo-arriba::after { bottom: -6px; }
+.tubo-abajo::after  { top: -6px; }
 
 @keyframes parpadeoLaser {
   0%   { opacity: 1;    filter: brightness(1); }

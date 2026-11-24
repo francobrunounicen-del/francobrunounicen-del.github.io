@@ -144,17 +144,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ADAPTACION (Requisito 3): la velocidad de cada capa depende de la velocidad del juego.
-    // Duracion = ancho del tile / (velocidad del juego * factor de profundidad).
+    // Duracion = distancia / (velocidad del juego * factor de profundidad).
     function ajustarVelocidadParallax() {
         const capas = document.querySelectorAll('.parallax-layer');
         const FACTORES = [0.1, 0.25, 0.5, 1]; // l1 lejos ... l4 cerca
         const ANCHOS_TILE = [512, 160, 512, 512];
         capas.forEach((capa, i) => {
-            if (i === 1) return; // el agujero negro (l2) tiene su propia animacion
-            const duracion = ANCHOS_TILE[i] / (juego.velBase * FACTORES[i]);
+            // l2 (agujero negro) cruza 2 anchos de pantalla; las demas, 1 tile.
+            const distancia = i === 1 ? ANCHO_JUEGO * 2 : ANCHOS_TILE[i];
+            const duracion = distancia / (vel * FACTORES[i]);
             capa.style.animationDuration = duracion + 's';
         });
     }
+
+    // Si cambia el tamaño del cuadro, l2 debe recalcular su distancia.
+    window.addEventListener('resize', () => ajustarVelocidadParallax());
+    document.addEventListener('fullscreenchange', () => ajustarVelocidadParallax());
 
     // -------------------------------------------------------------------------
     // 4. CAPTURA DE ENTRADAS (Teclado y Clic)
