@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let tubos = [];
     let items = [];
     let tiempo = 0;
-    let vel = juego.velBase;
+    const vel = juego.velBase; // Velocidad constante (Requisito 1)
     let distanciaTubo = 0;
     let timerEscudo = 2.5;
     let timerAsteroide = 4.5;
@@ -65,7 +65,6 @@ document.addEventListener('DOMContentLoaded', () => {
         x: 100,
         y: ALTO_JUEGO / 2,
         vy: 0,
-        w: 74, // Coincide con el ancho del frame de nave.png
         h: 42, // Coincide con el alto del frame de nave.png
         invulnerable: 0,
         el: document.getElementById('ship'),
@@ -210,7 +209,6 @@ document.addEventListener('DOMContentLoaded', () => {
         juego.vidas = 10;
         juego.puntos = 0;
         tiempo = 0;
-        vel = juego.velBase;
         distanciaTubo = 150;
         timerEscudo = 2.0;
         timerAsteroide = 3.5;
@@ -279,8 +277,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         tubos.push({
             x: ANCHO_JUEGO,
-            centro,
-            hueco,
             superado: false,
             elArriba,
             elAbajo,
@@ -320,8 +316,6 @@ document.addEventListener('DOMContentLoaded', () => {
             tipo,
             x: ANCHO_JUEGO,
             y: posY,
-            w: ancho,
-            h: alto,
             hitX,
             hitY,
             hitW,
@@ -344,7 +338,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // -------------------------------------------------------------------------
     function actualizar(dt) {
         tiempo += dt;
-        vel = juego.velBase; // Velocidad constante (Requisito 1)
 
         if (nave.invulnerable > 0) {
             nave.invulnerable = Math.max(0, nave.invulnerable - dt);
@@ -355,7 +348,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (entrada.impulso) {
             nave.impulsar();
-            entrada.impulso = false;
         }
 
         nave.vy += GRAVEDAD * dt;
