@@ -188,11 +188,11 @@
 
 .item.moneda {
   width: 40px;
-  height: 40px;
+  height: 51px;
   background-image: url('../img/moneda.png');
-  background-size: 120px 40px;
-  animation:
-          escudoFrames 1.45s steps(3) infinite
+  /* Spritesheet: 3 frames de 528×672 → 3 frames de 40×51 (mantiene la proporción) */
+  background-size: 120px 51px;
+  animation: escudoFrames 1.45s steps(3) infinite;
 }
 
 .item.murcielago {
@@ -203,10 +203,6 @@
   animation: asteroideVuela 0.5s steps(2) infinite;
 }
 
-
-.item.tomado {
-  animation: recoger 0.4s ease-out forwards;
-}
 
 /* ===== Keyframes de ítems ===== */
 @keyframes escudoFrames {
@@ -230,8 +226,17 @@
   to   { background-position: -128px 0; }
 }
 
-/* Al ser tocado: explosión completa 8 frames × 64px = 512px */
-.item.tomado {
+/* Al ser tocado, cada ítem usa su propia animación */
+.item.moneda.tomado {
+  animation: recoger 0.4s ease-out forwards;
+}
+@keyframes recoger {
+  from { transform: scale(1);   opacity: 1; }
+  to   { transform: scale(1.6); opacity: 0; }
+}
+
+/* Asteroide: explosión completa 8 frames × 64px = 512px */
+.item.murcielago.tomado {
   animation: asteroideExplota 0.5s steps(8) forwards;
 }
 @keyframes asteroideExplota {

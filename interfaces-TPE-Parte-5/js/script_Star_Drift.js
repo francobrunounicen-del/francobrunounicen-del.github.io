@@ -272,15 +272,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (container) container.appendChild(el);
 
-        // El asteroide (murcielago) se renderiza a 48×48; la moneda sigue siendo 32×32
-        const tamano = tipo === 'murcielago' ? 64 : 32;
+        // Tamaños reales de cada sprite (deben coincidir con el CSS)
+        const ancho = tipo === 'murcielago' ? 64 : 40;
+        const alto  = tipo === 'murcielago' ? 64 : 51;
 
         items.push({
             tipo,
             x: ANCHO_JUEGO,
             y: posY,
-            w: tamano,
-            h: tamano,
+            w: ancho,
+            h: alto,
             tomado: false,
             el,
             caja() {
