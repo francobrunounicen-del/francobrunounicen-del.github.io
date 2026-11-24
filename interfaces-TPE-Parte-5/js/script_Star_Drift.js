@@ -263,7 +263,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // 6. GENERACIÓN DE OBSTÁCULOS (TUBOS) E ÍTEMS ANIMADOS
     // -------------------------------------------------------------------------
     function crearTubo() {
-        const hueco = Math.max(HUECO_MIN, HUECO_INICIAL - tiempo * 3.5) + azar(-10, 10);
+        // El hueco baja de 190 a 125 px en 50s: (190 - 125) / 50 = 1,3 px/s.
+        // El azar es chico para que la tendencia se note entre barrera y barrera.
+        const hueco = Math.max(HUECO_MIN, HUECO_INICIAL - tiempo * 1.3) + azar(-2, 2);
         const margen = 60;
         const centro = azar(margen + hueco / 2, ALTO_JUEGO - margen - hueco / 2);
 
