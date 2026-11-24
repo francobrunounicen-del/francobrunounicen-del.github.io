@@ -68,9 +68,9 @@
 /* Fila 2 (vuelo normal): 6 frames */
 #ship.vuela  { animation: vuelo    0.5s steps(6)  infinite; }
 /* Fila 4 (planeo/caída): 4 frames */
-#ship.cae    { animation: planeo   0.6s steps(4)  infinite; }
+#ship.cae    { animation: planeo   0.6s steps(4)  infinite; transform: rotate(8deg); }
 /* Fila 3 (impulso/propulsión): 8 frames */
-#ship.impulso { animation: impulso 0.4s steps(8) forwards; }
+#ship.impulso { animation: impulso 0.4s steps(8) forwards; transform: rotate(-8deg); }
 /* Fila 1 (explosión): 5 frames */
 #ship.choca  { animation: explosion 0.5s steps(5); }
 #ship.invulnerable {
