@@ -427,9 +427,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Elemento 2: resta puntos y frena la nave (NO termina el juego)
                     juego.puntos = Math.max(0, juego.puntos - 3);
                     nave.vy = Math.max(nave.vy, 0);
+
+                    // Feedback: el marcador se pone rojo un instante para que se
+                    // note la bajada de puntos. Se reinicia la animación por si
+                    // el jugador toca otro asteroide poco después.
+                    if (scoreSpan) {
+                        scoreSpan.classList.remove('baja');
+                        void scoreSpan.offsetWidth;
+                        scoreSpan.classList.add('baja');
+                    }
                 }
 
-                setTimeout(() => { if (it.el) it.el.remove(); }, 400);
+                // Cada animación dura distinto: escudo 0.4s, asteroide 0.5s.
+                const duracionAnim = it.tipo === 'asteroide' ? 500 : 400;
+                setTimeout(() => { if (it.el) it.el.remove(); }, duracionAnim);
                 items.splice(i, 1);
                 continue;
             }

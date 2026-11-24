@@ -243,6 +243,16 @@
   from { background-position: 0 0; }
   to   { background-position: -512px 0; }
 }
+
+/* Al restar puntos con un asteroide, el marcador parpadea en rojo */
+#score.baja {
+  animation: mostrarBajada 0.5s ease-out;
+}
+@keyframes mostrarBajada {
+  from { color: #ff5252; text-shadow: 0 0 10px #ff5252; }
+  to   { color: #ffffff; text-shadow: none; }
+}
+
 /* ===== HUD (puntos y vidas en pantalla) ===== */
 #hud {
   position: absolute;
