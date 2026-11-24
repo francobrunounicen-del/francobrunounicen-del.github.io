@@ -6,8 +6,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('game-container');
     const gameScreen = document.getElementById('gameScreen');
 
-    const ANCHO_JUEGO = (container && container.clientWidth) ? container.clientWidth : 800;
-    const ALTO_JUEGO = (container && container.clientHeight) ? container.clientHeight : 500;
+    // El tamaño se mide al cargar y se vuelve a medir si cambia el tamaño de la
+    // ventana o se entra/sale de pantalla completa. Por eso son 'let' y no 'const'.
+    let ANCHO_JUEGO = 800;
+    let ALTO_JUEGO = 500;
+
+    function medirCampo() {
+        ANCHO_JUEGO = (container && container.clientWidth) ? container.clientWidth : 800;
+        ALTO_JUEGO = (container && container.clientHeight) ? container.clientHeight : 500;
+    }
+    medirCampo();
+
+    window.addEventListener('resize', medirCampo);
+    document.addEventListener('fullscreenchange', medirCampo);
 
     const GRAVEDAD = 600;       // px/s² (reducida para que sea jugable)
     const IMPULSO = 250;        // px/s (moderado)
@@ -149,10 +160,25 @@ document.addEventListener('DOMContentLoaded', () => {
     // 4. CAPTURA DE ENTRADAS (Teclado y Clic)
     // -------------------------------------------------------------------------
     document.addEventListener('keydown', (e) => {
-        if (e.code === 'Space') {
-            e.preventDefault();
-            if (!e.repeat) entrada.impulso = true;
-        }
+        if (e.code !== 'Space') return;
+
+        // Si el usuario está escribiendo en un campo, el espacio debe escribir
+        // un espacio normal y no impulsar la nave.
+        const activo = document.activeElement;
+        const escribiendo = activo && (
+            activo.tagName === 'INPUT' ||
+            activo.tagName === 'TEXTAREA' ||
+            activo.tagName === 'SELECT' ||
+            activo.isContentEditable
+        );
+        if (escribiendo) return;
+
+        // Fuera de la partida tampoco interceptamos el espacio (así, por
+        // ejemplo, funciona el botón de Play cuando tiene el foco).
+        if (juego.estado !== 'jugando') return;
+
+        e.preventDefault(); // evita que la página se desplace
+        if (!e.repeat) entrada.impulso = true;
     });
 
     if (gameScreen) {
