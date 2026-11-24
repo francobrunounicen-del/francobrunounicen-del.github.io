@@ -27,6 +27,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const HUECO_INICIAL = 190;  // Hueco inicial más amplio
     const ANCHO_TUBO = 18;
     const PUNTOS_OBJETIVO = 100; // Meta de puntaje para ganar (Requisito 6)
+    const VELOCIDAD_ITEM = 1.15;       // los ítems avanzan 15% más rápido que el fondo
+    const REBOTE_SUELO = -IMPULSO;     // velocidad vertical al tocar el suelo
+    const FRENO_ASTEREOIDE = 0.7;      // ritmo reducido al chocar un asteroide
+    const RECUPERACION_FRENO = 0.5;    // cuánto se recupera ese ritmo por segundo
+    const DURACION_ESCUDO = 0.4;       // segundos de la animación al recogerlo
+    const DURACION_ASTEREOIDE = 0.5;   // segundos de la explosión del asteroide
 
     // Estado general del juego
     const juego = {
@@ -343,21 +349,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // -------------------------------------------------------------------------
     // 7. ACTUALIZACIÓN DE FÍSICA Y COLISIONES
     // -------------------------------------------------------------------------
-    function actualizar(dt) {
-        tiempo += dt;
-
-        // El freno del asteroide se recupera solo en menos de un segundo.
-        if (factorFreno < 1) {
-            factorFreno = Math.min(1, factorFreno + dt * 0.5);
-        }
-
-        if (nave.invulnerable > 0) {
-            nave.invulnerable = Math.max(0, nave.invulnerable - dt);
-            if (nave.invulnerable === 0 && nave.el) {
-                nave.el.classList.remove('invulnerable');
-            }
-        }
-
+    function moverNave(dt) {
         if (entrada.impulso) {
             nave.impulsar();
         }
@@ -372,14 +364,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (nave.y > ALTO_JUEGO - nave.h + MARGEN_Y) {
             nave.y = ALTO_JUEGO - nave.h + MARGEN_Y;
-            nave.vy = -250;
+            nave.vy = REBOTE_SUELO;
             nave.chocar();
         }
+    }
 
+    function revisarTubos(dt, cajaNave) {
         distanciaTubo -= vel * factorFreno * dt;
         if (distanciaTubo <= 0) crearTubo();
-
-        const cajaNave = nave.hitbox();
 
         for (const t of tubos) {
             t.x -= vel * factorFreno * dt;
@@ -401,7 +393,9 @@ document.addEventListener('DOMContentLoaded', () => {
             t.elArriba.remove();
             t.elAbajo.remove();
         }
+    }
 
+    function revisarItems(dt, cajaNave) {
         timerEscudo -= dt;
         if (timerEscudo <= 0) {
             crearItem('escudo');
@@ -416,7 +410,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         for (let i = items.length - 1; i >= 0; i--) {
             const it = items[i];
-            it.x -= (vel * factorFreno * 1.15) * dt;
+            it.x -= (vel * factorFreno * VELOCIDAD_ITEM) * dt;
             it.el.style.left = it.x + 'px';
 
             if (!it.tomado && choca(cajaNave, it.caja())) {
@@ -431,7 +425,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Elemento 2: resta puntos y frena la nave (NO termina el juego)
                     juego.puntos = Math.max(0, juego.puntos - 3);
                     nave.vy = Math.max(nave.vy, 0); // corta el impulso hacia arriba
-                    factorFreno = 0.7;              // y frena el avance ~0,6s
+                    factorFreno = FRENO_ASTEREOIDE; // y frena el avance ~0,6s
 
                     // Feedback: el marcador se pone rojo un instante para que se
                     // note la bajada de puntos. Se reinicia la animación por si
@@ -443,9 +437,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
 
-                // Cada animación dura distinto: escudo 0.4s, asteroide 0.5s.
-                const duracionAnim = it.tipo === 'asteroide' ? 500 : 400;
-                setTimeout(() => { if (it.el) it.el.remove(); }, duracionAnim);
+                // La duración se define una sola vez y se aplica al elemento.
+                const duracion = it.tipo === 'asteroide' ? DURACION_ASTEREOIDE : DURACION_ESCUDO;
+                it.el.style.animationDuration = duracion + 's';
+                setTimeout(() => { if (it.el) it.el.remove(); }, duracion * 1000);
                 items.splice(i, 1);
                 continue;
             }
@@ -455,6 +450,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 items.splice(i, 1);
             }
         }
+    }
+
+    function actualizar(dt) {
+        tiempo += dt;
+
+        // El freno del asteroide se recupera solo en menos de un segundo.
+        if (factorFreno < 1) {
+            factorFreno = Math.min(1, factorFreno + dt * RECUPERACION_FRENO);
+        }
+
+        if (nave.invulnerable > 0) {
+            nave.invulnerable = Math.max(0, nave.invulnerable - dt);
+            if (nave.invulnerable === 0 && nave.el) {
+                nave.el.classList.remove('invulnerable');
+            }
+        }
+
+        moverNave(dt);
+
+        const cajaNave = nave.hitbox();
+        revisarTubos(dt, cajaNave);
+        revisarItems(dt, cajaNave);
 
         if (juego.vidas <= 0) {
             finalizarJuego('¡NAVE DESTRUIDA!');

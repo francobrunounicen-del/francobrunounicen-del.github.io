@@ -210,7 +210,8 @@
   to   { background-position: -128px 0; }
 }
 
-/* Al ser tocado, cada ítem usa su propia animación */
+/* Al ser tocado, cada ítem usa su propia animación.
+   La duración la aplica el JS (DURACION_ESCUDO / DURACION_ASTEREOIDE). */
 .item.escudo.tomado {
   animation: recoger 0.4s ease-out forwards;
 }
