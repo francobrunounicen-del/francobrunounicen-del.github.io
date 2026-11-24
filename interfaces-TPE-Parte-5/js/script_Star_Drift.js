@@ -54,6 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let items = [];
     let tiempo = 0;
     const vel = juego.velBase; // Velocidad constante (Requisito 1)
+    let factorFreno = 1;       // 1 = ritmo normal; baja al chocar un asteroide
     let distanciaTubo = 0;
     let timerEscudo = 2.5;
     let timerAsteroide = 4.5;
@@ -209,6 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
         juego.vidas = 10;
         juego.puntos = 0;
         tiempo = 0;
+        factorFreno = 1;
         distanciaTubo = 150;
         timerEscudo = 2.0;
         timerAsteroide = 3.5;
@@ -339,6 +341,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function actualizar(dt) {
         tiempo += dt;
 
+        // El freno del asteroide se recupera solo en menos de un segundo.
+        if (factorFreno < 1) {
+            factorFreno = Math.min(1, factorFreno + dt * 0.5);
+        }
+
         if (nave.invulnerable > 0) {
             nave.invulnerable = Math.max(0, nave.invulnerable - dt);
             if (nave.invulnerable === 0 && nave.el) {
@@ -364,13 +371,13 @@ document.addEventListener('DOMContentLoaded', () => {
             nave.chocar();
         }
 
-        distanciaTubo -= vel * dt;
+        distanciaTubo -= vel * factorFreno * dt;
         if (distanciaTubo <= 0) crearTubo();
 
         const cajaNave = nave.hitbox();
 
         for (const t of tubos) {
-            t.x -= vel * dt;
+            t.x -= vel * factorFreno * dt;
             t.elArriba.style.left = t.x + 'px';
             t.elAbajo.style.left = t.x + 'px';
 
@@ -404,7 +411,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         for (let i = items.length - 1; i >= 0; i--) {
             const it = items[i];
-            it.x -= (vel * 1.15) * dt;
+            it.x -= (vel * factorFreno * 1.15) * dt;
             it.el.style.left = it.x + 'px';
 
             if (!it.tomado && choca(cajaNave, it.caja())) {
@@ -418,7 +425,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else if (it.tipo === 'asteroide') {
                     // Elemento 2: resta puntos y frena la nave (NO termina el juego)
                     juego.puntos = Math.max(0, juego.puntos - 3);
-                    nave.vy = Math.max(nave.vy, 0);
+                    nave.vy = Math.max(nave.vy, 0); // corta el impulso hacia arriba
+                    factorFreno = 0.7;              // y frena el avance ~0,6s
 
                     // Feedback: el marcador se pone rojo un instante para que se
                     // note la bajada de puntos. Se reinicia la animación por si
