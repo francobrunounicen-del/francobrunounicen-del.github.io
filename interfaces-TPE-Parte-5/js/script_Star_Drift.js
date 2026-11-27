@@ -28,6 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const ANCHO_TUBO = 18;
     const PUNTOS_OBJETIVO = 100; // Meta de puntaje para ganar (Requisito 6)
     const VELOCIDAD_ITEM = 1.15;       // los ítems avanzan 15% más rápido que el fondo
+    const VELOCIDAD_ITEM2 = -2;
     const REBOTE_SUELO = -IMPULSO;     // velocidad vertical al tocar el suelo
     const FRENO_ASTEREOIDE = 0.7;      // ritmo reducido al chocar un asteroide
     const RECUPERACION_FRENO = 0.5;    // cuánto se recupera ese ritmo por segundo
@@ -193,6 +194,56 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault(); // evita que la página se desplace
         if (!e.repeat) entrada.impulso = true;
     });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.code !== 'Enter') return;
+        if (juego.estado !== 'jugando') return;
+        e.preventDefault(); // evita que la página se desplace
+        if (!e.repeat) disparo('asteroide2');
+    });
+
+    function disparo(tipo) {
+        const el = document.createElement('div');
+        el.className = 'item ' + tipo;
+        const posY = nave.y;
+        const posX = nave.x+75;
+        el.style.left = ANCHO_JUEGO + 'px';
+        el.style.top = posY + 'px';
+
+        if (container) container.appendChild(el);
+
+        // Tamaños reales de cada sprite (deben coincidir con el CSS)
+        const esAsteroide2 = tipo === 'asteroide2';
+        const ancho = esAsteroide2 ? 64 : 40;
+        const alto  = esAsteroide2 ? 64 : 51;
+
+        // El asteroide tiene mucho margen transparente en su frame:
+        // la roca visible ocupa aprox. x=19..44, y=21..43 dentro del frame de 64x64.
+        const hitX = esAsteroide2 ? 18 : 0;
+        const hitY = esAsteroide2 ? 20 : 0;
+        const hitW = esAsteroide2 ? 28 : ancho;
+        const hitH = esAsteroide2 ? 24 : alto;
+
+        items.push({
+            tipo,
+            x: posX,
+            y: posY,
+            hitX,
+            hitY,
+            hitW,
+            hitH,
+            tomado: false,
+            el,
+            caja() {
+                return {
+                    x: this.x + this.hitX,
+                    y: this.y + this.hitY,
+                    w: this.hitW,
+                    h: this.hitH
+                };
+            }
+        });
+    }
 
     if (gameScreen) {
         gameScreen.addEventListener('mousedown', (e) => {
@@ -424,8 +475,10 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let i = items.length - 1; i >= 0; i--) {
             const it = items[i];
             it.x -= (vel * factorFreno * VELOCIDAD_ITEM) * dt;
+            if(it.tipo==='asteroide2'){
+                it.x -= -2-(vel * factorFreno * VELOCIDAD_ITEM) * dt;
+            }
             it.el.style.left = it.x + 'px';
-
             if (!it.tomado && choca(cajaNave, it.caja())) {
                 it.tomado = true;
                 it.el.classList.add('tomado');
@@ -451,7 +504,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 items.splice(i, 1);
                 continue;
             }
+            for(let k = items.length - 1; k >= 0; k--){
+                if(choca(items[k].caja(), it.caja()) && k!==i && it.tipo === 'asteroide') {
+                    it.el.remove();
+                }
 
+            }
             if (it.x < -50) {
                 it.el.remove();
                 items.splice(i, 1);

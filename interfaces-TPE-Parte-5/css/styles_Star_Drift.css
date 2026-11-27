@@ -194,9 +194,18 @@
   background-size: 512px 64px;  /* 768×(2/3) = 512, 96×(2/3) = 64 → un frame = 64×64px */
   width:  64px;
   height: 64px;
-  animation: asteroideVuela 0.5s steps(2) infinite;
+  animation: asteroideVuela 5s steps(2) infinite;
 }
 
+.item.asteroide2 {
+  background-image: url('../img/asteroide.png');
+  background-size: 512px 64px;  /* 768×(2/3) = 512, 96×(2/3) = 64 → un frame = 64×64px */
+  width:  64px;
+  height: 64px;
+  opacity: 0.7;
+
+  animation: asteroideVuela -0.5s steps(2) infinite;
+}
 
 /* ===== Keyframes de ítems ===== */
 @keyframes escudoFrames {
